@@ -1,0 +1,7 @@
+# Bacon configuration for watching contracts directory
+
+[jobs.docker-up]
+command = ["sh", "-c", "docker compose down && docker compose up"]
+watch = ["./src"]
+need_stdout = true
+on_change_strategy = "kill_then_restart"
