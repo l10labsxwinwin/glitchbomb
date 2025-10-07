@@ -7,3 +7,7 @@ pub mod models;
 pub mod tests {
     mod test_world;
 }
+
+pub mod glitchbomb {
+    mod models;
+}
