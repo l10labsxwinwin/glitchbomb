@@ -81,7 +81,7 @@ enum GamePackState {
 }
 
 #[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
-enum GameState {
+pub enum GameState {
 	#[default]
     New,
     Level,

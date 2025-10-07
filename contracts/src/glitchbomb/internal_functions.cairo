@@ -1,4 +1,4 @@
-use crate::glitchbomb::models::{Game, OrbEffect};
+use crate::glitchbomb::models::{Game, OrbEffect, GameState};
 
 #[generate_trait]
 impl GameImpl of GameTrait {
@@ -71,7 +71,8 @@ impl GameImpl of GameTrait {
     }
 
     fn handle_bomb_immunity_effect(ref self: Game, turns: u32) {
-        // TODO: implement
+        self.bomb_immunity_turns += turns
+        // maybe we add turns + 1 depending on immunity impl.
     }
 
     fn handle_point_rewind_effect(ref self: Game) {
@@ -107,6 +108,6 @@ impl GameImpl of GameTrait {
     }
 
     fn handle_five_or_die_effect(ref self: Game) {
-        // TODO: implement
+        self.game_state = GameState::FiveOrDiePhase;
     }
 }
