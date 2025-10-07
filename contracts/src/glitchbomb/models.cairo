@@ -44,11 +44,30 @@ struct Game {
     glitch_chips: u32,
     moonrocks_spent: u32,
     moonrocks_earned: u32,
-    // all_orbs: [Orb; 21],
-    // sale_orbs_indices: Vec<usize>,
-    // pullable_orb_effects: Vec<OrbEffect>,
-    // pulled_orbs_effects: Vec<OrbEffect>,
+    orbs_for_sale_ids: [u32; 6],
+    pullable_orb_effects: Array<OrbEffect>,
+    pulled_orbs_effects: Array<OrbEffect>,
     bomb_immunity_turns: u32,
+}
+
+#[derive(Drop, Serde, Debug, Introspect, DojoStore)]
+#[dojo::model]
+struct Orb {
+	#[key]
+	player_id: ContractAddress,
+	#[key]
+	gamepack_id: u32,
+	#[key]
+	game_id: u32,
+	#[key]
+	orb_id: u32, // range = unique orbs in game (0-20)
+
+    effect: OrbEffect,
+    rarity: OrbRarity,
+    count: u32,
+    is_buyable: bool,
+    base_price: u32,
+    current_price: u32,
 }
 
 #[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
@@ -72,7 +91,26 @@ enum GameState {
 }
 
 #[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
-enum Orb {
+enum OrbEffect {
 	#[default]
-	DummyOrb,
+	Empty,
+    Point: u32,
+    PointPerOrbRemaining: u32,
+    PointPerBombPulled: u32,
+    GlitchChips: u32,
+    Moonrocks: u32,
+    Health: u32,
+    Bomb: u32,
+    Multiplier: u32,
+    BombImmunity: u32,
+    PointRewind,
+    FiveOrDie,
+}
+
+#[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
+enum OrbRarity {
+	#[default]
+    Common,
+    Rare,
+    Cosmic,
 }
