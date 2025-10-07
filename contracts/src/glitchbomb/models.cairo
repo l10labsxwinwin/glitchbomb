@@ -25,29 +25,29 @@ struct GamePack {
 
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
-struct Game {
+pub struct Game {
 	#[key]
-	player_id: ContractAddress,
+	pub player_id: ContractAddress,
 	#[key]
-	gamepack_id: u32,
+	pub gamepack_id: u32,
 	#[key]
-	game_id: u32,
+	pub game_id: u32,
 
-	game_state: GameState,
+	pub game_state: GameState,
 	
     level: u32,
-    points: u32,
-    milestone: u32,
-    hp: u32,
-    max_hp: u32,
-    multiplier: u32,
-    glitch_chips: u32,
-    moonrocks_spent: u32,
-    moonrocks_earned: u32,
-    orbs_for_sale_ids: [u32; 6],
-    pullable_orb_effects: Array<OrbEffect>,
-    pulled_orbs_effects: Array<OrbEffect>,
-    bomb_immunity_turns: u32,
+    pub points: u32,
+    pub milestone: u32,
+    pub hp: u32,
+    pub max_hp: u32,
+    pub multiplier: u32,
+    pub glitch_chips: u32,
+    pub moonrocks_spent: u32,
+    pub moonrocks_earned: u32,
+    pub orbs_for_sale_ids: [u32; 6],
+    pub pullable_orb_effects: Array<OrbEffect>,
+    pub pulled_orbs_effects: Array<OrbEffect>,
+    pub bomb_immunity_turns: u32,
 }
 
 #[derive(Drop, Serde, Debug, Introspect, DojoStore)]
@@ -91,7 +91,7 @@ enum GameState {
 }
 
 #[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
-enum OrbEffect {
+pub enum OrbEffect {
 	#[default]
 	Empty,
     Point: u32,
