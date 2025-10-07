@@ -5,9 +5,18 @@ impl GameImpl of GameTrait {
 
     fn apply_orb_effect(ref self: Game, effect: OrbEffect) {
         match effect {
-            OrbEffect::Point(x) => self.handle_point_effect(x),
-            OrbEffect::PointPerOrbRemaining(x) => self.handle_point_per_orb_remaining_effect(x),
-            _ => {},
+            OrbEffect::Point(points) => self.handle_point_effect(points),
+            OrbEffect::PointPerOrbRemaining(point_per_orb) => self.handle_point_per_orb_remaining_effect(point_per_orb),
+            OrbEffect::PointPerBombPulled(point_per_bomb) => self.handle_point_per_bomb_pulled_effect(point_per_bomb),
+            OrbEffect::GlitchChips(chips) => self.handle_glitch_chips_effect(chips),
+            OrbEffect::Moonrocks(moonrocks) => self.handle_moonrocks_effect(moonrocks),
+            OrbEffect::Health(health) => self.handle_health_effect(health),
+            OrbEffect::Bomb(damage) => self.handle_bomb_effect(damage),
+            OrbEffect::Multiplier(multiplier) => self.handle_multiplier_effect(multiplier),
+            OrbEffect::BombImmunity(turns) => self.handle_bomb_immunity_effect(turns),
+            OrbEffect::PointRewind => self.handle_point_rewind_effect(),
+            OrbEffect::FiveOrDie => self.handle_five_or_die_effect(),
+            OrbEffect::Empty => {},
         }
     }
 
@@ -20,5 +29,56 @@ impl GameImpl of GameTrait {
         let num_orbs = self.pullable_orb_effects.len();
         let total_points = (num_orbs * point_per_orb * self.multiplier / 100);
         self.points += total_points;
+    }
+
+    fn handle_point_per_bomb_pulled_effect(ref self: Game, point_per_bomb: u32) {
+        let total_points = self.bombs_pulled_in_level * point_per_bomb * self.multiplier / 100;
+        self.points += total_points;
+    }
+
+    fn handle_glitch_chips_effect(ref self: Game, chips: u32) {
+        self.glitch_chips += chips;
+    }
+
+    fn handle_moonrocks_effect(ref self: Game, moonrocks: u32) {
+        self.moonrocks_earned += moonrocks;
+    }
+
+    fn handle_health_effect(ref self: Game, health: u32) {
+        self.hp = if self.hp + health > self.max_hp {
+            self.max_hp
+        } else {
+            self.hp + health
+        };
+    }
+
+    fn handle_bomb_effect(ref self: Game, damage: u32) {
+        if self.bomb_immunity_turns > 0 {
+            return;
+        }
+
+        if damage >= self.hp {
+            self.hp = 0;
+        } else {
+            self.hp -= damage;
+        }
+
+        self.bombs_pulled_in_level += 1;
+    }
+
+    fn handle_multiplier_effect(ref self: Game, multiplier: u32) {
+        self.multiplier += multiplier;
+    }
+
+    fn handle_bomb_immunity_effect(ref self: Game, turns: u32) {
+        // TODO: implement
+    }
+
+    fn handle_point_rewind_effect(ref self: Game) {
+        // TODO: implement
+    }
+
+    fn handle_five_or_die_effect(ref self: Game) {
+        // TODO: implement
     }
 }

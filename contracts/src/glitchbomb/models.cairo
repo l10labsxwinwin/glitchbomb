@@ -35,7 +35,7 @@ pub struct Game {
 
 	pub game_state: GameState,
 	
-    level: u32,
+    pub level: u32,
     pub points: u32,
     pub milestone: u32,
     pub hp: u32,
@@ -48,6 +48,7 @@ pub struct Game {
     pub pullable_orb_effects: Array<OrbEffect>,
     pub pulled_orbs_effects: Array<OrbEffect>,
     pub bomb_immunity_turns: u32,
+    pub bombs_pulled_in_level: u32,
 }
 
 #[derive(Drop, Serde, Debug, Introspect, DojoStore)]
