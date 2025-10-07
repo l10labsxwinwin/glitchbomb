@@ -2,25 +2,25 @@ use starknet::ContractAddress;
 
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
-struct Player {
+pub struct Player {
 	#[key]
-	player_id: ContractAddress,
+	pub player_id: ContractAddress,
 
-	usdc: u32,
-	gamepack_id_tracker: u32,
+	pub usdc: u32,
+	pub gamepack_id_tracker: u32,
 }
 
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
-struct GamePack {
+pub struct GamePack {
 	#[key]
-	player_id: ContractAddress,
+	pub player_id: ContractAddress,
 	#[key]
-	gamepack_id: u32,
+	pub gamepack_id: u32,
 
-	gamepack_state: GamePackState,
-	current_game: u32,
-	accumulated_moonrocks: u32,
+	pub gamepack_state: GamePackState,
+	pub current_game: u32,
+	pub accumulated_moonrocks: u32,
 }
 
 #[derive(Drop, Serde, Debug)]
@@ -72,7 +72,7 @@ pub struct Orb {
 }
 
 #[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
-enum GamePackState {
+pub enum GamePackState {
 	#[default]
 	Unopened,
  	InProgress,

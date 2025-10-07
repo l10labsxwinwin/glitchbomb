@@ -501,4 +501,38 @@ impl AllOrbImpl of AllOrbTrait {
             _ => false,
         }
     }
+
+    fn all_orbs(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+    ) -> [Orb; 21] {
+        [
+            // non-buyables (orb_id 0-3)
+            Self::bomb(player_id, gamepack_id, game_id, 0, 1, 2),
+            Self::bomb(player_id, gamepack_id, game_id, 1, 2, 1),
+            Self::bomb(player_id, gamepack_id, game_id, 2, 3, 1),
+            Self::point_per_orb_remaining(player_id, gamepack_id, game_id, 3, 1, 1, OrbRarity::Common, false, 0),
+            // common buyables (orb_id 4-12)
+            Self::point(player_id, gamepack_id, game_id, 4, 5, 3, OrbRarity::Common, true, 5),
+            Self::glitch_chips(player_id, gamepack_id, game_id, 5, 15, 0, OrbRarity::Common, true, 5),
+            Self::five_or_die(player_id, gamepack_id, game_id, 6, 0, OrbRarity::Common, true, 5),
+            Self::point_per_bomb_pulled(player_id, gamepack_id, game_id, 7, 4, 1, OrbRarity::Common, true, 6),
+            Self::point(player_id, gamepack_id, game_id, 8, 7, 0, OrbRarity::Common, true, 8),
+            Self::moonrocks(player_id, gamepack_id, game_id, 9, 15, 0, OrbRarity::Common, true, 8),
+            Self::point_rewind(player_id, gamepack_id, game_id, 10, 0, OrbRarity::Common, true, 8),
+            Self::multiplier(player_id, gamepack_id, game_id, 11, 50, 0, OrbRarity::Common, true, 9),
+            Self::health(player_id, gamepack_id, game_id, 12, 1, 1, OrbRarity::Common, true, 9),
+            // rare buyables (orb_id 13-17)
+            Self::point(player_id, gamepack_id, game_id, 13, 8, 0, OrbRarity::Rare, true, 11),
+            Self::point(player_id, gamepack_id, game_id, 14, 9, 0, OrbRarity::Rare, true, 13),
+            Self::multiplier(player_id, gamepack_id, game_id, 15, 100, 1, OrbRarity::Rare, true, 14),
+            Self::point_per_orb_remaining(player_id, gamepack_id, game_id, 16, 2, 0, OrbRarity::Rare, true, 15),
+            Self::multiplier(player_id, gamepack_id, game_id, 17, 150, 0, OrbRarity::Rare, true, 16),
+            // cosmic buyables (orb_id 18-20)
+            Self::health(player_id, gamepack_id, game_id, 18, 3, 0, OrbRarity::Cosmic, true, 21),
+            Self::moonrocks(player_id, gamepack_id, game_id, 19, 40, 0, OrbRarity::Cosmic, true, 23),
+            Self::bomb_immunity(player_id, gamepack_id, game_id, 20, 0, OrbRarity::Cosmic, true, 24),
+        ]
+    }
 }
