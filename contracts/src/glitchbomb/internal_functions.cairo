@@ -1,8 +1,32 @@
-use crate::glitchbomb::models::{Game, OrbEffect, GameState};
+use crate::glitchbomb::models::{Game, OrbEffect, GameState, Orb, OrbRarity};
 use crate::glitchbomb::actions::{Action, ActionError};
+use starknet::ContractAddress;
 
 #[generate_trait]
 impl GameImpl of GameTrait {
+
+    fn new(player_id: ContractAddress, gamepack_id: u32, game_id: u32) -> Game {
+        Game {
+            player_id,
+            gamepack_id,
+            game_id,
+            game_state: GameState::New,
+            level: 0,
+            points: 0,
+            milestone: 0,
+            hp: 5,
+            max_hp: 5,
+            multiplier: 100,
+            glitch_chips: 0,
+            moonrocks_spent: 10,
+            moonrocks_earned: 0,
+            orbs_for_sale_ids: [99, 99, 99, 99, 99, 99],
+            pullable_orb_effects: ArrayTrait::new(),
+            pulled_orbs_effects: ArrayTrait::new(),
+            bomb_immunity_turns: 0,
+            bombs_pulled_in_level: 0,
+        }
+    }
 
     fn apply_action(ref self: Game, action: Action) -> Result<(), ActionError> {
         match (@self.game_state, action) {
@@ -168,5 +192,313 @@ impl GameImpl of GameTrait {
 
     fn handle_five_or_die_effect(ref self: Game) {
         self.game_state = GameState::FiveOrDiePhase;
+    }
+}
+
+
+#[generate_trait]
+impl AllOrbImpl of AllOrbTrait {
+    fn new(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        effect: OrbEffect,
+        rarity: OrbRarity,
+        count: u32,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Orb {
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            effect,
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+            current_price: base_price,
+        }
+    }
+
+    fn bomb(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        damage: u32,
+        count: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::Bomb(damage),
+            OrbRarity::Common,
+            count,
+            false,
+            0,
+        )
+    }
+
+    fn point(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        points: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::Point(points),
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn point_per_orb_remaining(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        points_per_orb: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::PointPerOrbRemaining(points_per_orb),
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn point_per_bomb_pulled(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        points_per_bomb: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::PointPerBombPulled(points_per_bomb),
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn glitch_chips(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        chips: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::GlitchChips(chips),
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn moonrocks(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        amount: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::Moonrocks(amount),
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn health(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        hp: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::Health(hp),
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn multiplier(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        mult: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::Multiplier(mult),
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn point_rewind(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::PointRewind,
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn five_or_die(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::FiveOrDie,
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn bomb_immunity(
+        player_id: ContractAddress,
+        gamepack_id: u32,
+        game_id: u32,
+        orb_id: u32,
+        count: u32,
+        rarity: OrbRarity,
+        is_buyable: bool,
+        base_price: u32,
+    ) -> Orb {
+        Self::new(
+            player_id,
+            gamepack_id,
+            game_id,
+            orb_id,
+            OrbEffect::BombImmunity(3),
+            rarity,
+            count,
+            is_buyable,
+            base_price,
+        )
+    }
+
+    fn is_common(self: @Orb) -> bool {
+        match self.rarity {
+            OrbRarity::Common => true,
+            _ => false,
+        }
+    }
+
+    fn is_rare(self: @Orb) -> bool {
+        match self.rarity {
+            OrbRarity::Rare => true,
+            _ => false,
+        }
+    }
+
+    fn is_cosmic(self: @Orb) -> bool {
+        match self.rarity {
+            OrbRarity::Cosmic => true,
+            _ => false,
+        }
     }
 }

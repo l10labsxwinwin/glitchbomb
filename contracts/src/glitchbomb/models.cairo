@@ -53,22 +53,22 @@ pub struct Game {
 
 #[derive(Drop, Serde, Debug, Introspect, DojoStore)]
 #[dojo::model]
-struct Orb {
+pub struct Orb {
 	#[key]
-	player_id: ContractAddress,
+	pub player_id: ContractAddress,
 	#[key]
-	gamepack_id: u32,
+	pub gamepack_id: u32,
 	#[key]
-	game_id: u32,
+	pub game_id: u32,
 	#[key]
-	orb_id: u32, // range = unique orbs in game (0-20)
+	pub orb_id: u32, // range = unique orbs in game (0-20)
 
-    effect: OrbEffect,
-    rarity: OrbRarity,
-    count: u32,
-    is_buyable: bool,
-    base_price: u32,
-    current_price: u32,
+    pub effect: OrbEffect,
+    pub rarity: OrbRarity,
+    pub count: u32,
+    pub is_buyable: bool,
+    pub base_price: u32,
+    pub current_price: u32,
 }
 
 #[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
@@ -109,7 +109,7 @@ pub enum OrbEffect {
 }
 
 #[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
-enum OrbRarity {
+pub enum OrbRarity {
 	#[default]
     Common,
     Rare,
