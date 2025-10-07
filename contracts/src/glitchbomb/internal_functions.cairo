@@ -1,7 +1,66 @@
 use crate::glitchbomb::models::{Game, OrbEffect, GameState};
+use crate::glitchbomb::actions::{Action, ActionError};
 
 #[generate_trait]
 impl GameImpl of GameTrait {
+
+    fn apply_action(ref self: Game, action: Action) -> Result<(), ActionError> {
+        match (@self.game_state, action) {
+            // New game state
+            (GameState::New, Action::StartGame) => self.handle_start_game(),
+            (GameState::New, _) => Err(ActionError::InvalidActionInNewGame),
+
+            // Level state
+            (GameState::Level, Action::PullOrb) => self.handle_pull_orb(),
+            (GameState::Level, Action::CashOut) => self.handle_cash_out(),
+            (GameState::Level, _) => Err(ActionError::InvalidActionInLevel),
+
+            // Level complete state
+            (GameState::LevelComplete, Action::EnterShop) => self.handle_enter_shop(),
+            (GameState::LevelComplete, Action::CashOut) => self.handle_cash_out(),
+            (GameState::LevelComplete, _) => Err(ActionError::InvalidActionInLevelComplete),
+
+            // Five or die phase
+            (GameState::FiveOrDiePhase, Action::ConfirmFiveOrDie(confirmed)) => self.handle_confirm_five_or_die(confirmed),
+            (GameState::FiveOrDiePhase, _) => Err(ActionError::InvalidActionInFiveOrDiePhase),
+
+            // Shop state
+            (GameState::Shop, Action::BuyOrb(orb_id)) => self.handle_buy_orb(orb_id),
+            (GameState::Shop, Action::GoToNextLevel) => self.handle_go_to_next_level(),
+            (GameState::Shop, _) => Err(ActionError::InvalidActionInShop),
+
+            // Game over state
+            (GameState::GameOver, _) => Err(ActionError::GameOver),
+        }
+    }
+
+    fn handle_start_game(ref self: Game) -> Result<(), ActionError> {
+        Ok(())
+    }
+
+    fn handle_pull_orb(ref self: Game) -> Result<(), ActionError> {
+        Ok(())
+    }
+
+    fn handle_cash_out(ref self: Game) -> Result<(), ActionError> {
+        Ok(())
+    }
+
+    fn handle_enter_shop(ref self: Game) -> Result<(), ActionError> {
+        Ok(())
+    }
+
+    fn handle_buy_orb(ref self: Game, orb_id: u32) -> Result<(), ActionError> {
+        Ok(())
+    }
+
+    fn handle_confirm_five_or_die(ref self: Game, confirmed: bool) -> Result<(), ActionError> {
+        Ok(())
+    }
+
+    fn handle_go_to_next_level(ref self: Game) -> Result<(), ActionError> {
+        Ok(())
+    }
 
     fn apply_orb_effect(ref self: Game, effect: OrbEffect) {
         match effect {
