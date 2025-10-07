@@ -75,7 +75,35 @@ impl GameImpl of GameTrait {
     }
 
     fn handle_point_rewind_effect(ref self: Game) {
-        // TODO: implement
+        let mut lowest_point_orb: Option<OrbEffect> = Option::None;
+        let mut lowest_point_value: u32 = 9999;
+
+        // Find the lowest Point orb
+        for effect in self.pulled_orbs_effects.span() {
+            if let OrbEffect::Point(points) = *effect {
+                if points < lowest_point_value {
+                    lowest_point_value = points;
+                    lowest_point_orb = Option::Some(*effect);
+                }
+            }
+        }
+
+        // If found, rebuild pulled_orbs_effects without it and add back to pullable
+        if let Option::Some(orb_to_return) = lowest_point_orb {
+            let mut new_pulled = ArrayTrait::new();
+            let mut removed_one = false;
+
+            for effect in self.pulled_orbs_effects.span() {
+                if !removed_one && *effect == orb_to_return {
+                    removed_one = true;
+                } else {
+                    new_pulled.append(*effect);
+                }
+            }
+
+            self.pulled_orbs_effects = new_pulled;
+            self.pullable_orb_effects.append(orb_to_return);
+        }
     }
 
     fn handle_five_or_die_effect(ref self: Game) {

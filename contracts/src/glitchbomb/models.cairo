@@ -91,7 +91,7 @@ enum GameState {
     GameOver,
 }
 
-#[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
+#[derive(Copy, Drop, Serde, Debug, Default, Introspect, DojoStore, PartialEq)]
 pub enum OrbEffect {
 	#[default]
 	Empty,
