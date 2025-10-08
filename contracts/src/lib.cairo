@@ -9,6 +9,7 @@ pub mod tests {
 }
 
 pub mod glitchbomb {
+    mod contract;
     mod models;
     mod actions;
     mod internal_functions;

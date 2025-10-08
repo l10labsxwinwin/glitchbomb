@@ -1,6 +1,11 @@
-use crate::glitchbomb::models::{Game, OrbEffect, GameState, Orb, OrbRarity};
+use crate::glitchbomb::models::{Game, GamePack, OrbEffect, GameState, Orb, OrbRarity};
 use crate::glitchbomb::actions::{Action, ActionError};
 use starknet::ContractAddress;
+
+#[generate_trait]
+pub impl GamePackImpl of GamePackTrait {
+    const PRICE: u32 = 1;
+}
 
 #[generate_trait]
 impl GameImpl of GameTrait {
