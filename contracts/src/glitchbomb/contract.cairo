@@ -10,6 +10,7 @@ pub trait PlayerActions<T> {
 pub mod gb_contract {
     use crate::glitchbomb::models::{ Player, GamePack, GamePackState, Game, GameState };
     use crate::glitchbomb::internal_functions::{GamePackTrait, GameTrait};
+    use crate::glitchbomb::actions::Action;
     use dojo::event::EventStorage;
     use dojo::model::ModelStorage;
     use super::{PlayerActions};
@@ -56,18 +57,23 @@ pub mod gb_contract {
 	        let p_addr = get_caller_address();
 	        let mut gamepack: GamePack = world.read_model((p_addr, gamepack_id));
 
+	        let game_id = gamepack.current_game_id;
+	        let mut game: Game = world.read_model((p_addr, gamepack_id, game_id));
+
 	        let is_valid_gamepack = match @gamepack.gamepack_state {
 	            GamePackState::Unopened | GamePackState::InProgress => true,
 	            _ => false,
 	        };
-	        assert(is_valid_gamepack, 'gamepack is already played');
+	        let is_game_state_new = game.game_state == GameState::New;
+	        let is_game_level_zero = game.level == 0;
 
-	        let game_id = gamepack.current_game_id;
-	        let mut game: Game = world.read_model((p_addr, gamepack_id, game_id));
-	        assert(game.game_state == GameState::New, 'already started a game');
+	        assert(
+	            is_valid_gamepack && is_game_state_new && is_game_level_zero,
+	            'invalid start game conditions'
+	        );
 
 	        gamepack.gamepack_state = GamePackState::InProgress;
-	        game = GameTrait::new(p_addr, gamepack_id, game_id);
+	        game = Game::new(p_addr, gamepack_id, game_id);
 
 	        world.write_model(@gamepack);
 	        world.write_model(@game);

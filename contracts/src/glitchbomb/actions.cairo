@@ -11,6 +11,7 @@ pub enum Action {
     GoToNextLevel,
 }
 
+#[derive(Drop)]
 pub enum ActionError {
     InvalidActionInNewGame,
     InvalidActionInLevel,
