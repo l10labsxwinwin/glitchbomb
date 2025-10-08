@@ -8,14 +8,14 @@ pub impl GamePackImpl of GamePackTrait {
 }
 
 #[generate_trait]
-impl GameImpl of GameTrait {
+pub impl GameImpl of GameTrait {
 
     fn new(player_id: ContractAddress, gamepack_id: u32, game_id: u32) -> Game {
         Game {
             player_id,
             gamepack_id,
             game_id,
-            game_state: GameState::New,
+            game_state: GameState::Level,
             level: 0,
             points: 0,
             milestone: 0,

@@ -19,7 +19,7 @@ pub struct GamePack {
 	pub gamepack_id: u32,
 
 	pub gamepack_state: GamePackState,
-	pub current_game: u32,
+	pub current_game_id: u32,
 	pub accumulated_moonrocks: u32,
 }
 
@@ -71,7 +71,7 @@ pub struct Orb {
     pub current_price: u32,
 }
 
-#[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
+#[derive(Drop, Serde, Debug, Default, Introspect, DojoStore, PartialEq)]
 pub enum GamePackState {
 	#[default]
 	Unopened,
@@ -80,7 +80,7 @@ pub enum GamePackState {
  	Completed,
 }
 
-#[derive(Drop, Serde, Debug, Default, Introspect, DojoStore)]
+#[derive(Drop, Serde, Debug, Default, Introspect, DojoStore, PartialEq)]
 pub enum GameState {
 	#[default]
     New,
