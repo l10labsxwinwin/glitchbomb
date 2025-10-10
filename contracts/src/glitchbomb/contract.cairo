@@ -4,6 +4,7 @@ pub trait PlayerActions<T> {
     fn buy_gamepack(ref self: T);
     fn start_game(ref self: T, gamepack_id: u32);
     fn pull_orb(ref self: T, gamepack_id: u32);
+    fn confirm_five_or_die(ref self: T, gamepack_id: u32, confirmed: bool);
 }
 
 #[dojo::contract]
@@ -102,6 +103,26 @@ pub mod gb_contract {
 	            },
 	            Result::Err(err) => {
 	                panic!("pull orb failed: {:?}", err);
+	            }
+	        }
+	    }
+
+	    fn confirm_five_or_die(ref self: ContractState, gamepack_id: u32, confirmed: bool) {
+	        let mut world = self.world_default();
+	        let p_addr = get_caller_address();
+	        let gamepack: GamePack = world.read_model((p_addr, gamepack_id));
+
+	        let game_id = gamepack.current_game_id;
+	        let mut game: Game = world.read_model((p_addr, gamepack_id, game_id));
+
+	        let result = game.apply_action(Action::ConfirmFiveOrDie(confirmed));
+
+	        match result {
+	            Result::Ok(_) => {
+	                world.write_model(@game);
+	            },
+	            Result::Err(err) => {
+	                panic!("confirm five or die failed: {:?}", err);
 	            }
 	        }
 	    }

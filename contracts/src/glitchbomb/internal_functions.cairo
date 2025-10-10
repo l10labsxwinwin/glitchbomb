@@ -125,7 +125,56 @@ pub impl GameImpl of GameTrait {
     }
 
     fn handle_confirm_five_or_die(ref self: Game, confirmed: bool) -> Result<(), ActionError> {
-        Ok(())
+        match @confirmed {
+            true => {
+                // Apply +1x (100) multiplier bonus for the duration of the five pulls
+                self.multiplier += 100;
+
+                // Pull and apply 5 orbs
+                let mut orbs_pulled: u32 = 0;
+                while orbs_pulled < 5 {
+                    // Check if player is already dead - stop pulling if so
+                    if self.hp == 0 {
+                        break;
+                    }
+
+                    // Pull the orb from the front using pop_front
+                    let pulled_effect = match self.pullable_orb_effects.pop_front() {
+                        Option::Some(effect) => effect,
+                        Option::None => break, // No more orbs to pull
+                    };
+                    self.pulled_orbs_effects.append(pulled_effect);
+
+                    // Apply the orb effect
+                    self.apply_orb_effect(pulled_effect);
+
+                    // Decrement bomb immunity if active
+                    if self.bomb_immunity_turns > 0 {
+                        self.bomb_immunity_turns -= 1;
+                    }
+
+                    orbs_pulled += 1;
+                }
+
+                // Restore the multiplier to its original value
+                self.multiplier -= 100;
+
+                // Set game state based on final state after all pulls
+                if self.hp == 0 {
+                    self.game_state = GameState::GameOver;
+                } else if self.points >= self.milestone {
+                    self.game_state = GameState::LevelComplete;
+                } else {
+                    self.game_state = GameState::Level;
+                }
+
+                Ok(())
+            },
+            false => {
+                self.game_state = GameState::Level;
+                Ok(())
+            }
+        }
     }
 
     fn handle_go_to_next_level(ref self: Game) -> Result<(), ActionError> {
