@@ -1,5 +1,6 @@
 use crate::glitchbomb::models::{Game, GamePack, GamePackState, OrbEffect, GameState, Orb, OrbRarity, FiveOrDieData, FiveOrDieDataTrait, OrbEffectData, OrbEffectDataTrait};
 use crate::glitchbomb::actions::{Action, ActionError};
+use crate::glitchbomb::helpers::shuffle;
 use starknet::ContractAddress;
 
 #[generate_trait]
@@ -83,7 +84,8 @@ pub impl GameImpl of GameTrait {
             return Err(ActionError::NoOrbsRemaining);
         }
 
-        // TODO: have to shuffle the pullable orbs here before pulling an orb
+        // Shuffle the pullable orbs before pulling
+        self.pullable_orb_effects = shuffle(self.pullable_orb_effects);
 
         let mut new_pullable = ArrayTrait::new();
         let pulled_effect = *self.pullable_orb_effects[self.pullable_orb_effects.len() - 1];
@@ -129,6 +131,9 @@ pub impl GameImpl of GameTrait {
     fn handle_confirm_five_or_die(ref self: Game, confirmed: bool) -> Result<Option<FiveOrDieData>, ActionError> {
         match @confirmed {
             true => {
+                // Shuffle the pullable orbs once at the start of five or die
+                self.pullable_orb_effects = shuffle(self.pullable_orb_effects);
+
                 // Track data for FiveOrDieData model
                 let mut effects_pulled: Array<OrbEffect> = ArrayTrait::new();
                 let mut effects_data: Array<OrbEffectData> = ArrayTrait::new();

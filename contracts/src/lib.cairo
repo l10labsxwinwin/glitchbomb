@@ -13,4 +13,5 @@ pub mod glitchbomb {
     mod models;
     mod actions;
     mod internal_functions;
+    mod helpers;
 }
