@@ -11,6 +11,7 @@ sierra-replace-ids = true
 migrate = "sozo build && sozo migrate"
 spawn = "sozo execute dojo_starter-actions spawn --wait"
 move = "sozo execute dojo_starter-actions move -c 1 --wait"
+watch = "find src -name '*.cairo' | entr -c sozo build"
 
 [dependencies]
 dojo = "1.7.1"
