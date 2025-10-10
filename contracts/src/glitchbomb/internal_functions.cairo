@@ -1,4 +1,4 @@
-use crate::glitchbomb::models::{Game, GamePack, GamePackState, OrbEffect, GameState, Orb, OrbRarity};
+use crate::glitchbomb::models::{Game, GamePack, GamePackState, OrbEffect, GameState, Orb, OrbRarity, FiveOrDieData, FiveOrDieDataTrait, OrbEffectData, OrbEffectDataTrait};
 use crate::glitchbomb::actions::{Action, ActionError};
 use starknet::ContractAddress;
 
@@ -40,10 +40,11 @@ pub impl GameImpl of GameTrait {
             pulled_orbs_effects: ArrayTrait::new(),
             bomb_immunity_turns: 0,
             bombs_pulled_in_level: 0,
+            pull_number: 0,
         }
     }
 
-    fn apply_action(ref self: Game, action: Action) -> Result<(), ActionError> {
+    fn apply_action(ref self: Game, action: Action) -> Result<Option<FiveOrDieData>, ActionError> {
         match (@self.game_state, action) {
             // New game state
             (GameState::New, Action::StartGame) => self.handle_start_game(),
@@ -73,11 +74,11 @@ pub impl GameImpl of GameTrait {
         }
     }
 
-    fn handle_start_game(ref self: Game) -> Result<(), ActionError> {
-        Ok(())
+    fn handle_start_game(ref self: Game) -> Result<Option<FiveOrDieData>, ActionError> {
+        Ok(Option::None)
     }
 
-    fn handle_pull_orb(ref self: Game) -> Result<(), ActionError> {
+    fn handle_pull_orb(ref self: Game) -> Result<Option<FiveOrDieData>, ActionError> {
         if self.pullable_orb_effects.len() == 0 {
             return Err(ActionError::NoOrbsRemaining);
         }
@@ -95,6 +96,7 @@ pub impl GameImpl of GameTrait {
 
         self.pullable_orb_effects = new_pullable;
         self.pulled_orbs_effects.append(pulled_effect);
+        self.pull_number += 1;
         self.apply_orb_effect(pulled_effect);
 
         if self.bomb_immunity_turns > 0 {
@@ -109,24 +111,28 @@ pub impl GameImpl of GameTrait {
             self.game_state = GameState::GameOver;
         }
 
-        Ok(())
+        Ok(Option::None)
     }
 
-    fn handle_cash_out(ref self: Game) -> Result<(), ActionError> {
-        Ok(())
+    fn handle_cash_out(ref self: Game) -> Result<Option<FiveOrDieData>, ActionError> {
+        Ok(Option::None)
     }
 
-    fn handle_enter_shop(ref self: Game) -> Result<(), ActionError> {
-        Ok(())
+    fn handle_enter_shop(ref self: Game) -> Result<Option<FiveOrDieData>, ActionError> {
+        Ok(Option::None)
     }
 
-    fn handle_buy_orb(ref self: Game, orb_id: u32) -> Result<(), ActionError> {
-        Ok(())
+    fn handle_buy_orb(ref self: Game, orb_id: u32) -> Result<Option<FiveOrDieData>, ActionError> {
+        Ok(Option::None)
     }
 
-    fn handle_confirm_five_or_die(ref self: Game, confirmed: bool) -> Result<(), ActionError> {
+    fn handle_confirm_five_or_die(ref self: Game, confirmed: bool) -> Result<Option<FiveOrDieData>, ActionError> {
         match @confirmed {
             true => {
+                // Track data for FiveOrDieData model
+                let mut effects_pulled: Array<OrbEffect> = ArrayTrait::new();
+                let mut effects_data: Array<OrbEffectData> = ArrayTrait::new();
+
                 // Apply +1x (100) multiplier bonus for the duration of the five pulls
                 self.multiplier += 100;
 
@@ -157,6 +163,10 @@ pub impl GameImpl of GameTrait {
                                         self.bomb_immunity_turns -= 1;
                                     }
 
+                                    // Track the effect and game state after applying it
+                                    effects_pulled.append(pulled_effect);
+                                    effects_data.append(OrbEffectDataTrait::from_game(@self));
+
                                     orbs_pulled += 1;
                                 }
                             }
@@ -180,17 +190,23 @@ pub impl GameImpl of GameTrait {
                     self.game_state = GameState::Level;
                 }
 
-                Ok(())
+                // Create FiveOrDieData model
+                let five_or_die_data = FiveOrDieDataTrait::new(@self, effects_pulled, effects_data);
+
+                Ok(Option::Some(five_or_die_data))
             },
             false => {
                 self.game_state = GameState::Level;
-                Ok(())
+                Ok(Option::None)
             }
         }
     }
 
-    fn handle_go_to_next_level(ref self: Game) -> Result<(), ActionError> {
-        Ok(())
+    fn handle_go_to_next_level(ref self: Game) -> Result<Option<FiveOrDieData>, ActionError> {
+        // Reset level-specific counters
+        self.bombs_pulled_in_level = 0;
+        self.pull_number = 0;
+        Ok(Option::None)
     }
 
     fn apply_orb_effect(ref self: Game, effect: OrbEffect) {

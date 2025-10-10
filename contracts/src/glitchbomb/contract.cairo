@@ -118,8 +118,16 @@ pub mod gb_contract {
 	        let result = game.apply_action(Action::ConfirmFiveOrDie(confirmed));
 
 	        match result {
-	            Result::Ok(_) => {
+	            Result::Ok(five_or_die_data_option) => {
 	                world.write_model(@game);
+
+	                // If FiveOrDieData was returned, write it to the store
+	                match five_or_die_data_option {
+	                    Option::Some(five_or_die_data) => {
+	                        world.write_model(@five_or_die_data);
+	                    },
+	                    Option::None => {}
+	                }
 	            },
 	            Result::Err(err) => {
 	                panic!("confirm five or die failed: {:?}", err);
