@@ -11,7 +11,7 @@ pub enum Action {
     GoToNextLevel,
 }
 
-#[derive(Drop)]
+#[derive(Drop, Debug)]
 pub enum ActionError {
     InvalidActionInNewGame,
     InvalidActionInLevel,
@@ -23,4 +23,5 @@ pub enum ActionError {
     OrbTooExpensive,
     BrokenErrorNonBuyableInShop,
     GameOver,
+    NoOrbsRemaining,
 }

@@ -1,10 +1,20 @@
-use crate::glitchbomb::models::{Game, GamePack, OrbEffect, GameState, Orb, OrbRarity};
+use crate::glitchbomb::models::{Game, GamePack, GamePackState, OrbEffect, GameState, Orb, OrbRarity};
 use crate::glitchbomb::actions::{Action, ActionError};
 use starknet::ContractAddress;
 
 #[generate_trait]
 pub impl GamePackImpl of GamePackTrait {
     const PRICE: u32 = 1;
+
+    fn new(player_id: ContractAddress, gamepack_id: u32) -> GamePack {
+        GamePack {
+            player_id,
+            gamepack_id,
+            gamepack_state: GamePackState::Unopened,
+            current_game_id: 0,
+            accumulated_moonrocks: 0,
+        }
+    }
 }
 
 #[generate_trait]
@@ -68,6 +78,37 @@ pub impl GameImpl of GameTrait {
     }
 
     fn handle_pull_orb(ref self: Game) -> Result<(), ActionError> {
+        if self.pullable_orb_effects.len() == 0 {
+            return Err(ActionError::NoOrbsRemaining);
+        }
+
+        // TODO: have to shuffle the pullable orbs here before pulling an orb
+
+        let mut new_pullable = ArrayTrait::new();
+        let pulled_effect = *self.pullable_orb_effects[self.pullable_orb_effects.len() - 1];
+
+        let mut i = 0;
+        while i < self.pullable_orb_effects.len() - 1 {
+            new_pullable.append(*self.pullable_orb_effects[i]);
+            i += 1;
+        };
+
+        self.pullable_orb_effects = new_pullable;
+        self.pulled_orbs_effects.append(pulled_effect);
+        self.apply_orb_effect(pulled_effect);
+
+        if self.bomb_immunity_turns > 0 {
+            self.bomb_immunity_turns -= 1;
+        }
+
+        if self.points >= self.milestone {
+            self.game_state = GameState::LevelComplete;
+        }
+
+        if self.hp == 0 {
+            self.game_state = GameState::GameOver;
+        }
+
         Ok(())
     }
 
@@ -142,6 +183,8 @@ pub impl GameImpl of GameTrait {
 
     fn handle_bomb_effect(ref self: Game, damage: u32) {
         if self.bomb_immunity_turns > 0 {
+            // uncomment if we count pulled bombs even during immunity
+            // self.bombs_pulled_in_level += 1;
             return;
         }
 
@@ -150,7 +193,6 @@ pub impl GameImpl of GameTrait {
         } else {
             self.hp -= damage;
         }
-
         self.bombs_pulled_in_level += 1;
     }
 
@@ -159,8 +201,7 @@ pub impl GameImpl of GameTrait {
     }
 
     fn handle_bomb_immunity_effect(ref self: Game, turns: u32) {
-        self.bomb_immunity_turns += turns
-        // maybe we add turns + 1 depending on immunity impl.
+        self.bomb_immunity_turns += turns + 1;
     }
 
     fn handle_point_rewind_effect(ref self: Game) {
@@ -202,7 +243,7 @@ pub impl GameImpl of GameTrait {
 
 
 #[generate_trait]
-impl AllOrbImpl of AllOrbTrait {
+pub impl AllOrbImpl of AllOrbTrait {
     fn new(
         player_id: ContractAddress,
         gamepack_id: u32,

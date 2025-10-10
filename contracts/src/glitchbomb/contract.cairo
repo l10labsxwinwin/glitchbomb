@@ -1,20 +1,19 @@
-
 #[starknet::interface]
 pub trait PlayerActions<T> {
     fn claim_free_usdc(ref self: T);
     fn buy_gamepack(ref self: T);
     fn start_game(ref self: T, gamepack_id: u32);
+    fn pull_orb(ref self: T, gamepack_id: u32);
 }
 
 #[dojo::contract]
 pub mod gb_contract {
     use crate::glitchbomb::models::{ Player, GamePack, GamePackState, Game, GameState };
-    use crate::glitchbomb::internal_functions::{GamePackTrait, GameTrait};
+    use crate::glitchbomb::internal_functions::{GamePackTrait, GameTrait, AllOrbTrait};
     use crate::glitchbomb::actions::Action;
-    use dojo::event::EventStorage;
     use dojo::model::ModelStorage;
     use super::{PlayerActions};
-    use starknet::{ContractAddress, get_caller_address};
+    use starknet::get_caller_address;
 
 	#[abi(embed_v0)]
 	impl PlayerActionsImpl of PlayerActions<ContractState> {
@@ -36,14 +35,7 @@ pub mod gb_contract {
 	        assert(gb_player.usdc >= GamePackTrait::PRICE, 'insufficient funds');
 
 	        let gamepack_id = gb_player.gamepack_id_tracker;
-
-	        let new_gamepack = GamePack {
-	            player_id: p_addr,
-	            gamepack_id,
-	            gamepack_state: GamePackState::Unopened,
-	            current_game_id: 0,
-	            accumulated_moonrocks: 0,
-	        };
+	        let new_gamepack = GamePackTrait::new(p_addr, gamepack_id);
 
 	        gb_player.usdc -= GamePackTrait::PRICE;
 	        gb_player.gamepack_id_tracker += 1;
@@ -73,10 +65,45 @@ pub mod gb_contract {
 	        );
 
 	        gamepack.gamepack_state = GamePackState::InProgress;
-	        game = Game::new(p_addr, gamepack_id, game_id);
+	        game = GameTrait::new(p_addr, gamepack_id, game_id);
+
+	        let all_orbs = AllOrbTrait::all_orbs(p_addr, gamepack_id, game_id);
+	        let all_orbs_span = all_orbs.span();
+	        let mut orb_idx: u32 = 0;
+	        while orb_idx < all_orbs_span.len() {
+	            let orb = all_orbs_span.at(orb_idx);
+	            let mut count_idx: u32 = 0;
+	            while count_idx < *orb.count {
+	                game.pullable_orb_effects.append(*orb.effect);
+	                count_idx += 1;
+	            };
+	            orb_idx += 1;
+
+	            world.write_model(orb);
+	        };
 
 	        world.write_model(@gamepack);
 	        world.write_model(@game);
+	    }
+
+	    fn pull_orb(ref self: ContractState, gamepack_id: u32) {
+	        let mut world = self.world_default();
+	        let p_addr = get_caller_address();
+	        let gamepack: GamePack = world.read_model((p_addr, gamepack_id));
+
+	        let game_id = gamepack.current_game_id;
+	        let mut game: Game = world.read_model((p_addr, gamepack_id, game_id));
+
+	        let result = game.apply_action(Action::PullOrb);
+
+	        match result {
+	            Result::Ok(_) => {
+	                world.write_model(@game);
+	            },
+	            Result::Err(err) => {
+	                panic!("pull orb failed: {:?}", err);
+	            }
+	        }
 	    }
 	}
 
