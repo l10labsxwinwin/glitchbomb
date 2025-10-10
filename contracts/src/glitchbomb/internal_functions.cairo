@@ -139,21 +139,33 @@ pub impl GameImpl of GameTrait {
                     }
 
                     // Pull the orb from the front using pop_front
-                    let pulled_effect = match self.pullable_orb_effects.pop_front() {
-                        Option::Some(effect) => effect,
-                        Option::None => break, // No more orbs to pull
-                    };
-                    self.pulled_orbs_effects.append(pulled_effect);
+                    match self.pullable_orb_effects.pop_front() {
+                        Option::Some(pulled_effect) => {
+                            // If we pull another FiveOrDie orb, put it back and don't count it
+                            match pulled_effect {
+                                OrbEffect::FiveOrDie => {
+                                    self.pullable_orb_effects.append(pulled_effect);
+                                },
+                                _ => {
+                                    self.pulled_orbs_effects.append(pulled_effect);
 
-                    // Apply the orb effect
-                    self.apply_orb_effect(pulled_effect);
+                                    // Apply the orb effect
+                                    self.apply_orb_effect(pulled_effect);
 
-                    // Decrement bomb immunity if active
-                    if self.bomb_immunity_turns > 0 {
-                        self.bomb_immunity_turns -= 1;
+                                    // Decrement bomb immunity if active
+                                    if self.bomb_immunity_turns > 0 {
+                                        self.bomb_immunity_turns -= 1;
+                                    }
+
+                                    orbs_pulled += 1;
+                                }
+                            }
+                        },
+                        Option::None => {
+                            // No more orbs to pull
+                            break;
+                        }
                     }
-
-                    orbs_pulled += 1;
                 }
 
                 // Restore the multiplier to its original value
