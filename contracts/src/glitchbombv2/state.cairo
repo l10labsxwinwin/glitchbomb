@@ -1,0 +1,100 @@
+#[derive(Drop, Serde, Debug, Copy, PartialEq)]
+pub enum PlayerState {
+    Empty,
+    Broke,
+    Stacked,
+}
+
+#[derive(Drop, Serde, Debug, Copy, PartialEq)]
+pub enum GamePackState {
+    Empty,
+    Unopened,
+    InProgress,
+    EndedEarly,
+    Completed,
+}
+
+#[derive(Drop, Serde, Debug, Copy, PartialEq)]
+pub enum GameState {
+    Empty,
+    New,
+    Level,
+    LevelComplete,
+    FiveOrDiePhase,
+    Shop,
+    GameOver,
+}
+
+#[derive(Drop, Serde, Debug, Copy)]
+pub enum Action {
+    ClaimFreeUsdc,
+    BuyGamepack,
+    StartGame,
+    CashOut,
+    PullOrb,
+    EnterShop,
+    ConfirmFiveOrDie: bool,
+    BuyOrb: u32,
+    GoToNextLevel,
+}
+
+#[derive(Drop, Debug)]
+pub enum ActionError {
+    InvalidPlayerState,
+    PlayerIsBroke,
+    PlayerAlreadyHasUsdc,
+    InvalidGamePackState,
+    GamePackDoesNotExist,
+    InvalidGameState,
+    InvalidActionInNewGame,
+    InvalidActionInLevel,
+    InvalidActionInLevelComplete,
+    InvalidActionInFiveOrDiePhase,
+    InvalidActionInShop,
+    GameOver,
+}
+
+#[generate_trait]
+pub impl GameStateValidatorImpl of GameStateValidatorTrait {
+    fn validate_action(
+        player_state: PlayerState,
+        gamepack_state: GamePackState,
+        game_state: GameState,
+        action: Action
+    ) -> Result<(), ActionError> {
+        match (player_state, gamepack_state, game_state, action) {
+            (PlayerState::Empty, _, _, Action::ClaimFreeUsdc) => Ok(()),
+            (PlayerState::Broke, _, _, Action::ClaimFreeUsdc) => Ok(()),
+            (PlayerState::Stacked, _, _, Action::ClaimFreeUsdc) => Err(ActionError::PlayerAlreadyHasUsdc),
+            (PlayerState::Empty, _, _, Action::BuyGamepack) => Err(ActionError::PlayerIsBroke),
+            (PlayerState::Broke, _, _, Action::BuyGamepack) => Err(ActionError::PlayerIsBroke),
+            (PlayerState::Stacked, _, _, Action::BuyGamepack) => Ok(()),
+            (PlayerState::Empty, _, _, _) => Err(ActionError::InvalidPlayerState),
+            (_, GamePackState::Empty, _, _) => Err(ActionError::GamePackDoesNotExist),
+            (_, GamePackState::Unopened, GameState::Empty, Action::StartGame) => Ok(()),
+            (_, GamePackState::Unopened, GameState::Empty, _) => Err(ActionError::InvalidGameState),
+            (_, GamePackState::InProgress, GameState::Empty, Action::StartGame) => Ok(()),
+            (_, GamePackState::InProgress, GameState::Empty, _) => Err(ActionError::InvalidGameState),
+            (_, GamePackState::EndedEarly, GameState::Empty, _) => Err(ActionError::InvalidGameState),
+            (_, GamePackState::Completed, GameState::Empty, _) => Err(ActionError::InvalidGameState),
+            (_, GamePackState::Unopened, GameState::New, Action::StartGame) => Ok(()),
+            (_, GamePackState::Unopened, _, _) => Err(ActionError::InvalidGamePackState),
+            (_, GamePackState::EndedEarly, _, _) => Err(ActionError::InvalidGamePackState),
+            (_, GamePackState::Completed, _, _) => Err(ActionError::InvalidGamePackState),
+            (_, GamePackState::InProgress, GameState::New, Action::StartGame) => Ok(()),
+            (_, GamePackState::InProgress, GameState::New, _) => Err(ActionError::InvalidActionInNewGame),
+            (_, GamePackState::InProgress, GameState::Level, Action::PullOrb) => Ok(()),
+            (_, GamePackState::InProgress, GameState::Level, Action::CashOut) => Ok(()),
+            (_, GamePackState::InProgress, GameState::Level, _) => Err(ActionError::InvalidActionInLevel),
+            (_, GamePackState::InProgress, GameState::LevelComplete, Action::EnterShop) => Ok(()),
+            (_, GamePackState::InProgress, GameState::LevelComplete, Action::CashOut) => Ok(()),
+            (_, GamePackState::InProgress, GameState::LevelComplete, _) => Err(ActionError::InvalidActionInLevelComplete),
+            (_, GamePackState::InProgress, GameState::FiveOrDiePhase, Action::ConfirmFiveOrDie(_)) => Ok(()),
+            (_, GamePackState::InProgress, GameState::FiveOrDiePhase, _) => Err(ActionError::InvalidActionInFiveOrDiePhase),
+            (_, GamePackState::InProgress, GameState::Shop, Action::BuyOrb(_)) => Ok(()),
+            (_, GamePackState::InProgress, GameState::Shop, Action::GoToNextLevel) => Ok(()),
+            (_, GamePackState::InProgress, GameState::Shop, _) => Err(ActionError::InvalidActionInShop),
+            (_, GamePackState::InProgress, GameState::GameOver, _) => Err(ActionError::GameOver),
+        }
+    }
+}

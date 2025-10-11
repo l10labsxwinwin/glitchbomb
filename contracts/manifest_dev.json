@@ -1709,8 +1709,8 @@
       ]
     },
     {
-      "address": "0x5be0dc419aca3b78d84f76440bf4644b0105b30ce6a91615dab46c31134142c",
-      "class_hash": "0x3bc14796ff3ae570615289dfa20b3cfe3006f0cfc5db1656457bc4263d00b75",
+      "address": "0x2a936de2e9391b4677b94ab33351b61698963f1bb5b7527f1a651252527f939",
+      "class_hash": "0x67bcaf968fd5e67c5557efb7168bcb421deed896698cef085d5e6bc472374bc",
       "abi": [
         {
           "type": "impl",
@@ -1850,6 +1850,22 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "write_all_orbs",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "game_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -1978,6 +1994,7 @@
         "pull_orb",
         "advance_to_shop",
         "confirm_five_or_die",
+        "write_all_orbs",
         "upgrade"
       ]
     }
@@ -1998,7 +2015,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x4e45e89ad5db74fbd4bc4a2cd6fe82d18b7e59f1ff62cd6d01e3a652a021024",
+      "class_hash": "0x4e0beeb65a9603f0895fee180dd280f4179097238ad5f1eeed49ebb097628be",
       "tag": "glitchbomb-Game",
       "selector": "0x24b5e6dd68463f27991d99c66043ff038cc0018a54982d584626ea84dadb312"
     },

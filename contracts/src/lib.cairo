@@ -10,8 +10,13 @@ pub mod tests {
 
 pub mod glitchbomb {
     mod contract;
-    mod models;
-    mod actions;
+    pub mod models;
+    pub mod actions;
     mod internal_functions;
     mod helpers;
+}
+
+pub mod glitchbombv2 {
+    mod contract;
+    mod state;
 }
