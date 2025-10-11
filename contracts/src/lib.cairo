@@ -18,5 +18,6 @@ pub mod glitchbomb {
 
 pub mod glitchbombv2 {
     mod contract;
-    mod state;
+    pub mod states;
+    pub mod models;
 }

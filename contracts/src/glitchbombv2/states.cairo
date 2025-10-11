@@ -1,11 +1,13 @@
-#[derive(Drop, Serde, Debug, Copy, PartialEq)]
+#[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum PlayerState {
+    #[default]
     Broke,
     Stacked,
 }
 
-#[derive(Drop, Serde, Debug, Copy, PartialEq)]
+#[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GamePackState {
+    #[default]
     Empty,
     Unopened,
     InProgress,
@@ -13,8 +15,9 @@ pub enum GamePackState {
     Completed,
 }
 
-#[derive(Drop, Serde, Debug, Copy, PartialEq)]
+#[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GameState {
+    #[default]
     Empty,
     New,
     Level,
