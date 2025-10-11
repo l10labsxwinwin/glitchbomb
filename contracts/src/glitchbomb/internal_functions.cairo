@@ -121,6 +121,7 @@ pub impl GameImpl of GameTrait {
     }
 
     fn handle_enter_shop(ref self: Game) -> Result<Option<FiveOrDieData>, ActionError> {
+        self.game_state = GameState::Shop;
         Ok(Option::None)
     }
 
