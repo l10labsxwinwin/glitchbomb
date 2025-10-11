@@ -44,7 +44,7 @@ pub struct Game {
     pub glitch_chips: u32,
     pub moonrocks_spent: u32,
     pub moonrocks_earned: u32,
-    pub orbs_for_sale_ids: [u32; 6],
+    pub orbs_for_sale_ids: Array<u32>,
     pub pullable_orb_effects: Array<OrbEffect>,
     pub pulled_orbs_effects: Array<OrbEffect>,
     pub bomb_immunity_turns: u32,

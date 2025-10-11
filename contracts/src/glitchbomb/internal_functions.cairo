@@ -36,7 +36,7 @@ pub impl GameImpl of GameTrait {
             glitch_chips: 0,
             moonrocks_spent: 10,
             moonrocks_earned: 0,
-            orbs_for_sale_ids: [99, 99, 99, 99, 99, 99],
+            orbs_for_sale_ids: array![3, 3, 3, 3, 3, 3],
             pullable_orb_effects: ArrayTrait::new(),
             pulled_orbs_effects: ArrayTrait::new(),
             bomb_immunity_turns: 0,

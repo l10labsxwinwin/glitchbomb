@@ -144,14 +144,13 @@ pub mod gb_contract {
 	                let mut shuffled_rare = shuffle(rare_orb_ids);
 	                let mut shuffled_cosmic = shuffle(cosmic_orb_ids);
 
-	                let orbs_for_sale: [u32; 6] = [
-	                    shuffled_common.pop_front().unwrap(),
-	                    shuffled_common.pop_front().unwrap(),
-	                    shuffled_common.pop_front().unwrap(),
-	                    shuffled_rare.pop_front().unwrap(),
-	                    shuffled_rare.pop_front().unwrap(),
-	                    shuffled_cosmic.pop_front().unwrap(),
-	                ];
+	                let mut orbs_for_sale: Array<u32> = ArrayTrait::new();
+	                orbs_for_sale.append(shuffled_common.pop_front().unwrap());
+	                orbs_for_sale.append(shuffled_common.pop_front().unwrap());
+	                orbs_for_sale.append(shuffled_common.pop_front().unwrap());
+	                orbs_for_sale.append(shuffled_rare.pop_front().unwrap());
+	                orbs_for_sale.append(shuffled_rare.pop_front().unwrap());
+	                orbs_for_sale.append(shuffled_cosmic.pop_front().unwrap());
 	                game.orbs_for_sale_ids = orbs_for_sale;
 
 	                world.write_model(@game);
