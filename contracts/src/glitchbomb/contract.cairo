@@ -4,14 +4,16 @@ pub trait PlayerActions<T> {
     fn buy_gamepack(ref self: T);
     fn start_game(ref self: T, gamepack_id: u32);
     fn pull_orb(ref self: T, gamepack_id: u32);
+    fn advance_to_shop(ref self: T, gamepack_id: u32);
     fn confirm_five_or_die(ref self: T, gamepack_id: u32, confirmed: bool);
 }
 
 #[dojo::contract]
 pub mod gb_contract {
-    use crate::glitchbomb::models::{ Player, GamePack, GamePackState, Game, GameState };
+    use crate::glitchbomb::models::{ Player, GamePack, GamePackState, Game, GameState, Orb, OrbRarity };
     use crate::glitchbomb::internal_functions::{GamePackTrait, GameTrait, AllOrbTrait};
     use crate::glitchbomb::actions::Action;
+    use crate::glitchbomb::helpers::shuffle;
     use dojo::model::ModelStorage;
     use super::{PlayerActions};
     use starknet::get_caller_address;
@@ -105,6 +107,53 @@ pub mod gb_contract {
 	                panic!("pull orb failed: {:?}", err);
 	            }
 	        }
+	    }
+
+	    fn advance_to_shop(ref self: ContractState, gamepack_id: u32) {
+	        let mut world = self.world_default();
+	        let p_addr = get_caller_address();
+	        let gamepack: GamePack = world.read_model((p_addr, gamepack_id));
+
+	        let game_id = gamepack.current_game_id;
+	        let mut game: Game = world.read_model((p_addr, gamepack_id, game_id));
+
+	        assert(game.game_state == GameState::LevelComplete, 'must be in level complete');
+
+	        let mut common_orb_ids: Array<u32> = ArrayTrait::new();
+	        let mut rare_orb_ids: Array<u32> = ArrayTrait::new();
+	        let mut cosmic_orb_ids: Array<u32> = ArrayTrait::new();
+
+	        let mut orb_id: u32 = 0;
+	        let num_all_orbs = AllOrbTrait::all_orbs(p_addr, gamepack_id, game_id).span().len();
+	        while orb_id < num_all_orbs {
+	            let orb: Orb = world.read_model((p_addr, gamepack_id, game_id, orb_id));
+	            if orb.is_buyable {
+	                match orb.rarity {
+	                    OrbRarity::Common => common_orb_ids.append(orb.orb_id),
+	                    OrbRarity::Rare => rare_orb_ids.append(orb.orb_id),
+	                    OrbRarity::Cosmic => cosmic_orb_ids.append(orb.orb_id),
+	                }
+	            }
+	            orb_id += 1;
+	        };
+
+	        let mut shuffled_common = shuffle(common_orb_ids);
+	        let mut shuffled_rare = shuffle(rare_orb_ids);
+	        let mut shuffled_cosmic = shuffle(cosmic_orb_ids);
+
+	        let orbs_for_sale: [u32; 6] = [
+	            shuffled_common.pop_front().unwrap(),
+	            shuffled_common.pop_front().unwrap(),
+	            shuffled_common.pop_front().unwrap(),
+	            shuffled_rare.pop_front().unwrap(),
+	            shuffled_rare.pop_front().unwrap(),
+	            shuffled_cosmic.pop_front().unwrap(),
+	        ];
+
+	        game.orbs_for_sale_ids = orbs_for_sale;
+	        game.game_state = GameState::Shop;
+
+	        world.write_model(@game);
 	    }
 
 	    fn confirm_five_or_die(ref self: ContractState, gamepack_id: u32, confirmed: bool) {
