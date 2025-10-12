@@ -18,10 +18,8 @@ pub mod gb_contract_v2 {
     use super::PlayerActionsV2;
     use starknet::get_caller_address;
     use dojo_starter::glitchbombv2::models::{Player, GamePack, Game};
-    use dojo_starter::glitchbombv2::states::{
-        GamePackState, GameState, Action, validate_action
-    };
-    use dojo_starter::glitchbombv2::handlers::{update_player, UpdateError};
+    use dojo_starter::glitchbombv2::states::{Action, validate_action};
+    use dojo_starter::glitchbombv2::handlers::update_player;
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {
@@ -45,13 +43,13 @@ pub mod gb_contract_v2 {
                 Result::Err(err) => panic!("{:?}", err),
             }
 
-            let (new_player_state, new_usdc) = match update_player(player.state, player.usdc, action) {
+            let (new_player_state, new_data) = match update_player(player.state, player.data, action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
 
             player.state = new_player_state;
-            player.usdc = new_usdc;
+            player.data = new_data;
 
             world.write_model(@player);
             world.write_model(@gamepack);
@@ -78,13 +76,13 @@ pub mod gb_contract_v2 {
                 Result::Err(err) => panic!("{:?}", err),
             }
 
-            let (new_player_state, new_usdc) = match update_player(player.state, player.usdc, action) {
+            let (new_player_state, new_data) = match update_player(player.state, player.data, action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
 
             player.state = new_player_state;
-            player.usdc = new_usdc;
+            player.data = new_data;
 
             world.write_model(@player);
             world.write_model(@gamepack);
