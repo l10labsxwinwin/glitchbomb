@@ -45,13 +45,13 @@ pub mod gb_contract_v2 {
                 Result::Err(err) => panic!("{:?}", err),
             }
 
-            let (new_player_state, new_player_data) = match update_player(player.state, player.data, action) {
+            let (new_player_state, new_usdc) = match update_player(player.state, player.usdc, action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
 
             player.state = new_player_state;
-            player.data = new_player_data;
+            player.usdc = new_usdc;
 
             world.write_model(@player);
             world.write_model(@gamepack);
@@ -78,13 +78,13 @@ pub mod gb_contract_v2 {
                 Result::Err(err) => panic!("{:?}", err),
             }
 
-            let (new_player_state, new_player_data) = match update_player(player.state, player.data, action) {
+            let (new_player_state, new_usdc) = match update_player(player.state, player.usdc, action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
 
             player.state = new_player_state;
-            player.data = new_player_data;
+            player.usdc = new_usdc;
 
             world.write_model(@player);
             world.write_model(@gamepack);

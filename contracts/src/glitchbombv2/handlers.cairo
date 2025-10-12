@@ -1,5 +1,5 @@
 use super::states::{PlayerState, GamePackState, GameState, Action};
-use super::data::{PlayerData, GamePackData, GameData};
+use super::data::{GamePackData, GameData};
 
 #[derive(Drop, Debug)]
 pub enum UpdateError {
@@ -7,19 +7,26 @@ pub enum UpdateError {
     InvalidData,
 }
 
-pub fn update_player(state: PlayerState, data: PlayerData, action: Action) -> Result<(PlayerState, PlayerData), UpdateError> {
-    match (state, data.usdc, action) {
-        (PlayerState::Broke, 0, Action::ClaimFreeUsdc) => {
-            let new_data = PlayerData { usdc: data.usdc + 5 };
-            Ok((PlayerState::Stacked, new_data))
+pub fn update_player(state: PlayerState, usdc: u32, action: Action) -> Result<(PlayerState, u32), UpdateError> {
+    match (state, action) {
+        (PlayerState::Broke, Action::ClaimFreeUsdc) => {
+            if usdc != 0 {
+                return Err(UpdateError::InvalidData);
+            }
+            let new_usdc = usdc + 5;
+            Ok((PlayerState::Stacked, new_usdc))
         },
-        (PlayerState::Stacked, 1, Action::BuyGamepack) => {
-            let new_data = PlayerData { usdc: 0 };
-            Ok((PlayerState::Broke, new_data))
-        },
-        (PlayerState::Stacked, _, Action::BuyGamepack) => {
-            let new_data = PlayerData { usdc: data.usdc - 1 };
-            Ok((PlayerState::Stacked, new_data))
+        (PlayerState::Stacked, Action::BuyGamepack) => {
+            if usdc == 0 {
+                return Err(UpdateError::InvalidData);
+            }
+            let new_usdc = usdc - 1;
+            let new_state = if new_usdc == 0 {
+                PlayerState::Broke
+            } else {
+                PlayerState::Stacked
+            };
+            Ok((new_state, new_usdc))
         },
         _ => Err(UpdateError::InvalidStateTransition),
     }

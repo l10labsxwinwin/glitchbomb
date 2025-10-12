@@ -1709,8 +1709,8 @@
       ]
     },
     {
-      "address": "0x2a936de2e9391b4677b94ab33351b61698963f1bb5b7527f1a651252527f939",
-      "class_hash": "0x67bcaf968fd5e67c5557efb7168bcb421deed896698cef085d5e6bc472374bc",
+      "address": "0x425293979ad3833ae22e0bb47e33d8e3cbc75649f765af49b6e2b0d696ad0a4",
+      "class_hash": "0x628194fb4ea73a93b62d7071168f52627e50e33f9b5d227c3cb92b1a5b8f9b3",
       "abi": [
         {
           "type": "impl",
@@ -1850,22 +1850,6 @@
               ],
               "outputs": [],
               "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "write_all_orbs",
-              "inputs": [
-                {
-                  "name": "gamepack_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "game_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
             }
           ]
         },
@@ -1994,7 +1978,346 @@
         "pull_orb",
         "advance_to_shop",
         "confirm_five_or_die",
-        "write_all_orbs",
+        "upgrade"
+      ]
+    },
+    {
+      "address": "0x4dccf3e0868d536b6eed529d491a2096f9cd6c42b123dbcf8b0deb6a29b1ba2",
+      "class_hash": "0x630f847a038b781eea9addefbe7c29624810c5c000b91526a79db66d3e9a9e5",
+      "abi": [
+        {
+          "type": "impl",
+          "name": "gb_contract_v2__ContractImpl",
+          "interface_name": "dojo::contract::interface::IContract"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::interface::IContract",
+          "items": []
+        },
+        {
+          "type": "impl",
+          "name": "DojoDeployedContractImpl",
+          "interface_name": "dojo::meta::interface::IDeployedResource"
+        },
+        {
+          "type": "struct",
+          "name": "core::byte_array::ByteArray",
+          "members": [
+            {
+              "name": "data",
+              "type": "core::array::Array::<core::bytes_31::bytes31>"
+            },
+            {
+              "name": "pending_word",
+              "type": "core::felt252"
+            },
+            {
+              "name": "pending_word_len",
+              "type": "core::integer::u32"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::meta::interface::IDeployedResource",
+          "items": [
+            {
+              "type": "function",
+              "name": "dojo_name",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "core::byte_array::ByteArray"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "PlayerActionsV2Impl",
+          "interface_name": "dojo_starter::glitchbombv2::contract::PlayerActionsV2"
+        },
+        {
+          "type": "enum",
+          "name": "core::bool",
+          "variants": [
+            {
+              "name": "False",
+              "type": "()"
+            },
+            {
+              "name": "True",
+              "type": "()"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo_starter::glitchbombv2::contract::PlayerActionsV2",
+          "items": [
+            {
+              "type": "function",
+              "name": "claim_free_usdc",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "buy_gamepack",
+              "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "start_game",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "cash_out",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "game_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "pull_orb",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "game_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "enter_shop",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "game_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "confirm_five_or_die",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "game_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "confirmed",
+                  "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "buy_orb",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "game_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "orb_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "go_to_next_level",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "game_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "function",
+          "name": "dojo_init",
+          "inputs": [],
+          "outputs": [],
+          "state_mutability": "view"
+        },
+        {
+          "type": "impl",
+          "name": "WorldProviderImpl",
+          "interface_name": "dojo::contract::components::world_provider::IWorldProvider"
+        },
+        {
+          "type": "struct",
+          "name": "dojo::world::iworld::IWorldDispatcher",
+          "members": [
+            {
+              "name": "contract_address",
+              "type": "core::starknet::contract_address::ContractAddress"
+            }
+          ]
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::world_provider::IWorldProvider",
+          "items": [
+            {
+              "type": "function",
+              "name": "world_dispatcher",
+              "inputs": [],
+              "outputs": [
+                {
+                  "type": "dojo::world::iworld::IWorldDispatcher"
+                }
+              ],
+              "state_mutability": "view"
+            }
+          ]
+        },
+        {
+          "type": "impl",
+          "name": "UpgradeableImpl",
+          "interface_name": "dojo::contract::components::upgradeable::IUpgradeable"
+        },
+        {
+          "type": "interface",
+          "name": "dojo::contract::components::upgradeable::IUpgradeable",
+          "items": [
+            {
+              "type": "function",
+              "name": "upgrade",
+              "inputs": [
+                {
+                  "name": "new_class_hash",
+                  "type": "core::starknet::class_hash::ClassHash"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            }
+          ]
+        },
+        {
+          "type": "constructor",
+          "name": "constructor",
+          "inputs": []
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+          "kind": "struct",
+          "members": [
+            {
+              "name": "class_hash",
+              "type": "core::starknet::class_hash::ClassHash",
+              "kind": "data"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "Upgraded",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Upgraded",
+              "kind": "nested"
+            }
+          ]
+        },
+        {
+          "type": "event",
+          "name": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+          "kind": "enum",
+          "variants": []
+        },
+        {
+          "type": "event",
+          "name": "dojo_starter::glitchbombv2::contract::gb_contract_v2::Event",
+          "kind": "enum",
+          "variants": [
+            {
+              "name": "UpgradeableEvent",
+              "type": "dojo::contract::components::upgradeable::upgradeable_cpt::Event",
+              "kind": "nested"
+            },
+            {
+              "name": "WorldProviderEvent",
+              "type": "dojo::contract::components::world_provider::world_provider_cpt::Event",
+              "kind": "nested"
+            }
+          ]
+        }
+      ],
+      "init_calldata": [],
+      "tag": "glitchbomb-gb_contract_v2",
+      "selector": "0x7852d7f9504b09ffb2334af7c715e1dc03bfad56fb32f91d50d79c179980a83",
+      "systems": [
+        "claim_free_usdc",
+        "buy_gamepack",
+        "start_game",
+        "cash_out",
+        "pull_orb",
+        "enter_shop",
+        "confirm_five_or_die",
+        "buy_orb",
+        "go_to_next_level",
         "upgrade"
       ]
     }
@@ -2015,13 +2338,13 @@
     },
     {
       "members": [],
-      "class_hash": "0x4e0beeb65a9603f0895fee180dd280f4179097238ad5f1eeed49ebb097628be",
+      "class_hash": "0x1d3402745319602354e5601091b7365333d00e9709c1c7cc4ba9d38effffa73",
       "tag": "glitchbomb-Game",
       "selector": "0x24b5e6dd68463f27991d99c66043ff038cc0018a54982d584626ea84dadb312"
     },
     {
       "members": [],
-      "class_hash": "0x45004170cc026926cf84c8669a9f7a5bde887937ebc763806082e0d1c45d199",
+      "class_hash": "0x9355c72bd9b4a33a9956fc971644515669acf0528121d619fc3cabdeb784e",
       "tag": "glitchbomb-GamePack",
       "selector": "0x7b8f7a36699ae315115ebc8f8ea14a7820388bdf157967587c8120a5eaf751"
     },
@@ -2039,7 +2362,7 @@
     },
     {
       "members": [],
-      "class_hash": "0x425b736f0914e6e600a56370227402f6cb0d8c2195b3acb1d78b6bd9f7d72b4",
+      "class_hash": "0x7858a60d9621eb7730906c9e21857a86a47179d07fbd0da4bdd991a69b545be",
       "tag": "glitchbomb-Player",
       "selector": "0x636658d36f9cf1eeafd449fa3242f0fd75d6522b204e5f8367ff071ad4beba2"
     },
