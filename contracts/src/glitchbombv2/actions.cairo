@@ -6,8 +6,8 @@ pub enum PlayerAction {
 
 #[derive(Drop, Serde, Debug, Copy)]
 pub enum GamePackAction {
-    StartGame,
-    CashOut,
+    OpenPack,
+    SubmitScore,
 }
 
 #[derive(Drop, Serde, Debug, Copy)]

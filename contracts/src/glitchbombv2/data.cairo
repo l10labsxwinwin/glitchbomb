@@ -5,7 +5,8 @@ pub struct PlayerData {
 
 #[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore, Default)]
 pub struct GamePackData {
-    dummy: u32
+    pub current_game_id: u32,
+    pub accumulated_moonrocks: u32,
 }
 
 #[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore, Default)]

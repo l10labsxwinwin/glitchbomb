@@ -1,6 +1,6 @@
-use super::states::{PlayerState, GamePackState, GameState, Action};
-use super::data::PlayerData;
-use super::actions::PlayerAction;
+use super::states::{PlayerState, GamePackState, GameState};
+use super::data::{PlayerData, GamePackData, GameData};
+use super::actions::{PlayerAction, GamePackAction, GameAction};
 
 #[derive(Drop, Debug)]
 pub enum UpdateError {
@@ -27,120 +27,36 @@ pub fn update_player(state: PlayerState, data: PlayerData, action: PlayerAction)
     }
 }
 
-pub fn update_gamepack(state: GamePackState, action: Action) -> Result<GamePackState, ()> {
+pub fn update_gamepack(state: GamePackState, data: GamePackData, action: GamePackAction) -> Result<(GamePackState, GamePackData), UpdateError> {
     match (state, action) {
-        (GamePackState::Empty, Action::ClaimFreeUsdc) => Ok(state),
-        (GamePackState::Empty, Action::BuyGamepack) => Ok(state),
-        (GamePackState::Empty, Action::StartGame) => Ok(state),
-        (GamePackState::Empty, Action::CashOut) => Ok(state),
-        (GamePackState::Empty, Action::PullOrb) => Ok(state),
-        (GamePackState::Empty, Action::EnterShop) => Ok(state),
-        (GamePackState::Empty, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GamePackState::Empty, Action::BuyOrb(_)) => Ok(state),
-        (GamePackState::Empty, Action::GoToNextLevel) => Ok(state),
-        (GamePackState::Unopened, Action::ClaimFreeUsdc) => Ok(state),
-        (GamePackState::Unopened, Action::BuyGamepack) => Ok(state),
-        (GamePackState::Unopened, Action::StartGame) => Ok(state),
-        (GamePackState::Unopened, Action::CashOut) => Ok(state),
-        (GamePackState::Unopened, Action::PullOrb) => Ok(state),
-        (GamePackState::Unopened, Action::EnterShop) => Ok(state),
-        (GamePackState::Unopened, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GamePackState::Unopened, Action::BuyOrb(_)) => Ok(state),
-        (GamePackState::Unopened, Action::GoToNextLevel) => Ok(state),
-        (GamePackState::InProgress, Action::ClaimFreeUsdc) => Ok(state),
-        (GamePackState::InProgress, Action::BuyGamepack) => Ok(state),
-        (GamePackState::InProgress, Action::StartGame) => Ok(state),
-        (GamePackState::InProgress, Action::CashOut) => Ok(state),
-        (GamePackState::InProgress, Action::PullOrb) => Ok(state),
-        (GamePackState::InProgress, Action::EnterShop) => Ok(state),
-        (GamePackState::InProgress, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GamePackState::InProgress, Action::BuyOrb(_)) => Ok(state),
-        (GamePackState::InProgress, Action::GoToNextLevel) => Ok(state),
-        (GamePackState::EndedEarly, Action::ClaimFreeUsdc) => Ok(state),
-        (GamePackState::EndedEarly, Action::BuyGamepack) => Ok(state),
-        (GamePackState::EndedEarly, Action::StartGame) => Ok(state),
-        (GamePackState::EndedEarly, Action::CashOut) => Ok(state),
-        (GamePackState::EndedEarly, Action::PullOrb) => Ok(state),
-        (GamePackState::EndedEarly, Action::EnterShop) => Ok(state),
-        (GamePackState::EndedEarly, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GamePackState::EndedEarly, Action::BuyOrb(_)) => Ok(state),
-        (GamePackState::EndedEarly, Action::GoToNextLevel) => Ok(state),
-        (GamePackState::Completed, Action::ClaimFreeUsdc) => Ok(state),
-        (GamePackState::Completed, Action::BuyGamepack) => Ok(state),
-        (GamePackState::Completed, Action::StartGame) => Ok(state),
-        (GamePackState::Completed, Action::CashOut) => Ok(state),
-        (GamePackState::Completed, Action::PullOrb) => Ok(state),
-        (GamePackState::Completed, Action::EnterShop) => Ok(state),
-        (GamePackState::Completed, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GamePackState::Completed, Action::BuyOrb(_)) => Ok(state),
-        (GamePackState::Completed, Action::GoToNextLevel) => Ok(state),
+        (GamePackState::Unopened, GamePackAction::OpenPack) => {
+            let new_data = GamePackData {
+                current_game_id: 1,
+                accumulated_moonrocks: 100,
+            };
+            Ok((GamePackState::InProgress, new_data))
+        },
+        (GamePackState::InProgress, GamePackAction::SubmitScore) => Ok((GamePackState::Completed, data)),
+        _ => Err(UpdateError::InvalidStateTransition),
     }
 }
 
-pub fn update_game(state: GameState, action: Action) -> Result<GameState, ()> {
+pub fn update_game(state: GameState, data: GameData, action: GameAction) -> Result<(GameState, GameData), UpdateError> {
     match (state, action) {
-        (GameState::Empty, Action::ClaimFreeUsdc) => Ok(state),
-        (GameState::Empty, Action::BuyGamepack) => Ok(state),
-        (GameState::Empty, Action::StartGame) => Ok(state),
-        (GameState::Empty, Action::CashOut) => Ok(state),
-        (GameState::Empty, Action::PullOrb) => Ok(state),
-        (GameState::Empty, Action::EnterShop) => Ok(state),
-        (GameState::Empty, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GameState::Empty, Action::BuyOrb(_)) => Ok(state),
-        (GameState::Empty, Action::GoToNextLevel) => Ok(state),
-        (GameState::New, Action::ClaimFreeUsdc) => Ok(state),
-        (GameState::New, Action::BuyGamepack) => Ok(state),
-        (GameState::New, Action::StartGame) => Ok(state),
-        (GameState::New, Action::CashOut) => Ok(state),
-        (GameState::New, Action::PullOrb) => Ok(state),
-        (GameState::New, Action::EnterShop) => Ok(state),
-        (GameState::New, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GameState::New, Action::BuyOrb(_)) => Ok(state),
-        (GameState::New, Action::GoToNextLevel) => Ok(state),
-        (GameState::Level, Action::ClaimFreeUsdc) => Ok(state),
-        (GameState::Level, Action::BuyGamepack) => Ok(state),
-        (GameState::Level, Action::StartGame) => Ok(state),
-        (GameState::Level, Action::CashOut) => Ok(state),
-        (GameState::Level, Action::PullOrb) => Ok(state),
-        (GameState::Level, Action::EnterShop) => Ok(state),
-        (GameState::Level, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GameState::Level, Action::BuyOrb(_)) => Ok(state),
-        (GameState::Level, Action::GoToNextLevel) => Ok(state),
-        (GameState::LevelComplete, Action::ClaimFreeUsdc) => Ok(state),
-        (GameState::LevelComplete, Action::BuyGamepack) => Ok(state),
-        (GameState::LevelComplete, Action::StartGame) => Ok(state),
-        (GameState::LevelComplete, Action::CashOut) => Ok(state),
-        (GameState::LevelComplete, Action::PullOrb) => Ok(state),
-        (GameState::LevelComplete, Action::EnterShop) => Ok(state),
-        (GameState::LevelComplete, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GameState::LevelComplete, Action::BuyOrb(_)) => Ok(state),
-        (GameState::LevelComplete, Action::GoToNextLevel) => Ok(state),
-        (GameState::FiveOrDiePhase, Action::ClaimFreeUsdc) => Ok(state),
-        (GameState::FiveOrDiePhase, Action::BuyGamepack) => Ok(state),
-        (GameState::FiveOrDiePhase, Action::StartGame) => Ok(state),
-        (GameState::FiveOrDiePhase, Action::CashOut) => Ok(state),
-        (GameState::FiveOrDiePhase, Action::PullOrb) => Ok(state),
-        (GameState::FiveOrDiePhase, Action::EnterShop) => Ok(state),
-        (GameState::FiveOrDiePhase, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GameState::FiveOrDiePhase, Action::BuyOrb(_)) => Ok(state),
-        (GameState::FiveOrDiePhase, Action::GoToNextLevel) => Ok(state),
-        (GameState::Shop, Action::ClaimFreeUsdc) => Ok(state),
-        (GameState::Shop, Action::BuyGamepack) => Ok(state),
-        (GameState::Shop, Action::StartGame) => Ok(state),
-        (GameState::Shop, Action::CashOut) => Ok(state),
-        (GameState::Shop, Action::PullOrb) => Ok(state),
-        (GameState::Shop, Action::EnterShop) => Ok(state),
-        (GameState::Shop, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GameState::Shop, Action::BuyOrb(_)) => Ok(state),
-        (GameState::Shop, Action::GoToNextLevel) => Ok(state),
-        (GameState::GameOver, Action::ClaimFreeUsdc) => Ok(state),
-        (GameState::GameOver, Action::BuyGamepack) => Ok(state),
-        (GameState::GameOver, Action::StartGame) => Ok(state),
-        (GameState::GameOver, Action::CashOut) => Ok(state),
-        (GameState::GameOver, Action::PullOrb) => Ok(state),
-        (GameState::GameOver, Action::EnterShop) => Ok(state),
-        (GameState::GameOver, Action::ConfirmFiveOrDie(_)) => Ok(state),
-        (GameState::GameOver, Action::BuyOrb(_)) => Ok(state),
-        (GameState::GameOver, Action::GoToNextLevel) => Ok(state),
+        (GameState::New, GameAction::PullOrb) => Ok((GameState::Level, data)),
+        (GameState::Level, GameAction::PullOrb) => Ok((GameState::LevelComplete, data)),
+        (GameState::Level, GameAction::CashOut) => Ok((GameState::GameOver, data)),
+        (GameState::LevelComplete, GameAction::EnterShop) => Ok((GameState::Shop, data)),
+        (GameState::LevelComplete, GameAction::CashOut) => Ok((GameState::GameOver, data)),
+        (GameState::FiveOrDiePhase, GameAction::ConfirmFiveOrDie(confirmed)) => {
+            if confirmed {
+                Ok((GameState::Level, data))
+            } else {
+                Ok((GameState::GameOver, data))
+            }
+        },
+        (GameState::Shop, GameAction::BuyOrb(_)) => Ok((state, data)),
+        (GameState::Shop, GameAction::GoToNextLevel) => Ok((GameState::Level, data)),
+        _ => Err(UpdateError::InvalidStateTransition),
     }
 }
