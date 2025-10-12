@@ -10,23 +10,17 @@ pub enum UpdateError {
 pub fn update_player(state: PlayerState, data: PlayerData, action: Action) -> Result<(PlayerState, PlayerData), UpdateError> {
     match (state, action) {
         (PlayerState::Broke, Action::ClaimFreeUsdc) => {
-            if data.usdc != 0 {
-                return Err(UpdateError::InvalidData);
+            match data.usdc {
+                0 => Ok((PlayerState::Stacked, PlayerData { usdc: 5 })),
+                _ => Err(UpdateError::InvalidData),
             }
-            let new_usdc = data.usdc + 5;
-            Ok((PlayerState::Stacked, PlayerData { usdc: new_usdc }))
         },
         (PlayerState::Stacked, Action::BuyGamepack) => {
-            if data.usdc == 0 {
-                return Err(UpdateError::InvalidData);
+            match data.usdc {
+                0 => Err(UpdateError::InvalidData),
+                1 => Ok((PlayerState::Broke, PlayerData { usdc: 0 })),
+                _ => Ok((PlayerState::Stacked, PlayerData { usdc: data.usdc - 1 })),
             }
-            let new_usdc = data.usdc - 1;
-            let new_state = if new_usdc == 0 {
-                PlayerState::Broke
-            } else {
-                PlayerState::Stacked
-            };
-            Ok((new_state, PlayerData { usdc: new_usdc }))
         },
         _ => Err(UpdateError::InvalidStateTransition),
     }
