@@ -1,5 +1,6 @@
 use starknet::ContractAddress;
 use super::states::{PlayerState, GamePackState, GameState};
+use super::data::{PlayerData, GamePackData, GameData};
 
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
@@ -8,6 +9,7 @@ pub struct Player {
     pub player_id: ContractAddress,
 
     pub state: PlayerState,
+    pub data: PlayerData,
 }
 
 #[derive(Drop, Serde, Debug)]

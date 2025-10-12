@@ -21,6 +21,7 @@ pub mod gb_contract_v2 {
     use dojo_starter::glitchbombv2::states::{
         GamePackState, GameState, Action, validate_action
     };
+    use dojo_starter::glitchbombv2::handlers::{update_player, UpdateError};
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {
@@ -28,7 +29,7 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
+            let mut player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, 1_u32));
             let game: Game = world.read_model((player_id, 1_u32, 1_u32));
 
@@ -44,6 +45,14 @@ pub mod gb_contract_v2 {
                 Result::Err(err) => panic!("{:?}", err),
             }
 
+            let (new_player_state, new_player_data) = match update_player(player.state, player.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            player.state = new_player_state;
+            player.data = new_player_data;
+
             world.write_model(@player);
             world.write_model(@gamepack);
             world.write_model(@game);
@@ -53,7 +62,7 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
+            let mut player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, 1_u32));
             let game: Game = world.read_model((player_id, 1_u32, 1_u32));
 
@@ -68,6 +77,14 @@ pub mod gb_contract_v2 {
                 Result::Ok(_) => {},
                 Result::Err(err) => panic!("{:?}", err),
             }
+
+            let (new_player_state, new_player_data) = match update_player(player.state, player.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            player.state = new_player_state;
+            player.data = new_player_data;
 
             world.write_model(@player);
             world.write_model(@gamepack);
