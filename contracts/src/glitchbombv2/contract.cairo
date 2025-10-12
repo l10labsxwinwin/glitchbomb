@@ -18,7 +18,7 @@ pub mod gb_contract_v2 {
     use super::PlayerActionsV2;
     use starknet::get_caller_address;
     use dojo_starter::glitchbombv2::models::{Player, GamePack, Game};
-    use dojo_starter::glitchbombv2::states::{Action, validate_action};
+    use dojo_starter::glitchbombv2::states::Action;
     use dojo_starter::glitchbombv2::handlers::update_player;
 
     #[abi(embed_v0)]
@@ -32,16 +32,6 @@ pub mod gb_contract_v2 {
             let game: Game = world.read_model((player_id, 1_u32, 1_u32));
 
             let action = Action::ClaimFreeUsdc;
-
-            match validate_action(
-                player.state,
-                gamepack.state,
-                game.state,
-                action
-            ) {
-                Result::Ok(_) => {},
-                Result::Err(err) => panic!("{:?}", err),
-            }
 
             let (new_player_state, new_data) = match update_player(player.state, player.data, action) {
                 Result::Ok(result) => result,
@@ -66,16 +56,6 @@ pub mod gb_contract_v2 {
 
             let action = Action::BuyGamepack;
 
-            match validate_action(
-                player.state,
-                gamepack.state,
-                game.state,
-                action
-            ) {
-                Result::Ok(_) => {},
-                Result::Err(err) => panic!("{:?}", err),
-            }
-
             let (new_player_state, new_data) = match update_player(player.state, player.data, action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
@@ -97,18 +77,6 @@ pub mod gb_contract_v2 {
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let game: Game = world.read_model((player_id, gamepack_id, 1_u32));
 
-            let action = Action::StartGame;
-
-            match validate_action(
-                player.state,
-                gamepack.state,
-                game.state,
-                action
-            ) {
-                Result::Ok(_) => {},
-                Result::Err(err) => panic!("{:?}", err),
-            }
-
             world.write_model(@player);
             world.write_model(@gamepack);
             world.write_model(@game);
@@ -121,18 +89,6 @@ pub mod gb_contract_v2 {
             let player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let game: Game = world.read_model((player_id, gamepack_id, game_id));
-
-            let action = Action::CashOut;
-
-            match validate_action(
-                player.state,
-                gamepack.state,
-                game.state,
-                action
-            ) {
-                Result::Ok(_) => {},
-                Result::Err(err) => panic!("{:?}", err),
-            }
 
             world.write_model(@player);
             world.write_model(@gamepack);
@@ -147,18 +103,6 @@ pub mod gb_contract_v2 {
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let game: Game = world.read_model((player_id, gamepack_id, game_id));
 
-            let action = Action::PullOrb;
-
-            match validate_action(
-                player.state,
-                gamepack.state,
-                game.state,
-                action
-            ) {
-                Result::Ok(_) => {},
-                Result::Err(err) => panic!("{:?}", err),
-            }
-
             world.write_model(@player);
             world.write_model(@gamepack);
             world.write_model(@game);
@@ -171,18 +115,6 @@ pub mod gb_contract_v2 {
             let player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let game: Game = world.read_model((player_id, gamepack_id, game_id));
-
-            let action = Action::EnterShop;
-
-            match validate_action(
-                player.state,
-                gamepack.state,
-                game.state,
-                action
-            ) {
-                Result::Ok(_) => {},
-                Result::Err(err) => panic!("{:?}", err),
-            }
 
             world.write_model(@player);
             world.write_model(@gamepack);
@@ -197,18 +129,6 @@ pub mod gb_contract_v2 {
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let game: Game = world.read_model((player_id, gamepack_id, game_id));
 
-            let action = Action::ConfirmFiveOrDie(confirmed);
-
-            match validate_action(
-                player.state,
-                gamepack.state,
-                game.state,
-                action
-            ) {
-                Result::Ok(_) => {},
-                Result::Err(err) => panic!("{:?}", err),
-            }
-
             world.write_model(@player);
             world.write_model(@gamepack);
             world.write_model(@game);
@@ -222,18 +142,6 @@ pub mod gb_contract_v2 {
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let game: Game = world.read_model((player_id, gamepack_id, game_id));
 
-            let action = Action::BuyOrb(orb_id);
-
-            match validate_action(
-                player.state,
-                gamepack.state,
-                game.state,
-                action
-            ) {
-                Result::Ok(_) => {},
-                Result::Err(err) => panic!("{:?}", err),
-            }
-
             world.write_model(@player);
             world.write_model(@gamepack);
             world.write_model(@game);
@@ -246,18 +154,6 @@ pub mod gb_contract_v2 {
             let player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let game: Game = world.read_model((player_id, gamepack_id, game_id));
-
-            let action = Action::GoToNextLevel;
-
-            match validate_action(
-                player.state,
-                gamepack.state,
-                game.state,
-                action
-            ) {
-                Result::Ok(_) => {},
-                Result::Err(err) => panic!("{:?}", err),
-            }
 
             world.write_model(@player);
             world.write_model(@gamepack);
