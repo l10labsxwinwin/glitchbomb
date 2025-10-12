@@ -92,7 +92,7 @@ pub mod gb_contract_v2 {
             let new_game = Game {
                 player_id,
                 gamepack_id,
-                game_id: 1_u32,
+                game_id: gamepack.data.current_game_id,
                 state: GameState::New,
                 data: Default::default(),
             };
