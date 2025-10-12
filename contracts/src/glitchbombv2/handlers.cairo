@@ -1,5 +1,6 @@
 use super::states::{PlayerState, GamePackState, GameState, Action};
 use super::data::PlayerData;
+use super::actions::PlayerAction;
 
 #[derive(Drop, Debug)]
 pub enum UpdateError {
@@ -7,15 +8,15 @@ pub enum UpdateError {
     InvalidData,
 }
 
-pub fn update_player(state: PlayerState, data: PlayerData, action: Action) -> Result<(PlayerState, PlayerData), UpdateError> {
+pub fn update_player(state: PlayerState, data: PlayerData, action: PlayerAction) -> Result<(PlayerState, PlayerData), UpdateError> {
     match (state, action) {
-        (PlayerState::Broke, Action::ClaimFreeUsdc) => {
+        (PlayerState::Broke, PlayerAction::ClaimFreeUsdc) => {
             match data.usdc {
                 0 => Ok((PlayerState::Stacked, PlayerData { usdc: 5 })),
                 _ => Err(UpdateError::InvalidData),
             }
         },
-        (PlayerState::Stacked, Action::BuyGamepack) => {
+        (PlayerState::Stacked, PlayerAction::BuyGamePack) => {
             match data.usdc {
                 0 => Err(UpdateError::InvalidData),
                 1 => Ok((PlayerState::Broke, PlayerData { usdc: 0 })),

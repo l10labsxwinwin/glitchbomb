@@ -18,7 +18,7 @@ pub mod gb_contract_v2 {
     use super::PlayerActionsV2;
     use starknet::get_caller_address;
     use dojo_starter::glitchbombv2::models::{Player, GamePack, Game};
-    use dojo_starter::glitchbombv2::states::Action;
+    use dojo_starter::glitchbombv2::actions::PlayerAction;
     use dojo_starter::glitchbombv2::handlers::update_player;
 
     #[abi(embed_v0)]
@@ -31,7 +31,7 @@ pub mod gb_contract_v2 {
             let gamepack: GamePack = world.read_model((player_id, 1_u32));
             let game: Game = world.read_model((player_id, 1_u32, 1_u32));
 
-            let action = Action::ClaimFreeUsdc;
+            let action = PlayerAction::ClaimFreeUsdc;
 
             let (new_player_state, new_data) = match update_player(player.state, player.data, action) {
                 Result::Ok(result) => result,
@@ -54,7 +54,7 @@ pub mod gb_contract_v2 {
             let gamepack: GamePack = world.read_model((player_id, 1_u32));
             let game: Game = world.read_model((player_id, 1_u32, 1_u32));
 
-            let action = Action::BuyGamepack;
+            let action = PlayerAction::BuyGamePack;
 
             let (new_player_state, new_data) = match update_player(player.state, player.data, action) {
                 Result::Ok(result) => result,
