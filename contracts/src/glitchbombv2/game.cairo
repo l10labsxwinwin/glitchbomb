@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use super::shared::{UpdateError, shuffle};
-use super::constants::{MAX_HP, MOONROCKS_GAME_PRICE, level_cost_in_moonrocks};
+use super::constants::{MAX_HP, MOONROCKS_GAME_PRICE, level_cost_in_moonrocks, milestones};
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GameState {
@@ -552,16 +552,7 @@ pub fn update_game(
         (GameState::New, GameAction::StartGame) => {
             match data.temp_moonrocks >= MOONROCKS_GAME_PRICE {
                 true => {
-                    let orb_arrays = array![
-                        get_non_buyable_orbs(),
-                        get_common_orbs(),
-                        get_rare_orbs(),
-                        get_cosmic_orbs(),
-                    ];
-                    let pullable_orbs = orbs_to_effects(orb_arrays);
-
                     let mut new_data = data.clone();
-                    new_data.pullable_orbs = pullable_orbs;
                     new_data.temp_moonrocks = data.temp_moonrocks - MOONROCKS_GAME_PRICE;
                     new_data.moonrocks_spent = data.moonrocks_spent + MOONROCKS_GAME_PRICE;
 
@@ -612,7 +603,20 @@ pub fn update_game(
                 false => Err(UpdateError::InsufficientGlitchChips),
             }
         },
-        (GameState::Shop, GameAction::GoToNextLevel) => Ok((GameState::Level, data)),
+        (GameState::Shop, GameAction::GoToNextLevel) => {
+            let next_level = data.level + 1;
+
+            let mut new_data = new_game_data();
+
+            new_data.level = next_level;
+            new_data.milestone = milestones(next_level);
+            new_data.glitch_chips = data.glitch_chips;
+            new_data.moonrocks_spent = data.moonrocks_spent;
+            new_data.moonrocks_earned = data.moonrocks_earned;
+            new_data.temp_moonrocks = data.temp_moonrocks;
+
+            Ok((GameState::Level, new_data))
+        },
         _ => Err(UpdateError::InvalidStateTransition),
     }
 }

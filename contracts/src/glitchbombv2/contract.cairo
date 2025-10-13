@@ -9,7 +9,7 @@ pub trait PlayerActionsV2<T> {
     fn cash_out(ref self: T, gamepack_id: u32);
     fn enter_shop(ref self: T, gamepack_id: u32);
     fn buy_orb(ref self: T, gamepack_id: u32, orb_id: u32);
-    fn go_to_next_level(ref self: T, gamepack_id: u32);
+    fn next_level(ref self: T, gamepack_id: u32);
 }
 
 #[dojo::contract]
@@ -22,7 +22,7 @@ pub mod gb_contract_v2 {
     use dojo_starter::glitchbombv2::gamepack::{GamePack, GamePackAction, GamePackState, update_gamepack, new_gamepack_data};
     use dojo_starter::glitchbombv2::game::{
         Game, GameAction, GameState, OrbsInGame, update_game, new_game_data,
-        get_non_buyable_orbs, get_common_orbs, get_rare_orbs, get_cosmic_orbs
+        get_non_buyable_orbs, get_common_orbs, get_rare_orbs, get_cosmic_orbs, orbs_to_effects
     };
     use dojo_starter::glitchbombv2::shared::shuffle;
     use dojo_starter::glitchbombv2::orbs::{get_orb_price, update_shop_orbs};
@@ -119,9 +119,6 @@ pub mod gb_contract_v2 {
                 Result::Err(err) => panic!("{:?}", err),
             };
 
-            game.state = new_game_state;
-            game.data = new_game_data;
-
             let orbs_in_game = OrbsInGame {
                 player_id,
                 gamepack_id,
@@ -131,6 +128,18 @@ pub mod gb_contract_v2 {
                 rare: get_rare_orbs(),
                 cosmic: get_cosmic_orbs(),
             };
+
+            let orb_arrays = array![
+                orbs_in_game.non_buyable.clone(),
+                orbs_in_game.common.clone(),
+                orbs_in_game.rare.clone(),
+                orbs_in_game.cosmic.clone(),
+            ];
+            let pullable_orbs = orbs_to_effects(orb_arrays);
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+            game.data.pullable_orbs = pullable_orbs;
 
             world.write_model(@gamepack);
             world.write_model(@game);
@@ -270,16 +279,33 @@ pub mod gb_contract_v2 {
             world.write_model(@orbs_in_game);
         }
 
-        fn go_to_next_level(ref self: ContractState, gamepack_id: u32) {
+        fn next_level(ref self: ContractState, gamepack_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let orbs_in_game: OrbsInGame = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
-            world.write_model(@player);
-            world.write_model(@gamepack);
+            let action = GameAction::GoToNextLevel;
+
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            let orb_arrays = array![
+                orbs_in_game.non_buyable,
+                orbs_in_game.common,
+                orbs_in_game.rare,
+                orbs_in_game.cosmic,
+            ];
+            let pullable_orbs = orbs_to_effects(orb_arrays);
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+            game.data.pullable_orbs = pullable_orbs;
+
             world.write_model(@game);
         }
     }
