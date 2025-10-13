@@ -19,12 +19,11 @@ pub mod gb_contract_v2 {
     use super::PlayerActionsV2;
     use starknet::get_caller_address;
     use dojo_starter::glitchbombv2::player::{Player, PlayerAction, update_player};
-    use dojo_starter::glitchbombv2::gamepack::{GamePack, GamePackAction, GamePackState, GamePackData, update_gamepack, new_gamepack_data};
+    use dojo_starter::glitchbombv2::gamepack::{GamePack, GamePackAction, GamePackState, update_gamepack, new_gamepack_data};
     use dojo_starter::glitchbombv2::game::{
         Game, GameAction, GameState, OrbsInGame, update_game, new_game_data,
         get_non_buyable_orbs, get_common_orbs, get_rare_orbs, get_cosmic_orbs
     };
-    use dojo_starter::glitchbombv2::constants::MOONROCKS_GAME_PRICE;
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {
@@ -109,23 +108,20 @@ pub mod gb_contract_v2 {
             let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
-            if gamepack.data.accumulated_moonrocks < MOONROCKS_GAME_PRICE {
-                panic!("Not enough moonrocks to start game");
-            }
-
-            let new_gamepack_data = GamePackData {
-                current_game_id: gamepack.data.current_game_id,
-                accumulated_moonrocks: gamepack.data.accumulated_moonrocks - MOONROCKS_GAME_PRICE,
-            };
-            gamepack.data = new_gamepack_data;
-
-            let action = GameAction::StartGame;
-
-            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+            let gamepack_action = GamePackAction::StartGame;
+            let (new_gamepack_state, new_gamepack_data) = match update_gamepack(gamepack.state, gamepack.data, gamepack_action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
 
+            let game_action = GameAction::StartGame;
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, game_action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            gamepack.state = new_gamepack_state;
+            gamepack.data = new_gamepack_data;
             game.state = new_game_state;
             game.data = new_game_data;
 
