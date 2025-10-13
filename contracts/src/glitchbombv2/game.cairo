@@ -361,6 +361,93 @@ pub fn orbs_to_effects(orb_arrays: Array<Array<Orb>>) -> Array<OrbEffect> {
     effects
 }
 
+fn apply_orb_effect_to_data(
+    effect: @OrbEffect,
+    data: GameData
+) -> Result<GameData, UpdateError> {
+    let mut new_data = data.clone();
+
+    match effect {
+        OrbEffect::Empty => {
+            return Err(UpdateError::InvalidData);
+        },
+        OrbEffect::Point(points) => {
+            let total_points = *points * new_data.multiplier / 100;
+            new_data.points += total_points;
+        },
+        OrbEffect::PointPerOrbRemaining(point_per_orb) => {
+            let num_orbs_remaining = new_data.pullable_orbs.len();
+            let total_points = num_orbs_remaining * *point_per_orb * new_data.multiplier / 100;
+            new_data.points += total_points;
+        },
+        OrbEffect::PointPerBombPulled(point_per_bomb) => {
+            let total_points = new_data.bombs_pulled_in_level * *point_per_bomb * new_data.multiplier / 100;
+            new_data.points += total_points;
+        },
+        OrbEffect::GlitchChips(chips) => {
+            new_data.glitch_chips += *chips;
+        },
+        OrbEffect::Moonrocks(moonrocks) => {
+            new_data.moonrocks_earned += *moonrocks;
+        },
+        OrbEffect::Health(health) => {
+            new_data.hp = match new_data.hp + *health > MAX_HP {
+                true => MAX_HP,
+                false => new_data.hp + *health,
+            };
+        },
+        OrbEffect::Bomb(damage) => {
+            match new_data.bomb_immunity_turns > 0 {
+                true => {
+                    new_data.pullable_orbs.append(*effect);
+                },
+                false => {
+                    new_data.hp = match *damage >= new_data.hp {
+                        true => 0,
+                        false => new_data.hp - *damage,
+                    };
+                    new_data.bombs_pulled_in_level += 1;
+                }
+            }
+        },
+        OrbEffect::Multiplier(multiplier) => {
+            new_data.multiplier += *multiplier;
+        },
+        OrbEffect::BombImmunity(turns) => {
+            new_data.bomb_immunity_turns += *turns + 1;
+        },
+        OrbEffect::PointRewind => {
+            // TODO: Implement point rewind logic
+        },
+        OrbEffect::FiveOrDie => {
+            // No data changes for FiveOrDie, only state transition
+        },
+    }
+
+    if new_data.bomb_immunity_turns > 0 {
+        new_data.bomb_immunity_turns -= 1;
+    }
+
+    Ok(new_data)
+}
+
+fn apply_data_for_state(effect: @OrbEffect, data: @GameData) -> GameState {
+    // Determine state based on game data and effect
+    if *data.hp == 0 {
+        // Player died
+        GameState::GameOver
+    } else if *data.points >= *data.milestone {
+        // Milestone reached
+        GameState::LevelComplete
+    } else if *effect == OrbEffect::FiveOrDie {
+        // Transition to FiveOrDiePhase
+        GameState::FiveOrDiePhase
+    } else {
+        // Continue in level
+        GameState::Level
+    }
+}
+
 pub fn update_game(
     state: GameState,
     data: GameData,
@@ -382,7 +469,23 @@ pub fn update_game(
 
             Ok((GameState::Level, new_data))
         },
-        (GameState::Level, GameAction::PullOrb) => Ok((GameState::LevelComplete, data)),
+        (GameState::Level, GameAction::PullOrb) => {
+            let mut new_data = data.clone();
+
+            let pulled_orb = match new_data.pullable_orbs.pop_front() {
+                Option::Some(orb) => orb,
+                Option::None => {
+                    return Ok((GameState::GameOver, data));
+                },
+            };
+
+            new_data.consumed_orbs.append(pulled_orb);
+
+            new_data = apply_orb_effect_to_data(@pulled_orb, new_data)?;
+            let new_state = apply_data_for_state(@pulled_orb, @new_data);
+
+            Ok((new_state, new_data))
+        },
         (GameState::Level, GameAction::CashOut) => Ok((GameState::GameOver, data)),
         (GameState::LevelComplete, GameAction::EnterShop) => Ok((GameState::Shop, data)),
         (GameState::LevelComplete, GameAction::CashOut) => Ok((GameState::GameOver, data)),

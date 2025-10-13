@@ -5,7 +5,7 @@ pub trait PlayerActionsV2<T> {
     fn open_gamepack(ref self: T, gamepack_id: u32);
     fn start_game(ref self: T, gamepack_id: u32);
     fn cash_out(ref self: T, gamepack_id: u32, game_id: u32);
-    fn pull_orb(ref self: T, gamepack_id: u32, game_id: u32);
+    fn pull_orb(ref self: T, gamepack_id: u32);
     fn enter_shop(ref self: T, gamepack_id: u32, game_id: u32);
     fn confirm_five_or_die(ref self: T, gamepack_id: u32, game_id: u32, confirmed: bool);
     fn buy_orb(ref self: T, gamepack_id: u32, game_id: u32, orb_id: u32);
@@ -73,6 +73,8 @@ pub mod gb_contract_v2 {
             world.write_model(@new_gamepack);
         }
 
+        // NOTE: opening a gamepack starts the first game at game_id = 1, we need to increment this when game ends so player can "start_game" to play the next game.
+        // we need to also set the next game state to New instead of Empty, need to think about how we handle next game. 
         fn open_gamepack(ref self: ContractState, gamepack_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
@@ -140,20 +142,27 @@ pub mod gb_contract_v2 {
             world.write_model(@orbs_in_game);
         }
 
-        fn cash_out(ref self: ContractState, gamepack_id: u32, game_id: u32) {
+        fn pull_orb(ref self: ContractState, gamepack_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, game_id));
+            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
-            world.write_model(@player);
-            world.write_model(@gamepack);
+            let action = GameAction::PullOrb;
+
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+
             world.write_model(@game);
         }
 
-        fn pull_orb(ref self: ContractState, gamepack_id: u32, game_id: u32) {
+        fn cash_out(ref self: ContractState, gamepack_id: u32, game_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
