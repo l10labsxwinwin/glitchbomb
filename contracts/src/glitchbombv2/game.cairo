@@ -1,5 +1,5 @@
 use starknet::ContractAddress;
-use super::shared::UpdateError;
+use super::shared::{UpdateError, shuffle};
 use super::constants::{MAX_HP, MOONROCKS_GAME_PRICE};
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
@@ -453,8 +453,9 @@ fn apply_orb_effect_to_data(
         },
     }
 
-    if OrbEffect::Bomb(_) != *effect {
-        new_data.consumed_orbs.append(*effect);
+    match effect {
+        OrbEffect::Bomb(_) => {},
+        _ => new_data.consumed_orbs.append(*effect),
     }
 
     if new_data.bomb_immunity_turns > 0 {
@@ -504,6 +505,8 @@ pub fn update_game(
         },
         (GameState::Level, GameAction::PullOrb) => {
             let mut new_data = data.clone();
+
+            new_data.pullable_orbs = shuffle(new_data.pullable_orbs);
 
             let pulled_orb = match new_data.pullable_orbs.pop_front() {
                 Option::Some(orb) => orb,
