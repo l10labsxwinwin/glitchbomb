@@ -468,21 +468,15 @@ fn apply_orb_effect_to_data(
 }
 
 fn apply_data_for_state(effect: @OrbEffect, data: @GameData) -> GameState {
-    // Determine state based on game data and effect
     if *data.hp == 0 {
-        // Player died
         GameState::GameOver
     } else if *data.points >= *data.milestone {
-        // Milestone reached
         GameState::LevelComplete
     } else if *effect == OrbEffect::FiveOrDie {
-        // Transition to FiveOrDiePhase
         GameState::FiveOrDiePhase
     } else if data.pullable_orbs.len() == 0 {
-        // No more orbs remaining
         GameState::GameOver
     } else {
-        // Continue in level
         GameState::Level
     }
 }
@@ -505,37 +499,29 @@ fn handle_five_or_die_data(data: GameData) -> Result<GameData, UpdateError> {
     let mut current_data = data;
     current_data.multiplier += 100;
 
+    let pullable_span = current_data.pullable_orbs.span();
+    let mut new_pullable: Array<OrbEffect> = ArrayTrait::new();
     let mut orbs_pulled: u32 = 0;
-    let mut five_or_die_orbs: Array<OrbEffect> = ArrayTrait::new();
 
-    loop {
+    for orb_effect in pullable_span {
         if orbs_pulled >= 5 || current_data.hp == 0 {
-            break;
-        }
-
-        let maybe_effect = current_data.pullable_orbs.pop_front();
-        let pulled_effect = match maybe_effect {
-            Option::Some(effect) => effect,
-            Option::None => { break; },
-        };
-
-        current_data = match pulled_effect {
-            OrbEffect::FiveOrDie => {
-                five_or_die_orbs.append(pulled_effect);
-                (@current_data).clone()
-            },
-            _ => {
-                orbs_pulled += 1;
-                apply_orb_effect_to_data(@pulled_effect, (@current_data).clone())?
+            new_pullable.append(*orb_effect);
+        } else {
+            match orb_effect {
+                OrbEffect::FiveOrDie => {
+                    new_pullable.append(*orb_effect);
+                },
+                _ => {
+                    // TODO: a way to track which orbs were pulled during five or die to display to user
+                    let temp_data = (@current_data).clone();
+                    current_data = apply_orb_effect_to_data(orb_effect, temp_data)?;
+                    orbs_pulled += 1;
+                }
             }
-        };
+        }
     };
 
-    // Append all FiveOrDie orbs back to pullable orbs
-    for orb in five_or_die_orbs {
-        current_data.pullable_orbs.append(orb);
-    };
-
+    current_data.pullable_orbs = new_pullable;
     current_data.multiplier -= 100;
 
     Ok(current_data)
@@ -571,7 +557,6 @@ pub fn update_game(
         (GameState::Level, GameAction::PullOrb) => {
             let mut new_data = data.clone();
 
-            // Shuffle the pullable orbs before pulling (uses constant seed for pseudorandom shuffle)
             new_data.pullable_orbs = shuffle(new_data.pullable_orbs);
 
             let pulled_orb = match new_data.pullable_orbs.pop_front() {
