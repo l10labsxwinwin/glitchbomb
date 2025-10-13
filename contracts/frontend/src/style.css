@@ -55,14 +55,27 @@ header h1 {
 .subtitle {
   color: var(--text-secondary);
   font-size: 1rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 0.5rem;
 }
 
-/* Connection Panel */
-.connection-panel {
+.test-notice {
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 500;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  background: var(--bg-secondary);
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  word-break: break-all;
+  max-width: 90%;
+}
+
+/* Status Panel */
+.status-panel {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
   gap: 1rem;
   margin-top: 1.5rem;
 }
@@ -258,8 +271,13 @@ footer p {
     font-size: 1.8rem;
   }
 
-  .connection-panel {
+  .status-panel {
     flex-direction: column;
+  }
+
+  .test-notice {
+    font-size: 0.75rem;
+    max-width: 100%;
   }
 
   .model-container {

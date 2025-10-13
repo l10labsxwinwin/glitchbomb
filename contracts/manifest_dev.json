@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x1a25781b10c7ac92d13e7044950286c9ef2f9ea0f9a1f493d31c91dba758a6a",
-      "class_hash": "0x5200b94594354d32ec93603d02cedde7df8b74c3aa583a8143f6e451a3b658",
+      "address": "0x43b818d4ff271fed426c28fbb03eeb763424101bfbf6e037e931e320c6d1c4b",
+      "class_hash": "0x67585d081822220b41246df2e0f40dfd5b9f11ffcfad4007d73dbb25e230ad4",
       "abi": [
         {
           "type": "impl",
@@ -1595,46 +1595,10 @@
             },
             {
               "type": "function",
-              "name": "cash_out",
-              "inputs": [
-                {
-                  "name": "gamepack_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "game_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
               "name": "pull_orb",
               "inputs": [
                 {
                   "name": "gamepack_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "game_id",
-                  "type": "core::integer::u32"
-                }
-              ],
-              "outputs": [],
-              "state_mutability": "external"
-            },
-            {
-              "type": "function",
-              "name": "enter_shop",
-              "inputs": [
-                {
-                  "name": "gamepack_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "game_id",
                   "type": "core::integer::u32"
                 }
               ],
@@ -1650,12 +1614,32 @@
                   "type": "core::integer::u32"
                 },
                 {
-                  "name": "game_id",
-                  "type": "core::integer::u32"
-                },
-                {
                   "name": "confirmed",
                   "type": "core::bool"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "cash_out",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "enter_shop",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
                 }
               ],
               "outputs": [],
@@ -1670,10 +1654,6 @@
                   "type": "core::integer::u32"
                 },
                 {
-                  "name": "game_id",
-                  "type": "core::integer::u32"
-                },
-                {
                   "name": "orb_id",
                   "type": "core::integer::u32"
                 }
@@ -1683,14 +1663,10 @@
             },
             {
               "type": "function",
-              "name": "go_to_next_level",
+              "name": "next_level",
               "inputs": [
                 {
                   "name": "gamepack_id",
-                  "type": "core::integer::u32"
-                },
-                {
-                  "name": "game_id",
                   "type": "core::integer::u32"
                 }
               ],
@@ -1822,12 +1798,12 @@
         "buy_gamepack",
         "open_gamepack",
         "start_game",
-        "cash_out",
         "pull_orb",
-        "enter_shop",
         "confirm_five_or_die",
+        "cash_out",
+        "enter_shop",
         "buy_orb",
-        "go_to_next_level",
+        "next_level",
         "upgrade"
       ]
     }
@@ -1836,25 +1812,25 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x6b36751ef9098fb65455d0ccdeae4639a2e6bff15d128e1410b4d3a78dc9210",
+      "class_hash": "0x66cbdbe21828c44bd3ffb114be3001e0f281090f2ded281e67e6914b367e7d6",
       "tag": "glitchbomb-Game",
       "selector": "0x24b5e6dd68463f27991d99c66043ff038cc0018a54982d584626ea84dadb312"
     },
     {
       "members": [],
-      "class_hash": "0x3fc737f96c5e5e24b7db164f634854a8d6d8f3bc0ca68c02a0b4f06914b7729",
+      "class_hash": "0x8d99f7d28f3fc0ac203684410cec6db1d0ea07bbdd94866c04f5261b311846",
       "tag": "glitchbomb-GamePack",
       "selector": "0x7b8f7a36699ae315115ebc8f8ea14a7820388bdf157967587c8120a5eaf751"
     },
     {
       "members": [],
-      "class_hash": "0x134988c123279855e40fbe5aad7d74d1a9e17491bf26f5057ef9ec1152bf7f4",
+      "class_hash": "0x6f8f809b5b93b5acff58810be373699052658d2ccdc59a2f3076c6b44f11b0f",
       "tag": "glitchbomb-OrbsInGame",
       "selector": "0x18053f443255be1b89ec5c21c826c664d4e45977ecb0c46c20d09f3e750b280"
     },
     {
       "members": [],
-      "class_hash": "0x1c7a3894b2d5fb6e5d4dbd2667f29d33a7e0c63c6c86b45cf4dbd2258cc2ad3",
+      "class_hash": "0x33737e71f5fdcdd490d3bd3ecfe96c9d0d9a05a3952608fc44c2a1e0593d227",
       "tag": "glitchbomb-Player",
       "selector": "0x636658d36f9cf1eeafd449fa3242f0fd75d6522b204e5f8367ff071ad4beba2"
     }
