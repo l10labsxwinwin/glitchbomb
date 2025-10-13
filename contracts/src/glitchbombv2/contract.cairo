@@ -18,11 +18,9 @@ pub mod gb_contract_v2 {
     use dojo::world::WorldStorage;
     use super::PlayerActionsV2;
     use starknet::get_caller_address;
-    use dojo_starter::glitchbombv2::models::{Player, GamePack, Game};
-    use dojo_starter::glitchbombv2::actions::{PlayerAction, GamePackAction};
-    use dojo_starter::glitchbombv2::handlers::{update_player, update_gamepack};
-    use dojo_starter::glitchbombv2::states::{GameState, GamePackState};
-    use dojo_starter::glitchbombv2::data::{new_gamepack_data, new_game_data};
+    use dojo_starter::glitchbombv2::player::{Player, PlayerAction, update_player};
+    use dojo_starter::glitchbombv2::gamepack::{GamePack, GamePackAction, GamePackState, update_gamepack, new_gamepack_data};
+    use dojo_starter::glitchbombv2::game::{Game, GameState, new_game_data};
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {

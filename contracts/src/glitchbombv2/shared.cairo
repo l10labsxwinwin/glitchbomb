@@ -1,31 +1,20 @@
-#[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
-pub enum PlayerState {
-    #[default]
-    Broke,
-    Stacked,
+use super::player::PlayerState;
+use super::gamepack::GamePackState;
+use super::game::GameState;
+
+// ============================================================================
+// Shared Update Error
+// ============================================================================
+
+#[derive(Drop, Debug)]
+pub enum UpdateError {
+    InvalidStateTransition,
+    InvalidData,
 }
 
-#[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
-pub enum GamePackState {
-    #[default]
-    Empty,
-    Unopened,
-    InProgress,
-    EndedEarly,
-    Completed,
-}
-
-#[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
-pub enum GameState {
-    #[default]
-    Empty,
-    New,
-    Level,
-    LevelComplete,
-    FiveOrDiePhase,
-    Shop,
-    GameOver,
-}
+// ============================================================================
+// Legacy Cross-Cutting Validation
+// ============================================================================
 
 #[derive(Drop, Serde, Debug, Copy)]
 pub enum Action {
