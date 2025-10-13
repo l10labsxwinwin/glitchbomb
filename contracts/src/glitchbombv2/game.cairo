@@ -25,6 +25,7 @@ pub struct GameData {
     pub glitch_chips: u32,
     pub moonrocks_spent: u32,
     pub moonrocks_earned: u32,
+    pub temp_moonrocks: u32,
     pub bomb_immunity_turns: u32,
     pub bombs_pulled_in_level: u32,
     pub pullable_orbs: Array<OrbEffect>,
@@ -40,6 +41,7 @@ pub fn new_game_data() -> GameData {
         hp: MAX_HP,
         multiplier: 1,
         glitch_chips: 0,
+        temp_moonrocks: 0,
         moonrocks_spent: 0,
         moonrocks_earned: 0,
         bomb_immunity_turns: 0,
@@ -482,6 +484,20 @@ fn apply_data_for_state(effect: @OrbEffect, data: @GameData) -> GameState {
     }
 }
 
+fn handle_cash_out(data: GameData) -> Result<(GameState, GameData), UpdateError> {
+    match data.points {
+        0 => Err(UpdateError::ZeroPointsToCashOut),
+        _ => {
+            let mut new_data = data.clone();
+            new_data.moonrocks_earned += data.points;
+            // update temp moonrocks ONLY when we cash out (for now)
+            new_data.temp_moonrocks += new_data.moonrocks_earned;
+            new_data.temp_moonrocks -= new_data.moonrocks_spent;
+            Ok((GameState::GameOver, new_data))
+        }
+    }
+}
+
 pub fn update_game(
     state: GameState,
     data: GameData,
@@ -489,19 +505,25 @@ pub fn update_game(
 ) -> Result<(GameState, GameData), UpdateError> {
     match (state, action) {
         (GameState::New, GameAction::StartGame) => {
-            let orb_arrays = array![
-                get_non_buyable_orbs(),
-                get_common_orbs(),
-                get_rare_orbs(),
-                get_cosmic_orbs(),
-            ];
-            let pullable_orbs = orbs_to_effects(orb_arrays);
+            match data.temp_moonrocks >= MOONROCKS_GAME_PRICE {
+                true => {
+                    let orb_arrays = array![
+                        get_non_buyable_orbs(),
+                        get_common_orbs(),
+                        get_rare_orbs(),
+                        get_cosmic_orbs(),
+                    ];
+                    let pullable_orbs = orbs_to_effects(orb_arrays);
 
-            let mut new_data = data.clone();
-            new_data.pullable_orbs = pullable_orbs;
-            new_data.moonrocks_spent = data.moonrocks_spent + MOONROCKS_GAME_PRICE;
+                    let mut new_data = data.clone();
+                    new_data.pullable_orbs = pullable_orbs;
+                    new_data.temp_moonrocks = data.temp_moonrocks - MOONROCKS_GAME_PRICE;
+                    new_data.moonrocks_spent = data.moonrocks_spent + MOONROCKS_GAME_PRICE;
 
-            Ok((GameState::Level, new_data))
+                    Ok((GameState::Level, new_data))
+                },
+                false => Err(UpdateError::InsufficientMoonrocks),
+            }
         },
         (GameState::Level, GameAction::PullOrb) => {
             let mut new_data = data.clone();
@@ -523,9 +545,9 @@ pub fn update_game(
 
             Ok((new_state, new_data))
         },
-        (GameState::Level, GameAction::CashOut) => Ok((GameState::GameOver, data)),
+        (GameState::Level, GameAction::CashOut) => handle_cash_out(data),
+        (GameState::LevelComplete, GameAction::CashOut) => handle_cash_out(data),
         (GameState::LevelComplete, GameAction::EnterShop) => Ok((GameState::Shop, data)),
-        (GameState::LevelComplete, GameAction::CashOut) => Ok((GameState::GameOver, data)),
         (GameState::FiveOrDiePhase, GameAction::ConfirmFiveOrDie(confirmed)) => {
             if confirmed {
                 Ok((GameState::Level, data))

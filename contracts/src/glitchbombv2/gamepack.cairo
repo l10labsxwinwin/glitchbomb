@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use super::shared::UpdateError;
-use super::constants::{INITIAL_GAME_ID, INITIAL_MOONROCKS, MAX_GAMES_PER_PACK, MOONROCKS_GAME_PRICE};
+use super::constants::{INITIAL_GAME_ID, INITIAL_MOONROCKS, MAX_GAMES_PER_PACK};
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GamePackState {
@@ -28,7 +28,6 @@ pub fn new_gamepack_data() -> GamePackData {
 #[derive(Drop, Serde, Debug, Copy)]
 pub enum GamePackAction {
     OpenPack,
-    StartGame,
     SubmitScore,
 }
 
@@ -56,16 +55,6 @@ pub fn update_gamepack(
                 accumulated_moonrocks: INITIAL_MOONROCKS,
             };
             Ok((GamePackState::InProgress, new_data))
-        },
-        (GamePackState::InProgress, GamePackAction::StartGame) => {
-            if data.accumulated_moonrocks < MOONROCKS_GAME_PRICE {
-                return Err(UpdateError::InvalidData);
-            }
-            let new_data = GamePackData {
-                current_game_id: data.current_game_id,
-                accumulated_moonrocks: data.accumulated_moonrocks - MOONROCKS_GAME_PRICE,
-            };
-            Ok((state, new_data))
         },
         (GamePackState::InProgress, GamePackAction::SubmitScore) => {
             match data.current_game_id == MAX_GAMES_PER_PACK {

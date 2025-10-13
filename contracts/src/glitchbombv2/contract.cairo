@@ -74,7 +74,7 @@ pub mod gb_contract_v2 {
         }
 
         // NOTE: opening a gamepack starts the first game at game_id = 1, we need to increment this when game ends so player can "start_game" to play the next game.
-        // we need to also set the next game state to New instead of Empty, need to think about how we handle next game. 
+        // we need to also set the next game state to New instead of Empty, need to think about how we handle next game.
         fn open_gamepack(ref self: ContractState, gamepack_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
@@ -91,13 +91,14 @@ pub mod gb_contract_v2 {
             gamepack.state = new_gamepack_state;
             gamepack.data = new_gamepack_data;
 
-            let new_game = Game {
+            let mut new_game = Game {
                 player_id,
                 gamepack_id: gamepack.gamepack_id,
                 game_id: 1,
                 state: GameState::New,
                 data: new_game_data(),
             };
+            new_game.data.temp_moonrocks = new_gamepack_data.accumulated_moonrocks;
 
             world.write_model(@gamepack);
             world.write_model(@new_game);
@@ -107,14 +108,8 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
-
-            let gamepack_action = GamePackAction::StartGame;
-            let (new_gamepack_state, new_gamepack_data) = match update_gamepack(gamepack.state, gamepack.data, gamepack_action) {
-                Result::Ok(result) => result,
-                Result::Err(err) => panic!("{:?}", err),
-            };
 
             let game_action = GameAction::StartGame;
             let (new_game_state, new_game_data) = match update_game(game.state, game.data, game_action) {
@@ -122,8 +117,6 @@ pub mod gb_contract_v2 {
                 Result::Err(err) => panic!("{:?}", err),
             };
 
-            gamepack.state = new_gamepack_state;
-            gamepack.data = new_gamepack_data;
             game.state = new_game_state;
             game.data = new_game_data;
 
@@ -166,11 +159,20 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
-            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, game_id));
+            let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let mut game: Game = world.read_model((player_id, gamepack_id, game_id));
 
-            world.write_model(@player);
+            let action = GameAction::CashOut;
+
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+            gamepack.data.accumulated_moonrocks = game.data.temp_moonrocks;
+
             world.write_model(@gamepack);
             world.write_model(@game);
         }

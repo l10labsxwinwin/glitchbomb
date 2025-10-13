@@ -11,6 +11,8 @@ use core::poseidon::poseidon_hash_span;
 pub enum UpdateError {
     InvalidStateTransition,
     InvalidData,
+    InsufficientMoonrocks,
+    ZeroPointsToCashOut,
 }
 
 // ============================================================================
