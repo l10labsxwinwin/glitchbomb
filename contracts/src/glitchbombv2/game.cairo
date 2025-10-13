@@ -506,6 +506,7 @@ pub fn update_game(
         (GameState::Level, GameAction::PullOrb) => {
             let mut new_data = data.clone();
 
+            // Shuffle the pullable orbs before pulling (uses constant seed for pseudorandom shuffle)
             new_data.pullable_orbs = shuffle(new_data.pullable_orbs);
 
             let pulled_orb = match new_data.pullable_orbs.pop_front() {
