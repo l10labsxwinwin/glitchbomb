@@ -478,6 +478,9 @@ fn apply_data_for_state(effect: @OrbEffect, data: @GameData) -> GameState {
     } else if *effect == OrbEffect::FiveOrDie {
         // Transition to FiveOrDiePhase
         GameState::FiveOrDiePhase
+    } else if data.pullable_orbs.len() == 0 {
+        // No more orbs remaining
+        GameState::GameOver
     } else {
         // Continue in level
         GameState::Level
@@ -496,6 +499,46 @@ fn handle_cash_out(data: GameData) -> Result<(GameState, GameData), UpdateError>
             Ok((GameState::GameOver, new_data))
         }
     }
+}
+
+fn handle_five_or_die_data(data: GameData) -> Result<GameData, UpdateError> {
+    let mut current_data = data;
+    current_data.multiplier += 100;
+
+    let mut orbs_pulled: u32 = 0;
+    let mut five_or_die_orbs: Array<OrbEffect> = ArrayTrait::new();
+
+    loop {
+        if orbs_pulled >= 5 || current_data.hp == 0 {
+            break;
+        }
+
+        let maybe_effect = current_data.pullable_orbs.pop_front();
+        let pulled_effect = match maybe_effect {
+            Option::Some(effect) => effect,
+            Option::None => { break; },
+        };
+
+        current_data = match pulled_effect {
+            OrbEffect::FiveOrDie => {
+                five_or_die_orbs.append(pulled_effect);
+                (@current_data).clone()
+            },
+            _ => {
+                orbs_pulled += 1;
+                apply_orb_effect_to_data(@pulled_effect, (@current_data).clone())?
+            }
+        };
+    };
+
+    // Append all FiveOrDie orbs back to pullable orbs
+    for orb in five_or_die_orbs {
+        current_data.pullable_orbs.append(orb);
+    };
+
+    current_data.multiplier -= 100;
+
+    Ok(current_data)
 }
 
 pub fn update_game(
@@ -549,10 +592,13 @@ pub fn update_game(
         (GameState::LevelComplete, GameAction::CashOut) => handle_cash_out(data),
         (GameState::LevelComplete, GameAction::EnterShop) => Ok((GameState::Shop, data)),
         (GameState::FiveOrDiePhase, GameAction::ConfirmFiveOrDie(confirmed)) => {
-            if confirmed {
-                Ok((GameState::Level, data))
-            } else {
-                Ok((GameState::GameOver, data))
+            match confirmed {
+                true => {
+                    let new_data = handle_five_or_die_data(data)?;
+                    let new_state = apply_data_for_state(@OrbEffect::Empty, @new_data);
+                    Ok((new_state, new_data))
+                },
+                false => Ok((GameState::Level, data)),
             }
         },
         (GameState::Shop, GameAction::BuyOrb(_)) => Ok((state, data)),

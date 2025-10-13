@@ -194,12 +194,18 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
-            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, game_id));
+            let mut game: Game = world.read_model((player_id, gamepack_id, game_id));
 
-            world.write_model(@player);
-            world.write_model(@gamepack);
+            let action = GameAction::ConfirmFiveOrDie(confirmed);
+
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+
             world.write_model(@game);
         }
 
