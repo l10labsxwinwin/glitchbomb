@@ -417,7 +417,35 @@ fn apply_orb_effect_to_data(
             new_data.bomb_immunity_turns += *turns + 1;
         },
         OrbEffect::PointRewind => {
-            // TODO: Implement point rewind logic
+            // Find the lowest Point orb in consumed_orbs
+            let mut lowest_point_orb: Option<OrbEffect> = Option::None;
+            let mut lowest_point_value: u32 = 9999;
+
+            for effect in new_data.consumed_orbs.span() {
+                if let OrbEffect::Point(points) = *effect {
+                    if points < lowest_point_value {
+                        lowest_point_value = points;
+                        lowest_point_orb = Option::Some(*effect);
+                    }
+                }
+            }
+
+            // If found, rebuild consumed_orbs without it and add back to pullable
+            if let Option::Some(orb_to_return) = lowest_point_orb {
+                let mut new_consumed = ArrayTrait::new();
+                let mut removed_one = false;
+
+                for effect in new_data.consumed_orbs.span() {
+                    if !removed_one && *effect == orb_to_return {
+                        removed_one = true;
+                    } else {
+                        new_consumed.append(*effect);
+                    }
+                }
+
+                new_data.consumed_orbs = new_consumed;
+                new_data.pullable_orbs.append(orb_to_return);
+            }
         },
         OrbEffect::FiveOrDie => {
             // No data changes for FiveOrDie, only state transition
