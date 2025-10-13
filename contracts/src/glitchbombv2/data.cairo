@@ -1,15 +1,32 @@
-#[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore, Default)]
+const MAX_HP: u32 = 5;
+
+#[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore)]
 pub struct PlayerData {
     pub usdc: u32,
+    pub gamepacks_bought: u32,
 }
 
-#[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore, Default)]
+pub fn new_player_data() -> PlayerData {
+    PlayerData {
+        usdc: 0,
+        gamepacks_bought: 0,
+    }
+}
+
+#[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore)]
 pub struct GamePackData {
     pub current_game_id: u32,
     pub accumulated_moonrocks: u32,
 }
 
-#[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore, Default)]
+pub fn new_gamepack_data() -> GamePackData {
+    GamePackData {
+        current_game_id: 1,
+        accumulated_moonrocks: 100,
+    }
+}
+
+#[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore)]
 pub struct GameData {
     pub level: u32,
     pub pull_number: u32,
@@ -23,6 +40,22 @@ pub struct GameData {
     pub moonrocks_earned: u32,
     pub bomb_immunity_turns: u32,
     pub bombs_pulled_in_level: u32,
+}
+
+pub fn new_game_data() -> GameData {
+    GameData {
+        level: 1,
+        pull_number: 0,
+        points: 0,
+        milestone: 0,
+        hp: MAX_HP,
+        multiplier: 1,
+        glitch_chips: 0,
+        moonrocks_spent: 0,
+        moonrocks_earned: 0,
+        bomb_immunity_turns: 0,
+        bombs_pulled_in_level: 0,
+    }
 }
 
 #[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore)]
@@ -40,7 +73,7 @@ pub struct OrbsInGame {
     cosmic: Array<Orb>,
 }
 
-#[derive(Copy, Drop, Serde, Debug, Default, Introspect, DojoStore, PartialEq)]
+#[derive(Copy, Drop, Serde, Debug, Introspect, DojoStore, PartialEq, Default)]
 pub enum OrbEffect {
 	#[default]
 	Empty,

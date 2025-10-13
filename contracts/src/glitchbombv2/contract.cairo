@@ -21,7 +21,8 @@ pub mod gb_contract_v2 {
     use dojo_starter::glitchbombv2::models::{Player, GamePack, Game};
     use dojo_starter::glitchbombv2::actions::{PlayerAction, GamePackAction};
     use dojo_starter::glitchbombv2::handlers::{update_player, update_gamepack};
-    use dojo_starter::glitchbombv2::states::GameState;
+    use dojo_starter::glitchbombv2::states::{GameState, GamePackState};
+    use dojo_starter::glitchbombv2::data::{new_gamepack_data, new_game_data};
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {
@@ -30,8 +31,6 @@ pub mod gb_contract_v2 {
             let player_id = get_caller_address();
 
             let mut player: Player = world.read_model(player_id);
-            let gamepack: GamePack = world.read_model((player_id, 1_u32));
-            let game: Game = world.read_model((player_id, 1_u32, 1_u32));
 
             let action = PlayerAction::ClaimFreeUsdc;
 
@@ -44,8 +43,6 @@ pub mod gb_contract_v2 {
             player.data = new_data;
 
             world.write_model(@player);
-            world.write_model(@gamepack);
-            world.write_model(@game);
         }
 
         fn buy_gamepack(ref self: ContractState) {
@@ -53,8 +50,6 @@ pub mod gb_contract_v2 {
             let player_id = get_caller_address();
 
             let mut player: Player = world.read_model(player_id);
-            let gamepack: GamePack = world.read_model((player_id, 1_u32));
-            let game: Game = world.read_model((player_id, 1_u32, 1_u32));
 
             let action = PlayerAction::BuyGamePack;
 
@@ -66,16 +61,21 @@ pub mod gb_contract_v2 {
             player.state = new_player_state;
             player.data = new_data;
 
+            let new_gamepack = GamePack {
+                player_id,
+                gamepack_id: new_data.gamepacks_bought,
+                state: GamePackState::Unopened,
+                data: new_gamepack_data(),
+            };
+
             world.write_model(@player);
-            world.write_model(@gamepack);
-            world.write_model(@game);
+            world.write_model(@new_gamepack);
         }
 
         fn open_gamepack(ref self: ContractState, gamepack_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
             let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
 
             let action = GamePackAction::OpenPack;
@@ -88,16 +88,14 @@ pub mod gb_contract_v2 {
             gamepack.state = new_gamepack_state;
             gamepack.data = new_gamepack_data;
 
-            // Create a new game with initial state
             let new_game = Game {
                 player_id,
-                gamepack_id,
-                game_id: gamepack.data.current_game_id,
+                gamepack_id: gamepack.gamepack_id,
+                game_id: 1,
                 state: GameState::New,
-                data: Default::default(),
+                data: new_game_data(),
             };
 
-            world.write_model(@player);
             world.write_model(@gamepack);
             world.write_model(@new_game);
         }

@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x13e0ae8e4347b7e8811fde0869d098670660ffb2ab7075937a0e0df5b22adb3",
-      "class_hash": "0x44b5028ecc9a0c58a7390b6bd23c087f7c4888eace09cd80a1ba151d2128507",
+      "address": "0x1a25781b10c7ac92d13e7044950286c9ef2f9ea0f9a1f493d31c91dba758a6a",
+      "class_hash": "0x5200b94594354d32ec93603d02cedde7df8b74c3aa583a8143f6e451a3b658",
       "abi": [
         {
           "type": "impl",
@@ -1566,6 +1566,18 @@
               "type": "function",
               "name": "buy_gamepack",
               "inputs": [],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "open_gamepack",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                }
+              ],
               "outputs": [],
               "state_mutability": "external"
             },
@@ -1808,6 +1820,7 @@
       "systems": [
         "claim_free_usdc",
         "buy_gamepack",
+        "open_gamepack",
         "start_game",
         "cash_out",
         "pull_orb",
@@ -1823,15 +1836,21 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x727effdf6a641d04caf81e7b49a5f743c96eb803a7d2b102144c6b8bcdd3b02",
+      "class_hash": "0x6b36751ef9098fb65455d0ccdeae4639a2e6bff15d128e1410b4d3a78dc9210",
       "tag": "glitchbomb-Game",
       "selector": "0x24b5e6dd68463f27991d99c66043ff038cc0018a54982d584626ea84dadb312"
     },
     {
       "members": [],
-      "class_hash": "0x705a4e3ef051fda5d083b3663b687d62c1871cd729ea8b8983aed5834b9f10a",
+      "class_hash": "0x3fc737f96c5e5e24b7db164f634854a8d6d8f3bc0ca68c02a0b4f06914b7729",
       "tag": "glitchbomb-GamePack",
       "selector": "0x7b8f7a36699ae315115ebc8f8ea14a7820388bdf157967587c8120a5eaf751"
+    },
+    {
+      "members": [],
+      "class_hash": "0x134988c123279855e40fbe5aad7d74d1a9e17491bf26f5057ef9ec1152bf7f4",
+      "tag": "glitchbomb-OrbsInGame",
+      "selector": "0x18053f443255be1b89ec5c21c826c664d4e45977ecb0c46c20d09f3e750b280"
     },
     {
       "members": [],

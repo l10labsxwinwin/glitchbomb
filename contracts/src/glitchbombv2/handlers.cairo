@@ -12,15 +12,15 @@ pub fn update_player(state: PlayerState, data: PlayerData, action: PlayerAction)
     match (state, action) {
         (PlayerState::Broke, PlayerAction::ClaimFreeUsdc) => {
             match data.usdc {
-                0 => Ok((PlayerState::Stacked, PlayerData { usdc: 5 })),
+                0 => Ok((PlayerState::Stacked, PlayerData { usdc: 5, gamepacks_bought: data.gamepacks_bought })),
                 _ => Err(UpdateError::InvalidData),
             }
         },
         (PlayerState::Stacked, PlayerAction::BuyGamePack) => {
             match data.usdc {
                 0 => Err(UpdateError::InvalidData),
-                1 => Ok((PlayerState::Broke, PlayerData { usdc: 0 })),
-                _ => Ok((PlayerState::Stacked, PlayerData { usdc: data.usdc - 1 })),
+                1 => Ok((PlayerState::Broke, PlayerData { usdc: 0, gamepacks_bought: data.gamepacks_bought + 1 })),
+                _ => Ok((PlayerState::Stacked, PlayerData { usdc: data.usdc - 1, gamepacks_bought: data.gamepacks_bought + 1 })),
             }
         },
         _ => Err(UpdateError::InvalidStateTransition),
@@ -36,7 +36,12 @@ pub fn update_gamepack(state: GamePackState, data: GamePackData, action: GamePac
             };
             Ok((GamePackState::InProgress, new_data))
         },
-        (GamePackState::InProgress, GamePackAction::SubmitScore) => Ok((GamePackState::Completed, data)),
+        (GamePackState::InProgress, GamePackAction::SubmitScore) => {
+            match data.current_game_id == 10 {
+                true => Ok((GamePackState::Completed, data)),
+                false => Err(UpdateError::InvalidData),
+            }
+        },
         _ => Err(UpdateError::InvalidStateTransition),
     }
 }
