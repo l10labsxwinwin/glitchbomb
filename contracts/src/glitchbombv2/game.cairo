@@ -407,6 +407,7 @@ fn apply_orb_effect_to_data(
                         false => new_data.hp - *damage,
                     };
                     new_data.bombs_pulled_in_level += 1;
+                    new_data.consumed_orbs.append(*effect);
                 }
             }
         },
@@ -450,6 +451,10 @@ fn apply_orb_effect_to_data(
         OrbEffect::FiveOrDie => {
             // No data changes for FiveOrDie, only state transition
         },
+    }
+
+    if OrbEffect::Bomb(_) != *effect {
+        new_data.consumed_orbs.append(*effect);
     }
 
     if new_data.bomb_immunity_turns > 0 {
@@ -507,7 +512,7 @@ pub fn update_game(
                 },
             };
 
-            new_data.consumed_orbs.append(pulled_orb);
+            new_data.pull_number += 1;
 
             new_data = apply_orb_effect_to_data(@pulled_orb, new_data)?;
             let new_state = apply_data_for_state(@pulled_orb, @new_data);
