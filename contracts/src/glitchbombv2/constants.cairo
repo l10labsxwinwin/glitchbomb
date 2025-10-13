@@ -1,5 +1,4 @@
 pub const MAX_HP: u32 = 5;
-pub const MOONROCKS_GAME_PRICE: u32 = 10;
 
 pub const FREE_USDC_AMOUNT: u32 = 5;
 pub const GAMEPACK_PRICE: u32 = 1;

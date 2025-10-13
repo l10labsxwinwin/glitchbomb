@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use super::shared::{UpdateError, shuffle};
-use super::constants::{MAX_HP, MOONROCKS_GAME_PRICE, level_cost_in_moonrocks, milestones};
+use super::constants::{MAX_HP, level_cost_in_moonrocks, milestones};
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GameState {
@@ -37,7 +37,7 @@ pub fn new_game_data() -> GameData {
         level: 1,
         pull_number: 0,
         points: 0,
-        milestone: 0,
+        milestone: milestones(1),
         hp: MAX_HP,
         multiplier: 1,
         glitch_chips: 0,
@@ -550,11 +550,12 @@ pub fn update_game(
 ) -> Result<(GameState, GameData), UpdateError> {
     match (state, action) {
         (GameState::New, GameAction::StartGame) => {
-            match data.temp_moonrocks >= MOONROCKS_GAME_PRICE {
+            let game_cost = level_cost_in_moonrocks(data.level);
+            match data.temp_moonrocks >= game_cost {
                 true => {
                     let mut new_data = data.clone();
-                    new_data.temp_moonrocks = data.temp_moonrocks - MOONROCKS_GAME_PRICE;
-                    new_data.moonrocks_spent = data.moonrocks_spent + MOONROCKS_GAME_PRICE;
+                    new_data.temp_moonrocks = data.temp_moonrocks - game_cost;
+                    new_data.moonrocks_spent = data.moonrocks_spent + game_cost;
 
                     Ok((GameState::Level, new_data))
                 },
