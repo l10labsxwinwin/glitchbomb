@@ -24,6 +24,7 @@ pub mod gb_contract_v2 {
         Game, GameAction, GameState, OrbsInGame, update_game, new_game_data,
         get_non_buyable_orbs, get_common_orbs, get_rare_orbs, get_cosmic_orbs
     };
+    use dojo_starter::glitchbombv2::shared::shuffle;
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {
@@ -181,13 +182,26 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut orbs_in_game: OrbsInGame = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
-            world.write_model(@player);
-            world.write_model(@gamepack);
+            let action = GameAction::EnterShop;
+
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+
+            orbs_in_game.common = shuffle(orbs_in_game.common);
+            orbs_in_game.rare = shuffle(orbs_in_game.rare);
+            orbs_in_game.cosmic = shuffle(orbs_in_game.cosmic);
+
             world.write_model(@game);
+            world.write_model(@orbs_in_game);
         }
 
         fn confirm_five_or_die(ref self: ContractState, gamepack_id: u32, confirmed: bool) {

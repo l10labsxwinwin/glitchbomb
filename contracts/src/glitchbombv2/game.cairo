@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
 use super::shared::{UpdateError, shuffle};
-use super::constants::{MAX_HP, MOONROCKS_GAME_PRICE};
+use super::constants::{MAX_HP, MOONROCKS_GAME_PRICE, level_cost_in_moonrocks};
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GameState {
@@ -527,6 +527,21 @@ fn handle_five_or_die_data(data: GameData) -> Result<GameData, UpdateError> {
     Ok(current_data)
 }
 
+fn handle_enter_shop(data: GameData) -> Result<(GameState, GameData), UpdateError> {
+    let shop_cost = level_cost_in_moonrocks(data.level + 1);
+    let total_spent = data.moonrocks_spent + shop_cost;
+    let moonrocks = data.temp_moonrocks + data.moonrocks_earned;
+
+    match moonrocks >= total_spent {
+        true => {
+            let mut new_data = data.clone();
+            new_data.moonrocks_spent += shop_cost;
+            Ok((GameState::Shop, new_data))
+        },
+        false => Err(UpdateError::InsufficientMoonrocks),
+    }
+}
+
 pub fn update_game(
     state: GameState,
     data: GameData,
@@ -575,7 +590,7 @@ pub fn update_game(
         },
         (GameState::Level, GameAction::CashOut) => handle_cash_out(data),
         (GameState::LevelComplete, GameAction::CashOut) => handle_cash_out(data),
-        (GameState::LevelComplete, GameAction::EnterShop) => Ok((GameState::Shop, data)),
+        (GameState::LevelComplete, GameAction::EnterShop) => handle_enter_shop(data),
         (GameState::FiveOrDiePhase, GameAction::ConfirmFiveOrDie(confirmed)) => {
             match confirmed {
                 true => {
