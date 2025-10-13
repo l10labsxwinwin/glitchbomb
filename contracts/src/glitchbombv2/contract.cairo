@@ -4,12 +4,12 @@ pub trait PlayerActionsV2<T> {
     fn buy_gamepack(ref self: T);
     fn open_gamepack(ref self: T, gamepack_id: u32);
     fn start_game(ref self: T, gamepack_id: u32);
-    fn cash_out(ref self: T, gamepack_id: u32, game_id: u32);
     fn pull_orb(ref self: T, gamepack_id: u32);
-    fn enter_shop(ref self: T, gamepack_id: u32, game_id: u32);
-    fn confirm_five_or_die(ref self: T, gamepack_id: u32, game_id: u32, confirmed: bool);
-    fn buy_orb(ref self: T, gamepack_id: u32, game_id: u32, orb_id: u32);
-    fn go_to_next_level(ref self: T, gamepack_id: u32, game_id: u32);
+    fn confirm_five_or_die(ref self: T, gamepack_id: u32, confirmed: bool);
+    fn cash_out(ref self: T, gamepack_id: u32);
+    fn enter_shop(ref self: T, gamepack_id: u32);
+    fn buy_orb(ref self: T, gamepack_id: u32, orb_id: u32);
+    fn go_to_next_level(ref self: T, gamepack_id: u32);
 }
 
 #[dojo::contract]
@@ -155,12 +155,12 @@ pub mod gb_contract_v2 {
             world.write_model(@game);
         }
 
-        fn cash_out(ref self: ContractState, gamepack_id: u32, game_id: u32) {
+        fn cash_out(ref self: ContractState, gamepack_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
             let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let mut game: Game = world.read_model((player_id, gamepack_id, game_id));
+            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             let action = GameAction::CashOut;
 
@@ -177,24 +177,25 @@ pub mod gb_contract_v2 {
             world.write_model(@game);
         }
 
-        fn enter_shop(ref self: ContractState, gamepack_id: u32, game_id: u32) {
+        fn enter_shop(ref self: ContractState, gamepack_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
             let player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, game_id));
+            let game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             world.write_model(@player);
             world.write_model(@gamepack);
             world.write_model(@game);
         }
 
-        fn confirm_five_or_die(ref self: ContractState, gamepack_id: u32, game_id: u32, confirmed: bool) {
+        fn confirm_five_or_die(ref self: ContractState, gamepack_id: u32, confirmed: bool) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let mut game: Game = world.read_model((player_id, gamepack_id, game_id));
+            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             let action = GameAction::ConfirmFiveOrDie(confirmed);
 
@@ -209,26 +210,26 @@ pub mod gb_contract_v2 {
             world.write_model(@game);
         }
 
-        fn buy_orb(ref self: ContractState, gamepack_id: u32, game_id: u32, orb_id: u32) {
+        fn buy_orb(ref self: ContractState, gamepack_id: u32, orb_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
             let player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, game_id));
+            let game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             world.write_model(@player);
             world.write_model(@gamepack);
             world.write_model(@game);
         }
 
-        fn go_to_next_level(ref self: ContractState, gamepack_id: u32, game_id: u32) {
+        fn go_to_next_level(ref self: ContractState, gamepack_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
             let player: Player = world.read_model(player_id);
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, game_id));
+            let game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             world.write_model(@player);
             world.write_model(@gamepack);
