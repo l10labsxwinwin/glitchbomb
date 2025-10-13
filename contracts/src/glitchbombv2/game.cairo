@@ -536,6 +536,7 @@ fn handle_enter_shop(data: GameData) -> Result<(GameState, GameData), UpdateErro
         true => {
             let mut new_data = data.clone();
             new_data.moonrocks_spent += shop_cost;
+            new_data.glitch_chips += data.points;
             Ok((GameState::Shop, new_data))
         },
         false => Err(UpdateError::InsufficientMoonrocks),
