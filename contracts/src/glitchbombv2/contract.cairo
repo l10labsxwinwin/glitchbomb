@@ -25,6 +25,7 @@ pub mod gb_contract_v2 {
         get_non_buyable_orbs, get_common_orbs, get_rare_orbs, get_cosmic_orbs
     };
     use dojo_starter::glitchbombv2::shared::shuffle;
+    use dojo_starter::glitchbombv2::orbs::{get_orb_price, update_shop_orbs};
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {
@@ -228,13 +229,45 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
-            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            // early assert to save compute on incorrect contract call
+            assert!(orb_id <= 5, "Invalid orb_id: must be between 0 and 5");
 
-            world.write_model(@player);
-            world.write_model(@gamepack);
+            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut orbs_in_game: OrbsInGame = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+
+            let orb_price = get_orb_price(
+                @orbs_in_game.common,
+                @orbs_in_game.rare,
+                @orbs_in_game.cosmic,
+                orb_id
+            );
+
+            let action = GameAction::BuyOrb(orb_price);
+
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            let (new_common, new_rare, new_cosmic) = match update_shop_orbs(
+                orbs_in_game.common,
+                orbs_in_game.rare,
+                orbs_in_game.cosmic,
+                orb_id
+            ) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+            orbs_in_game.common = new_common;
+            orbs_in_game.rare = new_rare;
+            orbs_in_game.cosmic = new_cosmic;
+
             world.write_model(@game);
+            world.write_model(@orbs_in_game);
         }
 
         fn go_to_next_level(ref self: ContractState, gamepack_id: u32) {

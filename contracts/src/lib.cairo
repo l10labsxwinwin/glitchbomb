@@ -5,4 +5,5 @@ pub mod glitchbombv2 {
     pub mod player;
     pub mod gamepack;
     pub mod game;
+    pub mod orbs;
 }

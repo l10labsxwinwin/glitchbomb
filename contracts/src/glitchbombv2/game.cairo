@@ -601,7 +601,16 @@ pub fn update_game(
                 false => Ok((GameState::Level, data)),
             }
         },
-        (GameState::Shop, GameAction::BuyOrb(_)) => Ok((state, data)),
+        (GameState::Shop, GameAction::BuyOrb(orb_price)) => {
+            match data.glitch_chips >= orb_price {
+                true => {
+                    let mut new_data = data.clone();
+                    new_data.glitch_chips -= orb_price;
+                    Ok((state, new_data))
+                },
+                false => Err(UpdateError::InsufficientGlitchChips),
+            }
+        },
         (GameState::Shop, GameAction::GoToNextLevel) => Ok((GameState::Level, data)),
         _ => Err(UpdateError::InvalidStateTransition),
     }

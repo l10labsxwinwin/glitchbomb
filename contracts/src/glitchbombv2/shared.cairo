@@ -12,6 +12,7 @@ pub enum UpdateError {
     InvalidStateTransition,
     InvalidData,
     InsufficientMoonrocks,
+    InsufficientGlitchChips,
     ZeroPointsToCashOut,
 }
 
