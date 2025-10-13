@@ -9,6 +9,12 @@
     "preview": "vite preview"
   },
   "devDependencies": {
-    "vite": "^7.1.7"
+    "vite": "^7.1.7",
+    "vite-plugin-top-level-await": "^1.6.0",
+    "vite-plugin-wasm": "^3.5.0"
+  },
+  "dependencies": {
+    "@cartridge/controller": "^0.10.7",
+    "@dojoengine/sdk": "^1.8.0"
   }
 }

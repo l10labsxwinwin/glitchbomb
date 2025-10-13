@@ -4,10 +4,44 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>frontend</title>
+    <title>GlitchBomb V2 - Model Viewer</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <header>
+        <h1>GlitchBomb V2 - Model Viewer</h1>
+        <p class="subtitle">Real-time Dojo model data display using Torii subscriptions</p>
+        <div class="connection-panel">
+          <button id="connect-button" disabled>Initializing...</button>
+          <div id="connection-status" class="status disconnected">Initializing</div>
+        </div>
+      </header>
+
+      <main>
+        <div class="models-container">
+          <section id="player-display" class="model-container">
+            <p class="no-data">Not connected</p>
+          </section>
+
+          <section id="gamepack-display" class="model-container">
+            <p class="no-data">Not connected</p>
+          </section>
+
+          <section id="game-display" class="model-container">
+            <p class="no-data">Not connected</p>
+          </section>
+
+          <section id="orbs-display" class="model-container">
+            <p class="no-data">Not connected</p>
+          </section>
+        </div>
+      </main>
+
+      <footer>
+        <p>Models update in real-time via Torii subscriptions</p>
+        <p class="tech-info">Using @dojoengine/sdk and @cartridge/controller</p>
+      </footer>
+    </div>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>
