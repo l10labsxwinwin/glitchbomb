@@ -1,15 +1,6 @@
 use starknet::ContractAddress;
 use super::shared::UpdateError;
-
-// ============================================================================
-// Game Constants
-// ============================================================================
-
-const MAX_HP: u32 = 5;
-
-// ============================================================================
-// Game State
-// ============================================================================
+use super::constants::{MAX_HP, MOONROCKS_GAME_PRICE};
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GameState {
@@ -23,11 +14,7 @@ pub enum GameState {
     GameOver,
 }
 
-// ============================================================================
-// Game Data
-// ============================================================================
-
-#[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore)]
+#[derive(Drop, Serde, Debug, Clone, Introspect, DojoStore)]
 pub struct GameData {
     pub level: u32,
     pub pull_number: u32,
@@ -40,6 +27,8 @@ pub struct GameData {
     pub moonrocks_earned: u32,
     pub bomb_immunity_turns: u32,
     pub bombs_pulled_in_level: u32,
+    pub pullable_orbs: Array<OrbEffect>,
+    pub consumed_orbs: Array<OrbEffect>,
 }
 
 pub fn new_game_data() -> GameData {
@@ -55,12 +44,10 @@ pub fn new_game_data() -> GameData {
         moonrocks_earned: 0,
         bomb_immunity_turns: 0,
         bombs_pulled_in_level: 0,
+        pullable_orbs: ArrayTrait::new(),
+        consumed_orbs: ArrayTrait::new(),
     }
 }
-
-// ============================================================================
-// Orb Types
-// ============================================================================
 
 #[derive(Copy, Drop, Serde, Debug, Introspect, DojoStore, PartialEq, Default)]
 pub enum OrbEffect {
@@ -87,10 +74,6 @@ pub struct Orb {
     pub current_price: u32,
 }
 
-// ============================================================================
-// Game Actions
-// ============================================================================
-
 #[derive(Drop, Serde, Debug, Copy)]
 pub enum GameAction {
     StartGame,
@@ -101,10 +84,6 @@ pub enum GameAction {
     GoToNextLevel,
     CashOut,
 }
-
-// ============================================================================
-// Game Models
-// ============================================================================
 
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
@@ -136,11 +115,6 @@ pub struct OrbsInGame {
     pub cosmic: Array<Orb>,
 }
 
-// ============================================================================
-// Orb Initialization Functions
-// ============================================================================
-
-// Non-buyable orb constructors
 fn non_buyable_one_damage_bomb() -> Orb {
     Orb {
         effect: OrbEffect::Bomb(1),
@@ -177,7 +151,6 @@ fn non_buyable_point_per_orb_remaining() -> Orb {
     }
 }
 
-// Common orb constructors
 fn common_five_point_orb() -> Orb {
     Orb {
         effect: OrbEffect::Point(5),
@@ -259,7 +232,6 @@ fn common_health_orb() -> Orb {
     }
 }
 
-// Rare orb constructors
 fn rare_eight_point_orb() -> Orb {
     Orb {
         effect: OrbEffect::Point(8),
@@ -305,7 +277,6 @@ fn rare_one_and_half_multiplier_orb() -> Orb {
     }
 }
 
-// Cosmic orb constructors
 fn cosmic_three_health_orb() -> Orb {
     Orb {
         effect: OrbEffect::Health(3),
@@ -374,9 +345,21 @@ pub fn get_cosmic_orbs() -> Array<Orb> {
     ]
 }
 
-// ============================================================================
-// Game Update Handler
-// ============================================================================
+pub fn orbs_to_effects(orb_arrays: Array<Array<Orb>>) -> Array<OrbEffect> {
+    let mut effects = ArrayTrait::new();
+
+    for orb_array in orb_arrays {
+        for orb in orb_array {
+            let mut i: u32 = 0;
+            while i < orb.count {
+                effects.append(orb.effect);
+                i += 1;
+            }
+        }
+    };
+
+    effects
+}
 
 pub fn update_game(
     state: GameState,
@@ -384,7 +367,21 @@ pub fn update_game(
     action: GameAction
 ) -> Result<(GameState, GameData), UpdateError> {
     match (state, action) {
-        (GameState::New, GameAction::StartGame) => Ok((GameState::Level, data)),
+        (GameState::New, GameAction::StartGame) => {
+            let orb_arrays = array![
+                get_non_buyable_orbs(),
+                get_common_orbs(),
+                get_rare_orbs(),
+                get_cosmic_orbs(),
+            ];
+            let pullable_orbs = orbs_to_effects(orb_arrays);
+
+            let mut new_data = data.clone();
+            new_data.pullable_orbs = pullable_orbs;
+            new_data.moonrocks_spent = data.moonrocks_spent + MOONROCKS_GAME_PRICE;
+
+            Ok((GameState::Level, new_data))
+        },
         (GameState::Level, GameAction::PullOrb) => Ok((GameState::LevelComplete, data)),
         (GameState::Level, GameAction::CashOut) => Ok((GameState::GameOver, data)),
         (GameState::LevelComplete, GameAction::EnterShop) => Ok((GameState::Shop, data)),

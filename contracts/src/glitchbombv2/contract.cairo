@@ -19,8 +19,12 @@ pub mod gb_contract_v2 {
     use super::PlayerActionsV2;
     use starknet::get_caller_address;
     use dojo_starter::glitchbombv2::player::{Player, PlayerAction, update_player};
-    use dojo_starter::glitchbombv2::gamepack::{GamePack, GamePackAction, GamePackState, update_gamepack, new_gamepack_data};
-    use dojo_starter::glitchbombv2::game::{Game, GameState, new_game_data};
+    use dojo_starter::glitchbombv2::gamepack::{GamePack, GamePackAction, GamePackState, GamePackData, update_gamepack, new_gamepack_data};
+    use dojo_starter::glitchbombv2::game::{
+        Game, GameAction, GameState, OrbsInGame, update_game, new_game_data,
+        get_non_buyable_orbs, get_common_orbs, get_rare_orbs, get_cosmic_orbs
+    };
+    use dojo_starter::glitchbombv2::constants::MOONROCKS_GAME_PRICE;
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {
@@ -102,13 +106,42 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let player: Player = world.read_model(player_id);
-            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let game: Game = world.read_model((player_id, gamepack_id, 1_u32));
+            let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
-            world.write_model(@player);
+            if gamepack.data.accumulated_moonrocks < MOONROCKS_GAME_PRICE {
+                panic!("Not enough moonrocks to start game");
+            }
+
+            let new_gamepack_data = GamePackData {
+                current_game_id: gamepack.data.current_game_id,
+                accumulated_moonrocks: gamepack.data.accumulated_moonrocks - MOONROCKS_GAME_PRICE,
+            };
+            gamepack.data = new_gamepack_data;
+
+            let action = GameAction::StartGame;
+
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+
+            let orbs_in_game = OrbsInGame {
+                player_id,
+                gamepack_id,
+                game_id: gamepack.data.current_game_id,
+                non_buyable: get_non_buyable_orbs(),
+                common: get_common_orbs(),
+                rare: get_rare_orbs(),
+                cosmic: get_cosmic_orbs(),
+            };
+
             world.write_model(@gamepack);
             world.write_model(@game);
+            world.write_model(@orbs_in_game);
         }
 
         fn cash_out(ref self: ContractState, gamepack_id: u32, game_id: u32) {

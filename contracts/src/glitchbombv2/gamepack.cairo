@@ -1,9 +1,6 @@
 use starknet::ContractAddress;
 use super::shared::UpdateError;
-
-// ============================================================================
-// GamePack State
-// ============================================================================
+use super::constants::{INITIAL_GAME_ID, INITIAL_MOONROCKS, MAX_GAMES_PER_PACK};
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GamePackState {
@@ -15,10 +12,6 @@ pub enum GamePackState {
     Completed,
 }
 
-// ============================================================================
-// GamePack Data
-// ============================================================================
-
 #[derive(Drop, Serde, Debug, Copy, Introspect, DojoStore)]
 pub struct GamePackData {
     pub current_game_id: u32,
@@ -27,24 +20,16 @@ pub struct GamePackData {
 
 pub fn new_gamepack_data() -> GamePackData {
     GamePackData {
-        current_game_id: 1,
-        accumulated_moonrocks: 100,
+        current_game_id: INITIAL_GAME_ID,
+        accumulated_moonrocks: INITIAL_MOONROCKS,
     }
 }
-
-// ============================================================================
-// GamePack Actions
-// ============================================================================
 
 #[derive(Drop, Serde, Debug, Copy)]
 pub enum GamePackAction {
     OpenPack,
     SubmitScore,
 }
-
-// ============================================================================
-// GamePack Model
-// ============================================================================
 
 #[derive(Drop, Serde, Debug)]
 #[dojo::model]
@@ -58,10 +43,6 @@ pub struct GamePack {
     pub data: GamePackData,
 }
 
-// ============================================================================
-// GamePack Update Handler
-// ============================================================================
-
 pub fn update_gamepack(
     state: GamePackState,
     data: GamePackData,
@@ -70,13 +51,13 @@ pub fn update_gamepack(
     match (state, action) {
         (GamePackState::Unopened, GamePackAction::OpenPack) => {
             let new_data = GamePackData {
-                current_game_id: 1,
-                accumulated_moonrocks: 100,
+                current_game_id: INITIAL_GAME_ID,
+                accumulated_moonrocks: INITIAL_MOONROCKS,
             };
             Ok((GamePackState::InProgress, new_data))
         },
         (GamePackState::InProgress, GamePackAction::SubmitScore) => {
-            match data.current_game_id == 10 {
+            match data.current_game_id == MAX_GAMES_PER_PACK {
                 true => Ok((GamePackState::Completed, data)),
                 false => Err(UpdateError::InvalidData),
             }
