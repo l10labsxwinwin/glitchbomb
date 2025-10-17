@@ -9,12 +9,12 @@ sierra-replace-ids = true
 
 [scripts]
 k = "katana --dev --dev.no-fee --http.cors_origins '*' --cartridge.paymaster --explorer"
-m = "sozo build && sozo migrate --rpc-url http://localhost:5050"
+b = "sozo build"
+m = "sozo migrate"
+bm = "sozo build && sozo migrate --rpc-url http://localhost:5050"
 t = "sh -c 'world_address=$(cat manifest_dev.json | jq -r .world.address) && torii -w $world_address --http.cors_origins \"*\" --rpc http://localhost:5050 --http.addr 0.0.0.0 --config torii_dev.toml'"
-migrate = "sozo build && sozo migrate"
-spawn = "sozo execute dojo_starter-actions spawn --wait"
-move = "sozo execute dojo_starter-actions move -c 1 --wait"
 watch = "find src -name '*.cairo' | entr -c sozo build"
+btb = "sozo build --typescript --bindings-output ../sv_client/src/lib && cp manifest_dev.json ../sv_client/src/lib/"
 
 [dependencies]
 dojo = "1.7.1"
