@@ -9,12 +9,12 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
+    font-family: 'JetBrains Mono', monospace;
   }
 
   h1 {
     color: #ffffff;
     font-size: 4rem;
     margin: 0;
-    font-family: 'JetBrains Mono', monospace;
   }
 </style>
