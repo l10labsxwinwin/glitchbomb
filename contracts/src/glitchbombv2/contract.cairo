@@ -18,14 +18,14 @@ pub mod gb_contract_v2 {
     use dojo::world::WorldStorage;
     use super::PlayerActionsV2;
     use starknet::get_caller_address;
-    use dojo_starter::glitchbombv2::player::{Player, PlayerAction, update_player};
-    use dojo_starter::glitchbombv2::gamepack::{GamePack, GamePackAction, GamePackState, update_gamepack, new_gamepack_data};
-    use dojo_starter::glitchbombv2::game::{
+    use crate::glitchbombv2::player::{Player, PlayerAction, update_player};
+    use crate::glitchbombv2::gamepack::{GamePack, GamePackAction, GamePackState, update_gamepack, new_gamepack_data};
+    use crate::glitchbombv2::game::{
         Game, GameAction, GameState, OrbsInGame, update_game, new_game_data,
         get_non_buyable_orbs, get_common_orbs, get_rare_orbs, get_cosmic_orbs, orbs_to_effects
     };
-    use dojo_starter::glitchbombv2::shared::shuffle;
-    use dojo_starter::glitchbombv2::orbs::{get_orb_price, update_shop_orbs};
+    use crate::glitchbombv2::shared::shuffle;
+    use crate::glitchbombv2::orbs::{get_orb_price, update_shop_orbs};
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {

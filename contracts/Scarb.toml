@@ -1,6 +1,6 @@
 [package]
 cairo-version = "2.12.2"
-name = "dojo_starter"
+name = "glitchbomb"
 version = "1.7.1"
 edition = "2024_07"
 
