@@ -1,20 +1,21 @@
-<h1>GLITCHBOMB</h1>
+<div class="app-container">
+  <h1>GLITCHBOMB</h1>
+</div>
 
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&display=swap');
+
   :global(body) {
+    background-color: black;
+    color: white;
     margin: 0;
-    padding: 0;
-    background-color: #000000;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .app-container {
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    font-family: 'JetBrains Mono', monospace;
-  }
-
-  h1 {
-    color: #ffffff;
-    font-size: 4rem;
-    margin: 0;
   }
 </style>
