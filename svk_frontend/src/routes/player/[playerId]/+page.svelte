@@ -2,6 +2,7 @@
 	import { page } from '$app/stores';
 	import { getToriiState } from '$lib/torii_global.svelte';
 	import PlayerStats from '$lib/PlayerStats.svelte';
+	import SubonPlayerRoute from '$lib/SubonPlayerRoute.svelte';
 	import type { Player } from '$lib/typescript/models.gen';
 
 	const state = getToriiState();
@@ -16,6 +17,7 @@
 	
 	{#if player}
 		<PlayerStats {player} />
+		<SubonPlayerRoute playerId={$page.params.playerId} />
 	{:else}
 		<p>Player not found</p>
 	{/if}
