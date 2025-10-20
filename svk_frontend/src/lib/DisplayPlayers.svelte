@@ -40,10 +40,26 @@
 				<tbody>
 					{#each sortedPlayers as player}
 						<tr class="border-b border-gray-200 hover:bg-gray-100 hover:text-black transition-colors">
-							<td class="py-2 px-4">{shortenPlayerId(player.player_id)}</td>
-							<td class="py-2 px-4">{getStateString(player.state)}</td>
-							<td class="py-2 px-4">{player.data.usdc.toString()}</td>
-							<td class="py-2 px-4">{player.data.gamepacks_bought.toString()}</td>
+							<td class="py-2 px-4">
+								<a href="/player/{player.player_id}" class="block">
+									{shortenPlayerId(player.player_id)}
+								</a>
+							</td>
+							<td class="py-2 px-4">
+								<a href="/player/{player.player_id}" class="block">
+									{getStateString(player.state)}
+								</a>
+							</td>
+							<td class="py-2 px-4">
+								<a href="/player/{player.player_id}" class="block">
+									{player.data.usdc.toString()}
+								</a>
+							</td>
+							<td class="py-2 px-4">
+								<a href="/player/{player.player_id}" class="block">
+									{player.data.gamepacks_bought.toString()}
+								</a>
+							</td>
 						</tr>
 					{/each}
 				</tbody>
