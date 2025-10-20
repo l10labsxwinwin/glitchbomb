@@ -29,7 +29,6 @@
 </script>
 
 <div>
-	<h2 class="text-2xl font-bold mb-4">Game Packs</h2>
 	{#if sortedGamePacks.length === 0}
 		<p>No game packs available</p>
 	{:else}
