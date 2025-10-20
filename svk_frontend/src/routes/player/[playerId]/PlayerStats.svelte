@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { Player } from './typescript/models.gen';
+	import type { Player } from '$lib/typescript/models.gen';
 
 	let { player }: { player: Player } = $props();
 

@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { getToriiState } from './torii_global.svelte';
+	import { getToriiState } from '$lib/torii_global.svelte';
 
 	const state = getToriiState();
 

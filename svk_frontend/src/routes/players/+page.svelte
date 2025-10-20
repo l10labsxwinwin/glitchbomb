@@ -1,5 +1,5 @@
 <script lang="ts">
-	import DisplayPlayers from '$lib/DisplayPlayers.svelte';
+	import DisplayPlayers from './DisplayPlayers.svelte';
 </script>
 
 <div class="min-h-screen p-8">
