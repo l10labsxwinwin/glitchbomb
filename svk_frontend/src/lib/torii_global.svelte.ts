@@ -48,6 +48,25 @@ export async function initDojoSDK() {
 	}
 }
 
+export function cancelSubscription() {
+	if (subscription) {
+		subscription.cancel();
+		subscription = null;
+	}
+}
+
+export function getSDK() {
+	return sdk;
+}
+
+export function sdkLoading() {
+	return toriiStateRune.isLoading;
+}
+
+export function sdkInitialized() {
+	return toriiStateRune.isInitialized;
+}
+
 export async function subscribeToGamePacks() {
 	if (!sdk) {
 		throw new Error('SDK not initialized');
@@ -86,25 +105,6 @@ export async function subscribeToGamePacks() {
 
 	console.log('Subscribed to GamePack entities, initial:', initialEntities);
 	return { initialEntities, subscription: sub };
-}
-
-export function cancelSubscription() {
-	if (subscription) {
-		subscription.cancel();
-		subscription = null;
-	}
-}
-
-export function getSDK() {
-	return sdk;
-}
-
-export function sdkLoading() {
-	return toriiStateRune.isLoading;
-}
-
-export function sdkInitialized() {
-	return toriiStateRune.isInitialized;
 }
 
 export function extractGamePacks(init_entities: any): GamePack[] {
