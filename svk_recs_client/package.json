@@ -34,5 +34,18 @@
 		"typescript": "^5.9.2",
 		"typescript-eslint": "^8.44.1",
 		"vite": "^7.1.7"
+	},
+	"dependencies": {
+		"@dojoengine/core": "^1.8.1",
+		"@dojoengine/create-burner": "^1.8.1",
+		"@dojoengine/recs": "^2.0.13",
+		"@dojoengine/sdk": "^1.8.2",
+		"@dojoengine/state": "^1.8.1",
+		"@dojoengine/torii-client": "^1.8.1",
+		"@dojoengine/utils": "^1.8.1",
+		"@latticexyz/utils": "^2.2.23",
+		"starknet": "^8.6.0",
+		"vite-plugin-top-level-await": "^1.6.0",
+		"vite-plugin-wasm": "^3.5.0"
 	}
 }
