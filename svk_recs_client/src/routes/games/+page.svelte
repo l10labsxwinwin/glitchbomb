@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { gql } from '@apollo/client/core';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { client } from '$lib/apollo';
+	import { getGameKey } from '$lib/keys';
 
 	interface GameData {
 		level: number;
@@ -87,7 +89,8 @@
 		}
 	`;
 
-	let games = $state<Game[]>([]);
+	let gameMap = $state(new SvelteMap<string, Game>());
+	let games = $derived(Array.from(gameMap.values()));
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let subscription: any = null;
@@ -99,7 +102,10 @@
 				fetchPolicy: 'network-only'
 			});
 
-			games = result.data.glitchbombGameModels?.edges?.map((edge: any) => edge.node) || [];
+			const nodes = result.data.glitchbombGameModels?.edges?.map((edge: any) => edge.node) || [];
+			nodes.forEach((game: Game) => {
+				gameMap.set(getGameKey(game.player_id, game.gamepack_id, game.game_id), game);
+			});
 			loading = false;
 
 			subscription = client.subscribe({
@@ -110,16 +116,8 @@
 						const models = data.data.entityUpdated.models;
 						models.forEach((model: any) => {
 							if (model.__typename === 'glitchbomb_Game') {
-								const index = games.findIndex(g => 
-									g.player_id === model.player_id && 
-									g.gamepack_id === model.gamepack_id && 
-									g.game_id === model.game_id
-								);
-								if (index !== -1) {
-									games[index] = model;
-								} else {
-									games = [...games, model];
-								}
+								const key = getGameKey(model.player_id, model.gamepack_id, model.game_id);
+								gameMap.set(key, model);
 							}
 						});
 					}

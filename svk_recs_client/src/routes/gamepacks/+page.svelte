@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { gql } from '@apollo/client/core';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { client } from '$lib/apollo';
+	import { getGamePackKey } from '$lib/keys';
 
 	interface GamePackData {
 		current_game_id: number;
@@ -54,7 +56,8 @@
 		}
 	`;
 
-	let gamepacks = $state<GamePack[]>([]);
+	let gamepackMap = $state(new SvelteMap<string, GamePack>());
+	let gamepacks = $derived(Array.from(gamepackMap.values()));
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let subscription: any = null;
@@ -66,7 +69,10 @@
 				fetchPolicy: 'network-only'
 			});
 
-			gamepacks = result.data.glitchbombGamePackModels?.edges?.map((edge: any) => edge.node) || [];
+			const nodes = result.data.glitchbombGamePackModels?.edges?.map((edge: any) => edge.node) || [];
+			nodes.forEach((gamepack: GamePack) => {
+				gamepackMap.set(getGamePackKey(gamepack.player_id, gamepack.gamepack_id), gamepack);
+			});
 			loading = false;
 
 			subscription = client.subscribe({
@@ -77,12 +83,8 @@
 						const models = data.data.entityUpdated.models;
 						models.forEach((model: any) => {
 							if (model.__typename === 'glitchbomb_GamePack') {
-								const index = gamepacks.findIndex(g => g.player_id === model.player_id && g.gamepack_id === model.gamepack_id);
-								if (index !== -1) {
-									gamepacks[index] = model;
-								} else {
-									gamepacks = [...gamepacks, model];
-								}
+								const key = getGamePackKey(model.player_id, model.gamepack_id);
+								gamepackMap.set(key, model);
 							}
 						});
 					}

@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { gql } from '@apollo/client/core';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { client } from '$lib/apollo';
+	import { getOrbsKey } from '$lib/keys';
 
 	interface OrbsInGame {
 		player_id: string;
@@ -156,7 +158,8 @@
 		}
 	`;
 
-	let orbs = $state<OrbsInGame[]>([]);
+	let orbsMap = $state(new SvelteMap<string, OrbsInGame>());
+	let orbs = $derived(Array.from(orbsMap.values()));
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let subscription: any = null;
@@ -168,7 +171,10 @@
 				fetchPolicy: 'network-only'
 			});
 
-			orbs = result.data.glitchbombOrbsInGameModels?.edges?.map((edge: any) => edge.node) || [];
+			const nodes = result.data.glitchbombOrbsInGameModels?.edges?.map((edge: any) => edge.node) || [];
+			nodes.forEach((orb: OrbsInGame) => {
+				orbsMap.set(getOrbsKey(orb.player_id, orb.gamepack_id, orb.game_id), orb);
+			});
 			loading = false;
 
 			subscription = client.subscribe({
@@ -179,16 +185,8 @@
 						const models = data.data.entityUpdated.models;
 						models.forEach((model: any) => {
 							if (model.__typename === 'glitchbomb_OrbsInGame') {
-								const index = orbs.findIndex(o => 
-									o.player_id === model.player_id && 
-									o.gamepack_id === model.gamepack_id && 
-									o.game_id === model.game_id
-								);
-								if (index !== -1) {
-									orbs[index] = model;
-								} else {
-									orbs = [...orbs, model];
-								}
+								const key = getOrbsKey(model.player_id, model.gamepack_id, model.game_id);
+								orbsMap.set(key, model);
 							}
 						});
 					}

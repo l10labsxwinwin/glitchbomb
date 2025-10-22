@@ -1,7 +1,9 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
 	import { gql } from '@apollo/client/core';
+	import { SvelteMap } from 'svelte/reactivity';
 	import { client } from '$lib/apollo';
+	import { getPlayerKey } from '$lib/keys';
 
 	interface PlayerData {
 		usdc: number;
@@ -51,7 +53,8 @@
 		}
 	`;
 
-	let players = $state<Player[]>([]);
+	let playerMap = $state(new SvelteMap<string, Player>());
+	let players = $derived(Array.from(playerMap.values()));
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let subscription: any = null;
@@ -63,7 +66,10 @@
 				fetchPolicy: 'network-only'
 			});
 
-			players = result.data.glitchbombPlayerModels?.edges?.map((edge: any) => edge.node) || [];
+			const nodes = result.data.glitchbombPlayerModels?.edges?.map((edge: any) => edge.node) || [];
+			nodes.forEach((player: Player) => {
+				playerMap.set(getPlayerKey(player.player_id), player);
+			});
 			loading = false;
 
 			subscription = client.subscribe({
@@ -74,12 +80,8 @@
 						const models = data.data.entityUpdated.models;
 						models.forEach((model: any) => {
 							if (model.__typename === 'glitchbomb_Player') {
-								const index = players.findIndex(p => p.player_id === model.player_id);
-								if (index !== -1) {
-									players[index] = model;
-								} else {
-									players = [...players, model];
-								}
+								const key = getPlayerKey(model.player_id);
+								playerMap.set(key, model);
 							}
 						});
 					}
