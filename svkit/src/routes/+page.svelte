@@ -5,8 +5,8 @@
 			<a href="/data" class="border border-white p-6 hover:bg-white hover:text-black transition-colors">
 				DATA VIEW
 			</a>
-			<a href="/game" class="border border-white p-6 hover:bg-white hover:text-black transition-colors">
-				GAME VIEW
+			<a href="/singleplayer" class="border border-white p-6 hover:bg-white hover:text-black transition-colors">
+				SINGLE PLAYER VIEW
 			</a>
 		</div>
 	</div>
