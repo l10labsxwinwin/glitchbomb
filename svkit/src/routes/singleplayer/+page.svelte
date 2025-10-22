@@ -3,6 +3,8 @@
 	import { dojoConfig } from '$lib/dojoConfig';
 	import { setup } from '$lib/dojo/setup';
 	import { setupWorld } from '$lib/typescript/contracts.gen';
+	import { client } from '$lib/apollo';
+	import { gql } from '@apollo/client/core';
 	import type { BurnerManager } from '@dojoengine/create-burner';
 	import type { Account } from 'starknet';
 	import type { DojoProvider } from '@dojoengine/core';
@@ -16,6 +18,24 @@
 	let burnerCount = $state(0);
 	let burners: any[] = $state([]);
 	let claiming = $state(false);
+	let allPlayers: any[] = $state([]);
+
+	const PLAYER_QUERY = gql`
+		query PlayerQuery($playerId: String!) {
+			glitchbombPlayerModels(where: { player_id: $playerId }) {
+				edges {
+					node {
+						player_id
+						state
+						data {
+							usdc
+							gamepacks_bought
+						}
+					}
+				}
+			}
+		}
+	`;
 
 	onMount(async () => {
 		try {
@@ -26,6 +46,7 @@
 			dojoProvider = result.dojoProvider;
 			burnerAddress = account.address;
 			updateBurnerList();
+			await loadAllPlayers();
 			loading = false;
 			console.log('✅ Burner wallet initialized');
 			console.log('Active burner address:', account.address);
@@ -35,6 +56,22 @@
 			loading = false;
 		}
 	});
+
+	async function loadAllPlayers() {
+		if (!burnerAddress) return;
+		try {
+			const result = await client.query({
+				query: PLAYER_QUERY,
+				variables: { playerId: burnerAddress }
+			});
+			console.log('Player data:', result);
+			if (result.data?.glitchbombPlayerModels?.edges) {
+				allPlayers = result.data.glitchbombPlayerModels.edges.map((edge: any) => edge.node);
+			}
+		} catch (err) {
+			console.error('Failed to load players:', err);
+		}
+	}
 
 	function updateBurnerList() {
 		if (!burnerManager) return;
@@ -80,20 +117,21 @@
 		}
 	}
 
-	function selectBurner(event: Event) {
+	async function selectBurner(event: Event) {
 		if (!burnerManager) return;
 		const target = event.target as HTMLSelectElement;
 		burnerManager.select(target.value);
 		account = burnerManager.getActiveAccount();
 		if (account) {
 			burnerAddress = account.address;
+			await loadAllPlayers();
 		}
 		console.log('Switched to burner:', target.value);
 	}
 
 	async function claimFreeUsdc() {
 		if (!account || !dojoProvider) return;
-		
+
 		claiming = true;
 		try {
 			console.log('Claiming free USDC...');
@@ -101,12 +139,20 @@
 			const result = await world.gb_contract_v2.claimFreeUsdc(account);
 			console.log('✅ Free USDC claimed!', result);
 			alert('Free USDC claimed successfully!');
+			await loadAllPlayers();
 		} catch (err) {
 			console.error('Failed to claim free USDC:', err);
 			alert('Failed to claim free USDC. See console for details.');
 		} finally {
 			claiming = false;
 		}
+	}
+
+	function getPlayerStateLabel(state: any): string {
+		if (!state) return 'Unknown';
+		if (state.Broke !== undefined) return 'Broke';
+		if (state.Stacked !== undefined) return 'Stacked';
+		return 'Unknown';
 	}
 </script>
 
@@ -178,7 +224,7 @@
 			<h1 class="text-4xl font-bold mb-8">Game Content Here</h1>
 
 			{#if !loading && !error}
-				<div class="space-y-4">
+				<div class="space-y-6">
 					<button
 						onclick={claimFreeUsdc}
 						disabled={claiming}
@@ -186,6 +232,46 @@
 					>
 						{claiming ? 'Claiming...' : 'Claim Free USDC'}
 					</button>
+
+					<div class="bg-black/30 p-6 rounded-lg">
+						<h2 class="text-2xl font-bold mb-4">Player Data</h2>
+						{#if allPlayers.length > 0}
+							<div class="space-y-4">
+								{#each allPlayers as player}
+									<div class="bg-black/50 p-4 rounded">
+										<div class="space-y-2">
+											<div class="flex gap-2">
+												<span class="font-semibold">Player ID:</span>
+												<code class="bg-black/50 px-2 py-1 rounded text-sm"
+													>{player.player_id}</code
+												>
+											</div>
+											<div class="flex gap-2">
+												<span class="font-semibold">State:</span>
+												<span class="bg-black/50 px-2 py-1 rounded text-sm"
+													>{getPlayerStateLabel(player.state)}</span
+												>
+											</div>
+											<div class="flex gap-2">
+												<span class="font-semibold">USDC:</span>
+												<span class="bg-black/50 px-2 py-1 rounded text-sm"
+													>{player.data.usdc.toString()}</span
+												>
+											</div>
+											<div class="flex gap-2">
+												<span class="font-semibold">Gamepacks Bought:</span>
+												<span class="bg-black/50 px-2 py-1 rounded text-sm"
+													>{player.data.gamepacks_bought.toString()}</span
+												>
+											</div>
+										</div>
+									</div>
+								{/each}
+							</div>
+						{:else}
+							<p class="text-sm opacity-60">No players found. Try claiming free USDC first.</p>
+						{/if}
+					</div>
 				</div>
 			{/if}
 		</div>
