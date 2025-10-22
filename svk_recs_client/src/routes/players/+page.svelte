@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { gql } from '@apollo/client/core';
 	import { client } from '$lib/apollo';
 
@@ -31,21 +31,72 @@
 		}
 	`;
 
+	const ENTITY_UPDATED = gql`
+		subscription EntityUpdated {
+			entityUpdated {
+				id
+				keys
+				models {
+					__typename
+					... on glitchbomb_Player {
+						player_id
+						state
+						data {
+							usdc
+							gamepacks_bought
+						}
+					}
+				}
+			}
+		}
+	`;
+
 	let players = $state<Player[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+	let subscription: any = null;
 
 	onMount(async () => {
 		try {
 			const result = await client.query({
-				query: GET_PLAYERS
+				query: GET_PLAYERS,
+				fetchPolicy: 'network-only'
 			});
 
 			players = result.data.glitchbombPlayerModels?.edges?.map((edge: any) => edge.node) || [];
 			loading = false;
+
+			subscription = client.subscribe({
+				query: ENTITY_UPDATED
+			}).subscribe({
+				next: (data) => {
+					if (data.data?.entityUpdated?.models) {
+						const models = data.data.entityUpdated.models;
+						models.forEach((model: any) => {
+							if (model.__typename === 'glitchbomb_Player') {
+								const index = players.findIndex(p => p.player_id === model.player_id);
+								if (index !== -1) {
+									players[index] = model;
+								} else {
+									players = [...players, model];
+								}
+							}
+						});
+					}
+				},
+				error: (err) => {
+					console.error('Subscription error:', err);
+				}
+			});
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to fetch data';
 			loading = false;
+		}
+	});
+
+	onDestroy(() => {
+		if (subscription) {
+			subscription.unsubscribe();
 		}
 	});
 </script>

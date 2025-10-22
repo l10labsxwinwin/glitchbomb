@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { gql } from '@apollo/client/core';
 	import { client } from '$lib/apollo';
 
@@ -83,21 +83,129 @@
 		}
 	`;
 
+	const ENTITY_UPDATED = gql`
+		subscription EntityUpdated {
+			entityUpdated {
+				id
+				keys
+				models {
+					__typename
+					... on glitchbomb_OrbsInGame {
+						player_id
+						gamepack_id
+						game_id
+						non_buyable {
+							effect {
+								Point
+								PointPerOrbRemaining
+								PointPerBombPulled
+								GlitchChips
+								Moonrocks
+								Health
+								Bomb
+								Multiplier
+								BombImmunity
+								option
+							}
+						}
+						common {
+							effect {
+								Point
+								PointPerOrbRemaining
+								PointPerBombPulled
+								GlitchChips
+								Moonrocks
+								Health
+								Bomb
+								Multiplier
+								BombImmunity
+								option
+							}
+						}
+						rare {
+							effect {
+								Point
+								PointPerOrbRemaining
+								PointPerBombPulled
+								GlitchChips
+								Moonrocks
+								Health
+								Bomb
+								Multiplier
+								BombImmunity
+								option
+							}
+						}
+						cosmic {
+							effect {
+								Point
+								PointPerOrbRemaining
+								PointPerBombPulled
+								GlitchChips
+								Moonrocks
+								Health
+								Bomb
+								Multiplier
+								BombImmunity
+								option
+							}
+						}
+					}
+				}
+			}
+		}
+	`;
+
 	let orbs = $state<OrbsInGame[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+	let subscription: any = null;
 
 	onMount(async () => {
 		try {
 			const result = await client.query({
-				query: GET_ORBS
+				query: GET_ORBS,
+				fetchPolicy: 'network-only'
 			});
 
 			orbs = result.data.glitchbombOrbsInGameModels?.edges?.map((edge: any) => edge.node) || [];
 			loading = false;
+
+			subscription = client.subscribe({
+				query: ENTITY_UPDATED
+			}).subscribe({
+				next: (data) => {
+					if (data.data?.entityUpdated?.models) {
+						const models = data.data.entityUpdated.models;
+						models.forEach((model: any) => {
+							if (model.__typename === 'glitchbomb_OrbsInGame') {
+								const index = orbs.findIndex(o => 
+									o.player_id === model.player_id && 
+									o.gamepack_id === model.gamepack_id && 
+									o.game_id === model.game_id
+								);
+								if (index !== -1) {
+									orbs[index] = model;
+								} else {
+									orbs = [...orbs, model];
+								}
+							}
+						});
+					}
+				},
+				error: (err) => {
+					console.error('Subscription error:', err);
+				}
+			});
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to fetch data';
 			loading = false;
+		}
+	});
+
+	onDestroy(() => {
+		if (subscription) {
+			subscription.unsubscribe();
 		}
 	});
 </script>

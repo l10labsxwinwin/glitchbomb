@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { gql } from '@apollo/client/core';
 	import { client } from '$lib/apollo';
 
@@ -33,21 +33,73 @@
 		}
 	`;
 
+	const ENTITY_UPDATED = gql`
+		subscription EntityUpdated {
+			entityUpdated {
+				id
+				keys
+				models {
+					__typename
+					... on glitchbomb_GamePack {
+						player_id
+						gamepack_id
+						state
+						data {
+							current_game_id
+							accumulated_moonrocks
+						}
+					}
+				}
+			}
+		}
+	`;
+
 	let gamepacks = $state<GamePack[]>([]);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
+	let subscription: any = null;
 
 	onMount(async () => {
 		try {
 			const result = await client.query({
-				query: GET_GAMEPACKS
+				query: GET_GAMEPACKS,
+				fetchPolicy: 'network-only'
 			});
 
 			gamepacks = result.data.glitchbombGamePackModels?.edges?.map((edge: any) => edge.node) || [];
 			loading = false;
+
+			subscription = client.subscribe({
+				query: ENTITY_UPDATED
+			}).subscribe({
+				next: (data) => {
+					if (data.data?.entityUpdated?.models) {
+						const models = data.data.entityUpdated.models;
+						models.forEach((model: any) => {
+							if (model.__typename === 'glitchbomb_GamePack') {
+								const index = gamepacks.findIndex(g => g.player_id === model.player_id && g.gamepack_id === model.gamepack_id);
+								if (index !== -1) {
+									gamepacks[index] = model;
+								} else {
+									gamepacks = [...gamepacks, model];
+								}
+							}
+						});
+					}
+				},
+				error: (err) => {
+					console.error('Subscription error:', err);
+				}
+			});
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to fetch data';
 			loading = false;
+		}
+	});
+
+	onDestroy(() => {
+		if (subscription) {
+			subscription.unsubscribe();
 		}
 	});
 </script>
