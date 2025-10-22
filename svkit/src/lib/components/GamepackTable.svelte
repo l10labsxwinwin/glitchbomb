@@ -23,7 +23,13 @@
 <div>
 	<h2 class="text-2xl font-bold mb-4">Gamepacks ({gamepacks.length})</h2>
 	{#if gamepacks.length > 0}
-		<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+		<div class="space-y-2">
+			<div class="grid grid-cols-4 gap-2 sm:gap-4 px-3 py-2 text-xs sm:text-sm opacity-60 font-bold">
+				<div>ID</div>
+				<div class="text-center">State</div>
+				<div class="text-center">Current Game</div>
+				<div class="text-center">Moonrocks</div>
+			</div>
 			{#each gamepacks as gamepack}
 				<GamepackCard {gamepack} />
 			{/each}
