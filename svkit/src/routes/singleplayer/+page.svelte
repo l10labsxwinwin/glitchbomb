@@ -7,6 +7,8 @@
 	import { gql } from '@apollo/client/core';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getPlayerKey } from '$lib/keys';
+	import PlayerBar from '$lib/components/PlayerBar.svelte';
+	import GamepackCard from '$lib/components/GamepackCard.svelte';
 	import type { BurnerManager } from '@dojoengine/create-burner';
 	import type { Account } from 'starknet';
 	import type { DojoProvider } from '@dojoengine/core';
@@ -22,6 +24,18 @@
 		data: PlayerData;
 	}
 
+	interface GamePackData {
+		current_game_id: number;
+		accumulated_moonrocks: number;
+	}
+
+	interface GamePack {
+		player_id: string;
+		gamepack_id: number;
+		state: string;
+		data: GamePackData;
+	}
+
 	let loading = $state(true);
 	let error = $state('');
 	let burnerManager: BurnerManager | undefined = $state();
@@ -35,6 +49,8 @@
 	let playerMap = $state(new SvelteMap<string, Player>());
 	let players = $derived(Array.from(playerMap.values()));
 	let currentPlayer = $derived(playerMap.get(getPlayerKey(burnerAddress)) || null);
+	let gamepackMap = $state(new SvelteMap<number, GamePack>());
+	let gamepacks = $derived(Array.from(gamepackMap.values()));
 	let subscription: any = null;
 
 	const GET_PLAYERS = gql`
@@ -47,6 +63,24 @@
 						data {
 							usdc
 							gamepacks_bought
+						}
+					}
+				}
+			}
+		}
+	`;
+
+	const GET_GAMEPACKS = gql`
+		query GetGamepacks($playerId: String!) {
+			glitchbombGamePackModels(where: { player_id: $playerId }) {
+				edges {
+					node {
+						player_id
+						gamepack_id
+						state
+						data {
+							current_game_id
+							accumulated_moonrocks
 						}
 					}
 				}
@@ -96,6 +130,18 @@
 				queryResult.data.glitchbombPlayerModels?.edges?.map((edge: any) => edge.node) || [];
 			nodes.forEach((player: Player) => {
 				playerMap.set(getPlayerKey(player.player_id), player);
+			});
+
+			const gamepackResult = await client.query({
+				query: GET_GAMEPACKS,
+				variables: { playerId: burnerAddress },
+				fetchPolicy: 'network-only'
+			});
+
+			const gamepackNodes =
+				gamepackResult.data.glitchbombGamePackModels?.edges?.map((edge: any) => edge.node) || [];
+			gamepackNodes.forEach((gamepack: GamePack) => {
+				gamepackMap.set(gamepack.gamepack_id, gamepack);
 			});
 
 			subscription = client
@@ -175,15 +221,35 @@
 		}
 	}
 
-	function selectBurner(event: Event) {
+	async function selectBurner(event: Event) {
 		if (!burnerManager) return;
 		const target = event.target as HTMLSelectElement;
 		burnerManager.select(target.value);
 		account = burnerManager.getActiveAccount();
 		if (account) {
 			burnerAddress = account.address;
+			await loadGamepacks(account.address);
 		}
 		console.log('Switched to burner:', target.value);
+	}
+
+	async function loadGamepacks(playerId: string) {
+		try {
+			gamepackMap.clear();
+			const gamepackResult = await client.query({
+				query: GET_GAMEPACKS,
+				variables: { playerId },
+				fetchPolicy: 'network-only'
+			});
+
+			const gamepackNodes =
+				gamepackResult.data.glitchbombGamePackModels?.edges?.map((edge: any) => edge.node) || [];
+			gamepackNodes.forEach((gamepack: GamePack) => {
+				gamepackMap.set(gamepack.gamepack_id, gamepack);
+			});
+		} catch (err) {
+			console.error('Failed to load gamepacks:', err);
+		}
 	}
 
 	async function claimFreeUsdc() {
@@ -286,10 +352,10 @@
 		</div>
 	</div>
 
+	<PlayerBar player={currentPlayer} />
+
 	<div class="flex-1 p-8">
 		<div class="max-w-7xl mx-auto">
-			<h1 class="text-4xl font-bold mb-8">Game Content Here</h1>
-
 			{#if !loading && !error}
 				<div class="space-y-6">
 					<div class="flex gap-3">
@@ -309,41 +375,16 @@
 						</button>
 					</div>
 
-					<div class="bg-black/30 p-6 rounded-lg">
-						<h2 class="text-2xl font-bold mb-4">Player Data</h2>
-						{#if currentPlayer}
-							<div class="bg-black/50 p-4 rounded">
-								<div class="space-y-2">
-									<div class="flex gap-2">
-										<span class="font-semibold">Player ID:</span>
-										<code class="bg-black/50 px-2 py-1 rounded text-sm"
-											>{currentPlayer.player_id}</code
-										>
-									</div>
-									<div class="flex gap-2">
-										<span class="font-semibold">State:</span>
-										<span class="bg-black/50 px-2 py-1 rounded text-sm"
-											>{currentPlayer.state}</span
-										>
-									</div>
-									<div class="flex gap-2">
-										<span class="font-semibold">USDC:</span>
-										<span class="bg-black/50 px-2 py-1 rounded text-sm"
-											>{currentPlayer.data.usdc.toString()}</span
-										>
-									</div>
-									<div class="flex gap-2">
-										<span class="font-semibold">Gamepacks Bought:</span>
-										<span class="bg-black/50 px-2 py-1 rounded text-sm"
-											>{currentPlayer.data.gamepacks_bought.toString()}</span
-										>
-									</div>
-								</div>
+					<div>
+						<h2 class="text-2xl font-bold mb-4">Gamepacks ({gamepacks.length})</h2>
+						{#if gamepacks.length > 0}
+							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+								{#each gamepacks as gamepack}
+									<GamepackCard {gamepack} />
+								{/each}
 							</div>
 						{:else}
-							<p class="text-sm opacity-60">
-								No player data for this wallet. Try claiming free USDC first.
-							</p>
+							<p class="text-sm opacity-60">No gamepacks found. Buy one to get started!</p>
 						{/if}
 					</div>
 				</div>
