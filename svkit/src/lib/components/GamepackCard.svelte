@@ -18,7 +18,10 @@
 	let { gamepack }: Props = $props();
 </script>
 
-<div class="bg-black/30 border border-white/10 p-4 rounded-lg">
+<a
+	href="/singleplayer/{gamepack.player_id}/gamepack/{gamepack.gamepack_id}"
+	class="block bg-black/30 border border-white/10 p-4 rounded-lg hover:border-white/30 transition-colors"
+>
 	<div class="space-y-3">
 		<div class="flex items-center justify-between">
 			<h3 class="text-lg font-bold">Gamepack #{gamepack.gamepack_id}</h3>
@@ -40,4 +43,4 @@
 			</div>
 		</div>
 	</div>
-</div>
+</a>

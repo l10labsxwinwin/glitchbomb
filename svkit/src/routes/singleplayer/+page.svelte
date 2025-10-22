@@ -19,6 +19,11 @@
 		saveBurners as saveBurnersHelper,
 		restoreBurners as restoreBurnersHelper
 	} from './burner_helpers';
+	import {
+		burnerManager as burnerManagerStore,
+		account as accountStore,
+		dojoProvider as dojoProviderStore
+	} from '$lib/stores/burner';
 
 	interface PlayerData {
 		usdc: number;
@@ -68,6 +73,11 @@
 			account = result.account;
 			dojoProvider = result.dojoProvider;
 			burnerAddress = account.address;
+			
+			burnerManagerStore.set(burnerManager);
+			accountStore.set(account);
+			dojoProviderStore.set(dojoProvider);
+			
 			updateBurnerList();
 			loading = false;
 			console.log('✅ Burner wallet initialized');
@@ -161,6 +171,7 @@
 		account = burnerManager.getActiveAccount();
 		if (account) {
 			burnerAddress = account.address;
+			accountStore.set(account);
 			await loadGamepacks(account.address);
 		}
 		console.log('Switched to burner:', target.value);
