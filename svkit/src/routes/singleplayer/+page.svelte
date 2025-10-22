@@ -1,13 +1,26 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, onDestroy } from 'svelte';
 	import { dojoConfig } from '$lib/dojoConfig';
 	import { setup } from '$lib/dojo/setup';
 	import { setupWorld } from '$lib/typescript/contracts.gen';
 	import { client } from '$lib/apollo';
 	import { gql } from '@apollo/client/core';
+	import { SvelteMap } from 'svelte/reactivity';
+	import { getPlayerKey } from '$lib/keys';
 	import type { BurnerManager } from '@dojoengine/create-burner';
 	import type { Account } from 'starknet';
 	import type { DojoProvider } from '@dojoengine/core';
+
+	interface PlayerData {
+		usdc: number;
+		gamepacks_bought: number;
+	}
+
+	interface Player {
+		player_id: string;
+		state: string;
+		data: PlayerData;
+	}
 
 	let loading = $state(true);
 	let error = $state('');
@@ -18,13 +31,36 @@
 	let burnerCount = $state(0);
 	let burners: any[] = $state([]);
 	let claiming = $state(false);
-	let allPlayers: any[] = $state([]);
+	let playerMap = $state(new SvelteMap<string, Player>());
+	let players = $derived(Array.from(playerMap.values()));
+	let currentPlayer = $derived(playerMap.get(getPlayerKey(burnerAddress)) || null);
+	let subscription: any = null;
 
-	const PLAYER_QUERY = gql`
-		query PlayerQuery($playerId: String!) {
-			glitchbombPlayerModels(where: { player_id: $playerId }) {
+	const GET_PLAYERS = gql`
+		query GetPlayers {
+			glitchbombPlayerModels {
 				edges {
 					node {
+						player_id
+						state
+						data {
+							usdc
+							gamepacks_bought
+						}
+					}
+				}
+			}
+		}
+	`;
+
+	const ENTITY_UPDATED = gql`
+		subscription EntityUpdated {
+			entityUpdated {
+				id
+				keys
+				models {
+					__typename
+					... on glitchbomb_Player {
 						player_id
 						state
 						data {
@@ -46,10 +82,41 @@
 			dojoProvider = result.dojoProvider;
 			burnerAddress = account.address;
 			updateBurnerList();
-			await loadAllPlayers();
 			loading = false;
 			console.log('✅ Burner wallet initialized');
 			console.log('Active burner address:', account.address);
+
+			const queryResult = await client.query({
+				query: GET_PLAYERS,
+				fetchPolicy: 'network-only'
+			});
+
+			const nodes =
+				queryResult.data.glitchbombPlayerModels?.edges?.map((edge: any) => edge.node) || [];
+			nodes.forEach((player: Player) => {
+				playerMap.set(getPlayerKey(player.player_id), player);
+			});
+
+			subscription = client
+				.subscribe({
+					query: ENTITY_UPDATED
+				})
+				.subscribe({
+					next: (data) => {
+						if (data.data?.entityUpdated?.models) {
+							const models = data.data.entityUpdated.models;
+							models.forEach((model: any) => {
+								if (model.__typename === 'glitchbomb_Player') {
+									const key = getPlayerKey(model.player_id);
+									playerMap.set(key, model);
+								}
+							});
+						}
+					},
+					error: (err) => {
+						console.error('Subscription error:', err);
+					}
+				});
 		} catch (e) {
 			error = e instanceof Error ? e.message : 'Failed to initialize burner wallet';
 			console.error('Failed to initialize:', e);
@@ -57,21 +124,11 @@
 		}
 	});
 
-	async function loadAllPlayers() {
-		if (!burnerAddress) return;
-		try {
-			const result = await client.query({
-				query: PLAYER_QUERY,
-				variables: { playerId: burnerAddress }
-			});
-			console.log('Player data:', result);
-			if (result.data?.glitchbombPlayerModels?.edges) {
-				allPlayers = result.data.glitchbombPlayerModels.edges.map((edge: any) => edge.node);
-			}
-		} catch (err) {
-			console.error('Failed to load players:', err);
+	onDestroy(() => {
+		if (subscription) {
+			subscription.unsubscribe();
 		}
-	}
+	});
 
 	function updateBurnerList() {
 		if (!burnerManager) return;
@@ -117,14 +174,13 @@
 		}
 	}
 
-	async function selectBurner(event: Event) {
+	function selectBurner(event: Event) {
 		if (!burnerManager) return;
 		const target = event.target as HTMLSelectElement;
 		burnerManager.select(target.value);
 		account = burnerManager.getActiveAccount();
 		if (account) {
 			burnerAddress = account.address;
-			await loadAllPlayers();
 		}
 		console.log('Switched to burner:', target.value);
 	}
@@ -139,20 +195,12 @@
 			const result = await world.gb_contract_v2.claimFreeUsdc(account);
 			console.log('✅ Free USDC claimed!', result);
 			alert('Free USDC claimed successfully!');
-			await loadAllPlayers();
 		} catch (err) {
 			console.error('Failed to claim free USDC:', err);
 			alert('Failed to claim free USDC. See console for details.');
 		} finally {
 			claiming = false;
 		}
-	}
-
-	function getPlayerStateLabel(state: any): string {
-		if (!state) return 'Unknown';
-		if (state.Broke !== undefined) return 'Broke';
-		if (state.Stacked !== undefined) return 'Stacked';
-		return 'Unknown';
 	}
 </script>
 
@@ -235,41 +283,39 @@
 
 					<div class="bg-black/30 p-6 rounded-lg">
 						<h2 class="text-2xl font-bold mb-4">Player Data</h2>
-						{#if allPlayers.length > 0}
-							<div class="space-y-4">
-								{#each allPlayers as player}
-									<div class="bg-black/50 p-4 rounded">
-										<div class="space-y-2">
-											<div class="flex gap-2">
-												<span class="font-semibold">Player ID:</span>
-												<code class="bg-black/50 px-2 py-1 rounded text-sm"
-													>{player.player_id}</code
-												>
-											</div>
-											<div class="flex gap-2">
-												<span class="font-semibold">State:</span>
-												<span class="bg-black/50 px-2 py-1 rounded text-sm"
-													>{getPlayerStateLabel(player.state)}</span
-												>
-											</div>
-											<div class="flex gap-2">
-												<span class="font-semibold">USDC:</span>
-												<span class="bg-black/50 px-2 py-1 rounded text-sm"
-													>{player.data.usdc.toString()}</span
-												>
-											</div>
-											<div class="flex gap-2">
-												<span class="font-semibold">Gamepacks Bought:</span>
-												<span class="bg-black/50 px-2 py-1 rounded text-sm"
-													>{player.data.gamepacks_bought.toString()}</span
-												>
-											</div>
-										</div>
+						{#if currentPlayer}
+							<div class="bg-black/50 p-4 rounded">
+								<div class="space-y-2">
+									<div class="flex gap-2">
+										<span class="font-semibold">Player ID:</span>
+										<code class="bg-black/50 px-2 py-1 rounded text-sm"
+											>{currentPlayer.player_id}</code
+										>
 									</div>
-								{/each}
+									<div class="flex gap-2">
+										<span class="font-semibold">State:</span>
+										<span class="bg-black/50 px-2 py-1 rounded text-sm"
+											>{currentPlayer.state}</span
+										>
+									</div>
+									<div class="flex gap-2">
+										<span class="font-semibold">USDC:</span>
+										<span class="bg-black/50 px-2 py-1 rounded text-sm"
+											>{currentPlayer.data.usdc.toString()}</span
+										>
+									</div>
+									<div class="flex gap-2">
+										<span class="font-semibold">Gamepacks Bought:</span>
+										<span class="bg-black/50 px-2 py-1 rounded text-sm"
+											>{currentPlayer.data.gamepacks_bought.toString()}</span
+										>
+									</div>
+								</div>
 							</div>
 						{:else}
-							<p class="text-sm opacity-60">No players found. Try claiming free USDC first.</p>
+							<p class="text-sm opacity-60">
+								No player data for this wallet. Try claiming free USDC first.
+							</p>
 						{/if}
 					</div>
 				</div>
