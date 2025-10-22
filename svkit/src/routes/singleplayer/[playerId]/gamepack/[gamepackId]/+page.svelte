@@ -10,6 +10,7 @@
 	import { setupWorld } from '$lib/typescript/contracts.gen';
 	import { toasts } from '$lib/stores/toast';
 	import BurnerWalletBar from '$lib/components/BurnerWalletBar.svelte';
+	import GameCard from '$lib/components/GameCard.svelte';
 
 	const playerId = $derived($page.params.playerId);
 	const gamepackId = $derived($page.params.gamepackId);
@@ -472,19 +473,6 @@
 		}
 	});
 
-	function formatOrbEffect(orb: OrbEffect): string {
-		for (const [key, value] of Object.entries(orb)) {
-			if (key !== 'option' && value !== undefined && value !== null) {
-				if (typeof value === 'number' && value !== 0) {
-					return `${key}(${value})`;
-				} else if (typeof value === 'object') {
-					return key;
-				}
-			}
-		}
-		return '';
-	}
-
 	async function openGamepack() {
 		if (!$account || !$dojoProvider || !gamepackId) return;
 
@@ -614,77 +602,15 @@
 					{#if games.length > 0}
 						<div class="space-y-4">
 							{#each games as game}
-								<div class="bg-black/30 border border-white/10 p-4 rounded-lg">
-									<h3 class="font-bold mb-3">Game #{game.game_id}</h3>
-									<div class="grid grid-cols-3 gap-3 text-sm mb-4">
-										<div><span class="opacity-60">State:</span> {game.state}</div>
-										<div><span class="opacity-60">Level:</span> {game.data.level}</div>
-										<div><span class="opacity-60">Points:</span> {game.data.points}</div>
-										<div><span class="opacity-60">HP:</span> {game.data.hp}</div>
-										<div><span class="opacity-60">Multiplier:</span> {game.data.multiplier}</div>
-										<div><span class="opacity-60">Pull Number:</span> {game.data.pull_number}</div>
-									</div>
-
-									<div class="grid grid-cols-2 gap-4 mb-4">
-										<div>
-											<div class="text-sm font-bold mb-2 opacity-60">
-												Pullable Orbs ({game.data.pullable_orbs.length})
-											</div>
-											{#if game.data.pullable_orbs.length > 0}
-												<div class="flex flex-wrap gap-2 text-xs">
-													{#each game.data.pullable_orbs as orb}
-														<div class="bg-black/50 px-2 py-1 rounded">
-															{formatOrbEffect(orb)}
-														</div>
-													{/each}
-												</div>
-											{:else}
-												<div class="text-xs opacity-60">No pullable orbs</div>
-											{/if}
-										</div>
-
-										<div>
-											<div class="text-sm font-bold mb-2 opacity-60">
-												Consumed Orbs ({game.data.consumed_orbs.length})
-											</div>
-											{#if game.data.consumed_orbs.length > 0}
-												<div class="flex flex-wrap gap-2 text-xs">
-													{#each game.data.consumed_orbs as orb}
-														<div class="bg-black/50 px-2 py-1 rounded">
-															{formatOrbEffect(orb)}
-														</div>
-													{/each}
-												</div>
-											{:else}
-												<div class="text-xs opacity-60">No consumed orbs</div>
-											{/if}
-										</div>
-									</div>
-
-									<div class="flex gap-2">
-										<button
-											onclick={() => startGame(game.game_id)}
-											disabled={startingGames.get(game.game_id) || game.state !== 'New'}
-											class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
-										>
-											{startingGames.get(game.game_id) ? 'Starting...' : 'Start Game'}
-										</button>
-										<button
-											onclick={() => pullOrb(game.game_id)}
-											disabled={pullingOrbs.get(game.game_id) || game.data.hp === 0}
-											class="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
-										>
-											{pullingOrbs.get(game.game_id) ? 'Pulling...' : 'Pull Orb'}
-										</button>
-										<button
-											onclick={cashOut}
-											disabled={cashingOut || game.data.points === 0}
-											class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
-										>
-											{cashingOut ? 'Cashing Out...' : 'Cash Out'}
-										</button>
-									</div>
-								</div>
+								<GameCard
+									{game}
+									onStartGame={startGame}
+									onPullOrb={pullOrb}
+									onCashOut={cashOut}
+									{startingGames}
+									{pullingOrbs}
+									{cashingOut}
+								/>
 							{/each}
 						</div>
 					{:else}
