@@ -1,8 +1,18 @@
 <script>
-	import { init_sdk } from '$lib/dojo/setup.svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import {
+		init_sdk,
+		subscribe_to_players,
+		cleanup_players_subscription
+	} from '$lib/dojo/setup.svelte';
 
-	$effect(() => {
-		init_sdk();
+	onMount(async () => {
+		await init_sdk();
+		await subscribe_to_players();
+	});
+
+	onDestroy(() => {
+		cleanup_players_subscription();
 	});
 </script>
 
