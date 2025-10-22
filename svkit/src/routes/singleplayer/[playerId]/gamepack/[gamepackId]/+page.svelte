@@ -33,6 +33,19 @@
 		data: GamePackData;
 	}
 
+	interface OrbEffect {
+		Point?: number;
+		PointPerOrbRemaining?: number;
+		PointPerBombPulled?: number;
+		GlitchChips?: number;
+		Moonrocks?: number;
+		Health?: number;
+		Bomb?: number;
+		Multiplier?: number;
+		BombImmunity?: number;
+		option?: any;
+	}
+
 	interface GameData {
 		level: number;
 		pull_number: number;
@@ -46,6 +59,8 @@
 		temp_moonrocks: number;
 		bomb_immunity_turns: number;
 		bombs_pulled_in_level: number;
+		pullable_orbs: OrbEffect[];
+		consumed_orbs: OrbEffect[];
 	}
 
 	interface Game {
@@ -106,6 +121,30 @@
 							temp_moonrocks
 							bomb_immunity_turns
 							bombs_pulled_in_level
+							pullable_orbs {
+								Point
+								PointPerOrbRemaining
+								PointPerBombPulled
+								GlitchChips
+								Moonrocks
+								Health
+								Bomb
+								Multiplier
+								BombImmunity
+								option
+							}
+							consumed_orbs {
+								Point
+								PointPerOrbRemaining
+								PointPerBombPulled
+								GlitchChips
+								Moonrocks
+								Health
+								Bomb
+								Multiplier
+								BombImmunity
+								option
+							}
 						}
 					}
 				}
@@ -217,6 +256,30 @@
 							temp_moonrocks
 							bomb_immunity_turns
 							bombs_pulled_in_level
+							pullable_orbs {
+								Point
+								PointPerOrbRemaining
+								PointPerBombPulled
+								GlitchChips
+								Moonrocks
+								Health
+								Bomb
+								Multiplier
+								BombImmunity
+								option
+							}
+							consumed_orbs {
+								Point
+								PointPerOrbRemaining
+								PointPerBombPulled
+								GlitchChips
+								Moonrocks
+								Health
+								Bomb
+								Multiplier
+								BombImmunity
+								option
+							}
 						}
 					}
 					... on glitchbomb_OrbsInGame {
@@ -391,6 +454,19 @@
 		}
 	});
 
+	function formatOrbEffect(orb: OrbEffect): string {
+		for (const [key, value] of Object.entries(orb)) {
+			if (key !== 'option' && value !== undefined && value !== null) {
+				if (typeof value === 'number' && value !== 0) {
+					return `${key}(${value})`;
+				} else if (typeof value === 'object') {
+					return key;
+				}
+			}
+		}
+		return '';
+	}
+
 	async function openGamepack() {
 		if (!$account || !$dojoProvider || !gamepackId) return;
 
@@ -525,6 +601,43 @@
 										<div><span class="opacity-60">Multiplier:</span> {game.data.multiplier}</div>
 										<div><span class="opacity-60">Pull Number:</span> {game.data.pull_number}</div>
 									</div>
+
+									<div class="grid grid-cols-2 gap-4 mb-4">
+										<div>
+											<div class="text-sm font-bold mb-2 opacity-60">
+												Pullable Orbs ({game.data.pullable_orbs.length})
+											</div>
+											{#if game.data.pullable_orbs.length > 0}
+												<div class="flex flex-wrap gap-2 text-xs">
+													{#each game.data.pullable_orbs as orb, i}
+														<div class="bg-black/50 px-2 py-1 rounded">
+															{formatOrbEffect(orb)}
+														</div>
+													{/each}
+												</div>
+											{:else}
+												<div class="text-xs opacity-60">No pullable orbs</div>
+											{/if}
+										</div>
+
+										<div>
+											<div class="text-sm font-bold mb-2 opacity-60">
+												Consumed Orbs ({game.data.consumed_orbs.length})
+											</div>
+											{#if game.data.consumed_orbs.length > 0}
+												<div class="flex flex-wrap gap-2 text-xs">
+													{#each game.data.consumed_orbs as orb, i}
+														<div class="bg-black/50 px-2 py-1 rounded">
+															{formatOrbEffect(orb)}
+														</div>
+													{/each}
+												</div>
+											{:else}
+												<div class="text-xs opacity-60">No consumed orbs</div>
+											{/if}
+										</div>
+									</div>
+
 									<div class="flex gap-2">
 										<button
 											onclick={() => startGame(game.game_id)}
