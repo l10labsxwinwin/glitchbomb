@@ -210,7 +210,7 @@
 
 <div class="min-h-screen p-8">
 	<div class="mb-8">
-		<a href="/" class="text-sm opacity-60 hover:opacity-100">← BACK</a>
+		<a href="/data" class="text-sm opacity-60 hover:opacity-100">← BACK</a>
 	</div>
 
 	<h1 class="text-4xl font-bold mb-8">ORBS</h1>
