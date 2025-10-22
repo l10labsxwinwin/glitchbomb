@@ -10,11 +10,11 @@ sierra-replace-ids = true
 [scripts]
 k = "katana --dev --dev.no-fee --http.cors_origins '*' --cartridge.paymaster --explorer"
 b = "sozo build"
-m = "sozo migrate && cp manifest_dev.json ../svk_frontend/src/lib/"
-bm = "sozo build --typescript --bindings-output ../svk_frontend/src/lib && sozo migrate --rpc-url http://localhost:5050 && cp manifest_dev.json ../svk_frontend/src/lib/"
+m = "sozo migrate && cp manifest_dev.json ../svkit/src/lib/"
+bm = "sozo build --typescript --bindings-output ../svkit/src/lib && sozo migrate --rpc-url http://localhost:5050 && cp manifest_dev.json ../svkit/src/lib/"
 t = "sh -c 'world_address=$(cat manifest_dev.json | jq -r .world.address) && torii -w $world_address --http.cors_origins \"*\" --rpc http://localhost:5050 --http.addr 0.0.0.0 --config torii_dev.toml'"
 watch = "find src -name '*.cairo' | entr -c sozo build"
-btb = "sozo build --typescript --bindings-output ../svk_frontend/src/lib"
+btb = "sozo build --typescript --bindings-output ../svkit/src/lib"
 
 [dependencies]
 dojo = "1.7.1"
