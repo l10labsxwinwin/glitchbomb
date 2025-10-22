@@ -5,7 +5,7 @@
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getPlayerKey } from '$lib/keys';
 	import PlayerBar from '$lib/components/PlayerBar.svelte';
-	import GamepackCard from '$lib/components/GamepackCard.svelte';
+	import GamepackTable from '$lib/components/GamepackTable.svelte';
 	import BurnerWalletBar from '$lib/components/BurnerWalletBar.svelte';
 	import type { BurnerManager } from '@dojoengine/create-burner';
 	import type { Account } from 'starknet';
@@ -234,18 +234,7 @@
 						</button>
 					</div>
 
-					<div>
-						<h2 class="text-2xl font-bold mb-4">Gamepacks ({gamepacks.length})</h2>
-						{#if gamepacks.length > 0}
-							<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-								{#each gamepacks as gamepack}
-									<GamepackCard {gamepack} />
-								{/each}
-							</div>
-						{:else}
-							<p class="text-sm opacity-60">No gamepacks found. Buy one to get started!</p>
-						{/if}
-					</div>
+					<GamepackTable {gamepacks} />
 				</div>
 			{/if}
 		</div>
