@@ -18,6 +18,10 @@
 	}
 
 	let { gamepacks }: Props = $props();
+	
+	let sortedGamepacks = $derived(
+		[...gamepacks].sort((a, b) => b.gamepack_id - a.gamepack_id)
+	);
 </script>
 
 <div>
@@ -30,7 +34,7 @@
 				<div class="text-center">Current Game</div>
 				<div class="text-center">Moonrocks</div>
 			</div>
-			{#each gamepacks as gamepack}
+			{#each sortedGamepacks as gamepack}
 				<GamepackCard {gamepack} />
 			{/each}
 		</div>
