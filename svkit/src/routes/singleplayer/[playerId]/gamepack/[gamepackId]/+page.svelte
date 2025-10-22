@@ -8,6 +8,7 @@
 	import { getGameKey, getOrbsKey } from '$lib/keys';
 	import { account, dojoProvider } from '$lib/stores/burner';
 	import { setupWorld } from '$lib/typescript/contracts.gen';
+	import { toasts } from '$lib/stores/toast';
 
 	const playerId = $derived($page.params.playerId);
 	const gamepackId = $derived($page.params.gamepackId);
@@ -357,8 +358,8 @@
 	let error = $state<string | null>(null);
 	let subscription: any = null;
 	let openingGamepack = $state(false);
-	let startingGames = new Map<number, boolean>();
-	let pullingOrbs = new Map<number, boolean>();
+	let startingGames = $state(new Map<number, boolean>());
+	let pullingOrbs = $state(new Map<number, boolean>());
 	let cashingOut = $state(false);
 
 	onMount(async () => {
@@ -477,10 +478,10 @@
 			const gamepackIdInt = parseInt(gamepackId);
 			const result = await world.gb_contract_v2.openGamepack($account, gamepackIdInt);
 			console.log('✅ Gamepack opened!', result);
-			alert('Gamepack opened successfully!');
+			toasts.add('Gamepack opened successfully!', 'success');
 		} catch (err) {
 			console.error('Failed to open gamepack:', err);
-			alert('Failed to open gamepack. See console for details.');
+			toasts.add('Failed to open gamepack', 'error');
 		} finally {
 			openingGamepack = false;
 		}
@@ -490,20 +491,18 @@
 		if (!$account || !$dojoProvider || !gamepackId) return;
 
 		startingGames.set(gameId, true);
-		startingGames = startingGames;
 		try {
 			console.log(`Starting game ${gameId}...`);
 			const world = setupWorld($dojoProvider);
 			const gamepackIdInt = parseInt(gamepackId);
 			const result = await world.gb_contract_v2.startGame($account, gamepackIdInt);
 			console.log('✅ Game started!', result);
-			alert('Game started successfully!');
+			toasts.add(`Game ${gameId} started successfully!`, 'success');
 		} catch (err) {
 			console.error('Failed to start game:', err);
-			alert('Failed to start game. See console for details.');
+			toasts.add('Failed to start game', 'error');
 		} finally {
 			startingGames.delete(gameId);
-			startingGames = startingGames;
 		}
 	}
 
@@ -511,19 +510,18 @@
 		if (!$account || !$dojoProvider || !gamepackId) return;
 
 		pullingOrbs.set(gameId, true);
-		pullingOrbs = pullingOrbs;
 		try {
 			console.log(`Pulling orb for game ${gameId}...`);
 			const world = setupWorld($dojoProvider);
 			const gamepackIdInt = parseInt(gamepackId);
 			const result = await world.gb_contract_v2.pullOrb($account, gamepackIdInt);
 			console.log('✅ Orb pulled!', result);
+			toasts.add('Orb pulled successfully!', 'success');
 		} catch (err) {
 			console.error('Failed to pull orb:', err);
-			alert('Failed to pull orb. See console for details.');
+			toasts.add('Failed to pull orb', 'error');
 		} finally {
 			pullingOrbs.delete(gameId);
-			pullingOrbs = pullingOrbs;
 		}
 	}
 
@@ -537,10 +535,10 @@
 			const gamepackIdInt = parseInt(gamepackId);
 			const result = await world.gb_contract_v2.cashOut($account, gamepackIdInt);
 			console.log('✅ Cashed out!', result);
-			alert('Cashed out successfully!');
+			toasts.add('Cashed out successfully!', 'success');
 		} catch (err) {
 			console.error('Failed to cash out:', err);
-			alert('Failed to cash out. See console for details.');
+			toasts.add('Failed to cash out', 'error');
 		} finally {
 			cashingOut = false;
 		}
@@ -609,7 +607,7 @@
 											</div>
 											{#if game.data.pullable_orbs.length > 0}
 												<div class="flex flex-wrap gap-2 text-xs">
-													{#each game.data.pullable_orbs as orb, i}
+													{#each game.data.pullable_orbs as orb}
 														<div class="bg-black/50 px-2 py-1 rounded">
 															{formatOrbEffect(orb)}
 														</div>
@@ -626,7 +624,7 @@
 											</div>
 											{#if game.data.consumed_orbs.length > 0}
 												<div class="flex flex-wrap gap-2 text-xs">
-													{#each game.data.consumed_orbs as orb, i}
+													{#each game.data.consumed_orbs as orb}
 														<div class="bg-black/50 px-2 py-1 rounded">
 															{formatOrbEffect(orb)}
 														</div>

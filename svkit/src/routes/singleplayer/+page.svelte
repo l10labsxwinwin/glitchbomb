@@ -24,6 +24,7 @@
 		account as accountStore,
 		dojoProvider as dojoProviderStore
 	} from '$lib/stores/burner';
+	import { toasts } from '$lib/stores/toast';
 
 	interface PlayerData {
 		usdc: number;
@@ -205,10 +206,10 @@
 			const world = setupWorld(dojoProvider);
 			const result = await world.gb_contract_v2.claimFreeUsdc(account);
 			console.log('✅ Free USDC claimed!', result);
-			alert('Free USDC claimed successfully!');
+			toasts.add('Free USDC claimed successfully!', 'success');
 		} catch (err) {
 			console.error('Failed to claim free USDC:', err);
-			alert('Failed to claim free USDC. See console for details.');
+			toasts.add('Failed to claim free USDC', 'error');
 		} finally {
 			claiming = false;
 		}
@@ -223,10 +224,10 @@
 			const world = setupWorld(dojoProvider);
 			const result = await world.gb_contract_v2.buyGamepack(account);
 			console.log('✅ Gamepack bought!', result);
-			alert('Gamepack bought successfully!');
+			toasts.add('Gamepack bought successfully!', 'success');
 		} catch (err) {
 			console.error('Failed to buy gamepack:', err);
-			alert('Failed to buy gamepack. See console for details.');
+			toasts.add('Failed to buy gamepack', 'error');
 		} finally {
 			buyingGamepack = false;
 		}
