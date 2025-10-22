@@ -9,16 +9,21 @@
 	import { account, dojoProvider } from '$lib/stores/burner';
 	import { setupWorld } from '$lib/typescript/contracts.gen';
 	import { toasts } from '$lib/stores/toast';
+	import BurnerWalletBar from '$lib/components/BurnerWalletBar.svelte';
 
 	const playerId = $derived($page.params.playerId);
 	const gamepackId = $derived($page.params.gamepackId);
 	
 	let currentAccount = $state<typeof $account>(undefined);
+	let accountReady = $state(false);
 	
 	$effect(() => {
 		currentAccount = $account;
-		if (currentAccount && currentAccount.address !== playerId) {
-			goto('/singleplayer');
+		if (currentAccount) {
+			accountReady = true;
+			if (currentAccount.address !== playerId) {
+				goto('/singleplayer');
+			}
 		}
 	});
 
@@ -362,8 +367,8 @@
 	let pullingOrbs = $state(new Map<number, boolean>());
 	let cashingOut = $state(false);
 
-	onMount(async () => {
-		if (!gamepackId) return;
+	async function loadGamepackData() {
+		if (!gamepackId || !accountReady) return;
 		
 		try {
 			const gamepackIdInt = parseInt(gamepackId);
@@ -446,6 +451,18 @@
 		} catch (err) {
 			error = err instanceof Error ? err.message : 'Failed to fetch data';
 			loading = false;
+		}
+	}
+
+	$effect(() => {
+		if (accountReady && !subscription) {
+			loadGamepackData();
+		}
+	});
+
+	onMount(() => {
+		if (accountReady) {
+			loadGamepackData();
 		}
 	});
 
@@ -545,11 +562,19 @@
 	}
 </script>
 
-<div class="min-h-screen p-8">
-	<div class="max-w-7xl mx-auto">
-		<a href="/singleplayer" class="text-sm opacity-60 hover:opacity-100 mb-4 inline-block">
-			← Back to Gamepacks
-		</a>
+<div class="min-h-screen flex flex-col">
+	<div class="bg-black/50 border-b border-white/10 px-4 py-3">
+		<div class="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+			<div class="flex items-center gap-4">
+				<a href="/singleplayer" class="text-sm opacity-60 hover:opacity-100">← BACK</a>
+				<span class="text-sm font-bold">GAMEPACK</span>
+			</div>
+			<BurnerWalletBar />
+		</div>
+	</div>
+
+	<div class="flex-1 p-8">
+		<div class="max-w-7xl mx-auto">
 
 		{#if loading}
 			<p>Loading...</p>
@@ -703,5 +728,6 @@
 		{:else}
 			<p class="opacity-60">Gamepack not found</p>
 		{/if}
+		</div>
 	</div>
 </div>

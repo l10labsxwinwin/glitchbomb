@@ -1,24 +1,16 @@
 <script lang="ts">
 	import { onMount, onDestroy } from 'svelte';
-	import { dojoConfig } from '$lib/dojoConfig';
-	import { setup } from '$lib/dojo/setup';
 	import { setupWorld } from '$lib/typescript/contracts.gen';
 	import { client } from '$lib/apollo';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getPlayerKey } from '$lib/keys';
 	import PlayerBar from '$lib/components/PlayerBar.svelte';
 	import GamepackCard from '$lib/components/GamepackCard.svelte';
+	import BurnerWalletBar from '$lib/components/BurnerWalletBar.svelte';
 	import type { BurnerManager } from '@dojoengine/create-burner';
 	import type { Account } from 'starknet';
 	import type { DojoProvider } from '@dojoengine/core';
 	import { GET_PLAYERS, GET_GAMEPACKS, ENTITY_UPDATED } from './queries';
-	import {
-		updateBurnerList as updateBurnerListHelper,
-		createBurner as createBurnerHelper,
-		clearBurners as clearBurnersHelper,
-		saveBurners as saveBurnersHelper,
-		restoreBurners as restoreBurnersHelper
-	} from './burner_helpers';
 	import {
 		burnerManager as burnerManagerStore,
 		account as accountStore,
@@ -51,12 +43,7 @@
 
 	let loading = $state(true);
 	let error = $state('');
-	let burnerManager: BurnerManager | undefined = $state();
-	let account: Account | undefined = $state();
-	let dojoProvider: DojoProvider | undefined = $state();
 	let burnerAddress = $state('');
-	let burnerCount = $state(0);
-	let burners: any[] = $state([]);
 	let claiming = $state(false);
 	let buyingGamepack = $state(false);
 	let playerMap = new SvelteMap<string, Player>();
@@ -66,23 +53,31 @@
 	let gamepacks = $derived(Array.from(gamepackMap.values()));
 	let subscription: any = null;
 
-	onMount(async () => {
+	let account = $state<Account | undefined>(undefined);
+	let dojoProvider = $state<DojoProvider | undefined>(undefined);
+
+	$effect(() => {
+		account = $accountStore;
+		dojoProvider = $dojoProviderStore;
+		if (account) {
+			const newAddress = account.address;
+			if (newAddress !== burnerAddress) {
+				burnerAddress = newAddress;
+				if (subscription) {
+					subscription.unsubscribe();
+					subscription = null;
+				}
+				gamepackMap.clear();
+				loadData();
+			} else if (!subscription) {
+				loadData();
+			}
+		}
+	});
+
+	async function loadData() {
 		try {
-			console.log('Initializing Dojo app...');
-			const result = await setup(dojoConfig);
-			burnerManager = result.burnerManager;
-			account = result.account;
-			dojoProvider = result.dojoProvider;
-			burnerAddress = account.address;
-			
-			burnerManagerStore.set(burnerManager);
-			accountStore.set(account);
-			dojoProviderStore.set(dojoProvider);
-			
-			updateBurnerList();
-			loading = false;
-			console.log('✅ Burner wallet initialized');
-			console.log('Active burner address:', account.address);
+			if (!burnerAddress) return;
 
 			const queryResult = await client.query({
 				query: GET_PLAYERS,
@@ -127,10 +122,18 @@
 						console.error('Subscription error:', err);
 					}
 				});
-		} catch (e) {
-			error = e instanceof Error ? e.message : 'Failed to initialize burner wallet';
-			console.error('Failed to initialize:', e);
+
 			loading = false;
+		} catch (e) {
+			error = e instanceof Error ? e.message : 'Failed to load data';
+			console.error('Failed to load data:', e);
+			loading = false;
+		}
+	}
+
+	onMount(() => {
+		if (account) {
+			loadData();
 		}
 	});
 
@@ -139,44 +142,6 @@
 			subscription.unsubscribe();
 		}
 	});
-
-	function updateBurnerList() {
-		const result = updateBurnerListHelper(burnerManager);
-		burners = result.burners;
-		burnerCount = result.count;
-	}
-
-	async function createBurner() {
-		await createBurnerHelper(burnerManager);
-		updateBurnerList();
-	}
-
-	function clearBurners() {
-		clearBurnersHelper(burnerManager);
-		updateBurnerList();
-	}
-
-	async function saveBurners() {
-		await saveBurnersHelper(burnerManager);
-	}
-
-	async function restoreBurners() {
-		await restoreBurnersHelper(burnerManager);
-		updateBurnerList();
-	}
-
-	async function selectBurner(event: Event) {
-		if (!burnerManager) return;
-		const target = event.target as HTMLSelectElement;
-		burnerManager.select(target.value);
-		account = burnerManager.getActiveAccount();
-		if (account) {
-			burnerAddress = account.address;
-			accountStore.set(account);
-			await loadGamepacks(account.address);
-		}
-		console.log('Switched to burner:', target.value);
-	}
 
 	async function loadGamepacks(playerId: string) {
 		try {
@@ -242,58 +207,7 @@
 				<span class="text-sm font-bold">SINGLE PLAYER</span>
 			</div>
 
-			{#if loading}
-				<div class="text-sm opacity-60">Loading wallet...</div>
-			{:else if error}
-				<div class="text-sm text-red-500">{error}</div>
-			{:else}
-				<div class="flex items-center gap-3 flex-wrap">
-					<select
-						id="burner-select"
-						onchange={selectBurner}
-						class="px-3 py-1.5 text-sm bg-black/50 border border-white/20 rounded"
-					>
-						{#each burners as burner}
-							<option value={burner.address} selected={burner.active}>
-								{burner.address.slice(0, 6)}...{burner.address.slice(-4)}
-							</option>
-						{/each}
-					</select>
-
-					<div class="flex gap-2">
-						<button
-							onclick={createBurner}
-							class="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 rounded"
-							title="Create New Burner"
-						>
-							+ New
-						</button>
-						<button
-							onclick={saveBurners}
-							class="px-3 py-1.5 text-sm bg-green-600 hover:bg-green-700 rounded"
-							title="Save to Clipboard"
-						>
-							Save
-						</button>
-						<button
-							onclick={restoreBurners}
-							class="px-3 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 rounded"
-							title="Restore from Clipboard"
-						>
-							Restore
-						</button>
-						<button
-							onclick={clearBurners}
-							class="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 rounded"
-							title="Clear All Burners"
-						>
-							Clear
-						</button>
-					</div>
-
-					<div class="text-xs opacity-60">{burnerCount} burner{burnerCount !== 1 ? 's' : ''}</div>
-				</div>
-			{/if}
+			<BurnerWalletBar />
 		</div>
 	</div>
 
