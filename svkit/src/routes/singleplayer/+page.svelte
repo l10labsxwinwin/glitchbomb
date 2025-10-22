@@ -4,7 +4,6 @@
 	import { setup } from '$lib/dojo/setup';
 	import { setupWorld } from '$lib/typescript/contracts.gen';
 	import { client } from '$lib/apollo';
-	import { gql } from '@apollo/client/core';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { getPlayerKey } from '$lib/keys';
 	import PlayerBar from '$lib/components/PlayerBar.svelte';
@@ -12,6 +11,14 @@
 	import type { BurnerManager } from '@dojoengine/create-burner';
 	import type { Account } from 'starknet';
 	import type { DojoProvider } from '@dojoengine/core';
+	import { GET_PLAYERS, GET_GAMEPACKS, ENTITY_UPDATED } from './queries';
+	import {
+		updateBurnerList as updateBurnerListHelper,
+		createBurner as createBurnerHelper,
+		clearBurners as clearBurnersHelper,
+		saveBurners as saveBurnersHelper,
+		restoreBurners as restoreBurnersHelper
+	} from './burner_helpers';
 
 	interface PlayerData {
 		usdc: number;
@@ -46,67 +53,12 @@
 	let burners: any[] = $state([]);
 	let claiming = $state(false);
 	let buyingGamepack = $state(false);
-	let playerMap = $state(new SvelteMap<string, Player>());
+	let playerMap = new SvelteMap<string, Player>();
 	let players = $derived(Array.from(playerMap.values()));
 	let currentPlayer = $derived(playerMap.get(getPlayerKey(burnerAddress)) || null);
-	let gamepackMap = $state(new SvelteMap<number, GamePack>());
+	let gamepackMap = new SvelteMap<number, GamePack>();
 	let gamepacks = $derived(Array.from(gamepackMap.values()));
 	let subscription: any = null;
-
-	const GET_PLAYERS = gql`
-		query GetPlayers {
-			glitchbombPlayerModels {
-				edges {
-					node {
-						player_id
-						state
-						data {
-							usdc
-							gamepacks_bought
-						}
-					}
-				}
-			}
-		}
-	`;
-
-	const GET_GAMEPACKS = gql`
-		query GetGamepacks($playerId: String!) {
-			glitchbombGamePackModels(where: { player_id: $playerId }) {
-				edges {
-					node {
-						player_id
-						gamepack_id
-						state
-						data {
-							current_game_id
-							accumulated_moonrocks
-						}
-					}
-				}
-			}
-		}
-	`;
-
-	const ENTITY_UPDATED = gql`
-		subscription EntityUpdated {
-			entityUpdated {
-				id
-				keys
-				models {
-					__typename
-					... on glitchbomb_Player {
-						player_id
-						state
-						data {
-							usdc
-							gamepacks_bought
-						}
-					}
-				}
-			}
-		}
-	`;
 
 	onMount(async () => {
 		try {
@@ -178,47 +130,28 @@
 	});
 
 	function updateBurnerList() {
-		if (!burnerManager) return;
-		burners = burnerManager.list();
-		burnerCount = burners.length;
+		const result = updateBurnerListHelper(burnerManager);
+		burners = result.burners;
+		burnerCount = result.count;
 	}
 
 	async function createBurner() {
-		if (!burnerManager) return;
-		console.log('Creating new burner...');
-		await burnerManager.create();
+		await createBurnerHelper(burnerManager);
 		updateBurnerList();
-		console.log('✅ New burner created');
 	}
 
 	function clearBurners() {
-		if (!burnerManager) return;
-		if (confirm('Are you sure you want to clear all burners?')) {
-			burnerManager.clear();
-			updateBurnerList();
-			console.log('✅ All burners cleared');
-		}
+		clearBurnersHelper(burnerManager);
+		updateBurnerList();
 	}
 
 	async function saveBurners() {
-		if (!burnerManager) return;
-		try {
-			await burnerManager.copyBurnersToClipboard();
-			alert('Burners saved to clipboard!');
-		} catch (err) {
-			console.error('Failed to save burners:', err);
-		}
+		await saveBurnersHelper(burnerManager);
 	}
 
 	async function restoreBurners() {
-		if (!burnerManager) return;
-		try {
-			await burnerManager.setBurnersFromClipboard();
-			updateBurnerList();
-			alert('Burners restored from clipboard!');
-		} catch (err) {
-			console.error('Failed to restore burners:', err);
-		}
+		await restoreBurnersHelper(burnerManager);
+		updateBurnerList();
 	}
 
 	async function selectBurner(event: Event) {
