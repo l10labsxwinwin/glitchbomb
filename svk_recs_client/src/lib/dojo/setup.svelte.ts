@@ -4,7 +4,7 @@ import { dojoConfig } from './dojoConfig';
 import { ModelsMapping, type Player, type SchemaType } from './typescript/models.gen';
 import type { Subscription } from '@dojoengine/torii-client';
 
-export const dojoState = $state({
+const dojoState = $state({
 	sdk: null as SDK<SchemaType> | null,
 	is_sdk_ready: false,
 
@@ -15,7 +15,7 @@ export const dojoState = $state({
 	}
 });
 
-export function get_sdk() {
+export function get_dojo_state() {
 	return dojoState;
 }
 
