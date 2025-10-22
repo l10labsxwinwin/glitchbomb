@@ -31,6 +31,7 @@
 	let burnerCount = $state(0);
 	let burners: any[] = $state([]);
 	let claiming = $state(false);
+	let buyingGamepack = $state(false);
 	let playerMap = $state(new SvelteMap<string, Player>());
 	let players = $derived(Array.from(playerMap.values()));
 	let currentPlayer = $derived(playerMap.get(getPlayerKey(burnerAddress)) || null);
@@ -202,6 +203,24 @@
 			claiming = false;
 		}
 	}
+
+	async function buyGamepack() {
+		if (!account || !dojoProvider) return;
+
+		buyingGamepack = true;
+		try {
+			console.log('Buying gamepack...');
+			const world = setupWorld(dojoProvider);
+			const result = await world.gb_contract_v2.buyGamepack(account);
+			console.log('✅ Gamepack bought!', result);
+			alert('Gamepack bought successfully!');
+		} catch (err) {
+			console.error('Failed to buy gamepack:', err);
+			alert('Failed to buy gamepack. See console for details.');
+		} finally {
+			buyingGamepack = false;
+		}
+	}
 </script>
 
 <div class="min-h-screen flex flex-col">
@@ -273,13 +292,22 @@
 
 			{#if !loading && !error}
 				<div class="space-y-6">
-					<button
-						onclick={claimFreeUsdc}
-						disabled={claiming}
-						class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
-					>
-						{claiming ? 'Claiming...' : 'Claim Free USDC'}
-					</button>
+					<div class="flex gap-3">
+						<button
+							onclick={claimFreeUsdc}
+							disabled={claiming}
+							class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
+						>
+							{claiming ? 'Claiming...' : 'Claim Free USDC'}
+						</button>
+						<button
+							onclick={buyGamepack}
+							disabled={buyingGamepack}
+							class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
+						>
+							{buyingGamepack ? 'Buying...' : 'Buy Gamepack'}
+						</button>
+					</div>
 
 					<div class="bg-black/30 p-6 rounded-lg">
 						<h2 class="text-2xl font-bold mb-4">Player Data</h2>
