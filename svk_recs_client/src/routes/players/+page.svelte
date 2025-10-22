@@ -6,7 +6,7 @@
 
 <div>
 	<h1>Players</h1>
-	{#each dojoState.players as player}
-		<div>{player.player_id}</div>
+	{#each dojoState.players as player (player.player_id)}
+		{player.player_id}
 	{/each}
 </div>
