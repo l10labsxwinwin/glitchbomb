@@ -52,6 +52,7 @@
 	let gamepackMap = new SvelteMap<number, GamePack>();
 	let gamepacks = $derived(Array.from(gamepackMap.values()));
 	let subscription: any = null;
+	let previousGamepackCount = $state(0);
 
 	let account = $state<Account | undefined>(undefined);
 	let dojoProvider = $state<DojoProvider | undefined>(undefined);
@@ -102,6 +103,8 @@
 				gamepackMap.set(gamepack.gamepack_id, gamepack);
 			});
 
+			previousGamepackCount = gamepackNodes.length;
+
 			subscription = client
 				.subscribe({
 					query: ENTITY_UPDATED
@@ -113,7 +116,15 @@
 							models.forEach((model: any) => {
 								if (model.__typename === 'glitchbomb_Player') {
 									const key = getPlayerKey(model.player_id);
+									const currentPlayerData = playerMap.get(key);
 									playerMap.set(key, model);
+									
+									if (model.player_id === burnerAddress && currentPlayerData) {
+										if (model.data.gamepacks_bought > currentPlayerData.data.gamepacks_bought) {
+											console.log('New gamepack detected, reloading gamepacks...');
+											loadGamepacks(burnerAddress);
+										}
+									}
 								}
 							});
 						}
