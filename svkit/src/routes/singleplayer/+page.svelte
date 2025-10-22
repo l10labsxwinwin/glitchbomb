@@ -2,16 +2,20 @@
 	import { onMount } from 'svelte';
 	import { dojoConfig } from '$lib/dojoConfig';
 	import { setup } from '$lib/dojo/setup';
+	import { setupWorld } from '$lib/typescript/contracts.gen';
 	import type { BurnerManager } from '@dojoengine/create-burner';
 	import type { Account } from 'starknet';
+	import type { DojoProvider } from '@dojoengine/core';
 
 	let loading = $state(true);
 	let error = $state('');
 	let burnerManager: BurnerManager | undefined = $state();
 	let account: Account | undefined = $state();
+	let dojoProvider: DojoProvider | undefined = $state();
 	let burnerAddress = $state('');
 	let burnerCount = $state(0);
 	let burners: any[] = $state([]);
+	let claiming = $state(false);
 
 	onMount(async () => {
 		try {
@@ -19,6 +23,7 @@
 			const result = await setup(dojoConfig);
 			burnerManager = result.burnerManager;
 			account = result.account;
+			dojoProvider = result.dojoProvider;
 			burnerAddress = account.address;
 			updateBurnerList();
 			loading = false;
@@ -85,84 +90,104 @@
 		}
 		console.log('Switched to burner:', target.value);
 	}
+
+	async function claimFreeUsdc() {
+		if (!account || !dojoProvider) return;
+		
+		claiming = true;
+		try {
+			console.log('Claiming free USDC...');
+			const world = setupWorld(dojoProvider);
+			const result = await world.gb_contract_v2.claimFreeUsdc(account);
+			console.log('✅ Free USDC claimed!', result);
+			alert('Free USDC claimed successfully!');
+		} catch (err) {
+			console.error('Failed to claim free USDC:', err);
+			alert('Failed to claim free USDC. See console for details.');
+		} finally {
+			claiming = false;
+		}
+	}
 </script>
 
-<div class="flex items-center justify-center min-h-screen p-8">
-	<div class="w-full max-w-2xl">
-		<div class="mb-8">
-			<a href="/" class="text-sm opacity-60 hover:opacity-100">← BACK</a>
-		</div>
-
-		<h1 class="text-4xl font-bold mb-8">SINGLE PLAYER VIEW</h1>
-
-		{#if loading}
-			<div class="text-center py-8">
-				<p class="text-lg">Loading burner wallet...</p>
+<div class="min-h-screen flex flex-col">
+	<div class="bg-black/50 border-b border-white/10 px-4 py-3">
+		<div class="max-w-7xl mx-auto flex items-center justify-between gap-4 flex-wrap">
+			<div class="flex items-center gap-4">
+				<a href="/" class="text-sm opacity-60 hover:opacity-100">← BACK</a>
+				<span class="text-sm font-bold">SINGLE PLAYER</span>
 			</div>
-		{:else if error}
-			<div class="text-center py-8 text-red-500">
-				<p class="text-lg">Error: {error}</p>
-			</div>
-		{:else}
-			<div class="space-y-6">
-				<div class="bg-black/30 p-6 rounded-lg">
-					<h2 class="text-xl font-bold mb-4">Burner Wallet</h2>
-					<div class="space-y-2 mb-4">
-						<p class="text-sm opacity-80">
-							Active Burner: <code class="bg-black/50 px-2 py-1 rounded"
-								>{burnerAddress}</code
-							>
-						</p>
-						<p class="text-sm opacity-80">Total Burners: {burnerCount}</p>
+
+			{#if loading}
+				<div class="text-sm opacity-60">Loading wallet...</div>
+			{:else if error}
+				<div class="text-sm text-red-500">{error}</div>
+			{:else}
+				<div class="flex items-center gap-3 flex-wrap">
+					<select
+						id="burner-select"
+						onchange={selectBurner}
+						class="px-3 py-1.5 text-sm bg-black/50 border border-white/20 rounded"
+					>
+						{#each burners as burner}
+							<option value={burner.address} selected={burner.active}>
+								{burner.address.slice(0, 6)}...{burner.address.slice(-4)}
+							</option>
+						{/each}
+					</select>
+
+					<div class="flex gap-2">
+						<button
+							onclick={createBurner}
+							class="px-3 py-1.5 text-sm bg-blue-600 hover:bg-blue-700 rounded"
+							title="Create New Burner"
+						>
+							+ New
+						</button>
+						<button
+							onclick={saveBurners}
+							class="px-3 py-1.5 text-sm bg-green-600 hover:bg-green-700 rounded"
+							title="Save to Clipboard"
+						>
+							Save
+						</button>
+						<button
+							onclick={restoreBurners}
+							class="px-3 py-1.5 text-sm bg-purple-600 hover:bg-purple-700 rounded"
+							title="Restore from Clipboard"
+						>
+							Restore
+						</button>
+						<button
+							onclick={clearBurners}
+							class="px-3 py-1.5 text-sm bg-red-600 hover:bg-red-700 rounded"
+							title="Clear All Burners"
+						>
+							Clear
+						</button>
 					</div>
 
-					<div class="space-y-3">
-						<div class="flex flex-wrap gap-2">
-							<button
-								onclick={createBurner}
-								class="px-4 py-2 bg-blue-600 hover:bg-blue-700 rounded"
-							>
-								Create New Burner
-							</button>
-							<button
-								onclick={clearBurners}
-								class="px-4 py-2 bg-red-600 hover:bg-red-700 rounded"
-							>
-								Clear All Burners
-							</button>
-							<button
-								onclick={saveBurners}
-								class="px-4 py-2 bg-green-600 hover:bg-green-700 rounded"
-							>
-								Save to Clipboard
-							</button>
-							<button
-								onclick={restoreBurners}
-								class="px-4 py-2 bg-purple-600 hover:bg-purple-700 rounded"
-							>
-								Restore from Clipboard
-							</button>
-						</div>
-
-						<div>
-							<label for="burner-select" class="block text-sm mb-1 opacity-80"
-								>Select Burner:</label
-							>
-							<select
-								id="burner-select"
-								onchange={selectBurner}
-								class="w-full px-3 py-2 bg-black/50 border border-white/20 rounded"
-							>
-								{#each burners as burner}
-									<option value={burner.address} selected={burner.active}>
-										{burner.address}
-									</option>
-								{/each}
-							</select>
-						</div>
-					</div>
+					<div class="text-xs opacity-60">{burnerCount} burner{burnerCount !== 1 ? 's' : ''}</div>
 				</div>
-			</div>
-		{/if}
+			{/if}
+		</div>
+	</div>
+
+	<div class="flex-1 p-8">
+		<div class="max-w-7xl mx-auto">
+			<h1 class="text-4xl font-bold mb-8">Game Content Here</h1>
+
+			{#if !loading && !error}
+				<div class="space-y-4">
+					<button
+						onclick={claimFreeUsdc}
+						disabled={claiming}
+						class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
+					>
+						{claiming ? 'Claiming...' : 'Claim Free USDC'}
+					</button>
+				</div>
+			{/if}
+		</div>
 	</div>
 </div>
