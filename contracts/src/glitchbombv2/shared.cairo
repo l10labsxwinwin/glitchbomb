@@ -1,7 +1,7 @@
-use super::player::PlayerState;
-use super::gamepack::GamePackState;
-use super::game::GameState;
 use core::poseidon::poseidon_hash_span;
+use super::game::GameState;
+use super::gamepack::GamePackState;
+use super::player::PlayerState;
 
 // ============================================================================
 // Shared Update Error
@@ -62,7 +62,7 @@ pub fn shuffle<T, +Drop<T>, +Copy<T>>(arr: Array<T>) -> Array<T> {
     while i < len {
         remaining.append(*input_span[i]);
         i += 1;
-    };
+    }
 
     // Build shuffled result using Fisher-Yates
     let mut result: Array<T> = ArrayTrait::new();
@@ -86,12 +86,12 @@ pub fn shuffle<T, +Drop<T>, +Copy<T>>(arr: Array<T>) -> Array<T> {
                 new_remaining.append(*remaining_span[j]);
             }
             j += 1;
-        };
+        }
         remaining = new_remaining;
 
         remaining_count -= 1;
         shuffle_iteration += 1;
-    };
+    }
 
     result
 }
@@ -132,10 +132,7 @@ pub enum ActionError {
 }
 
 pub fn validate_action(
-    player_state: PlayerState,
-    gamepack_state: GamePackState,
-    game_state: GameState,
-    action: Action
+    player_state: PlayerState, gamepack_state: GamePackState, game_state: GameState, action: Action,
 ) -> Result<(), ActionError> {
     match (player_state, gamepack_state, game_state, action) {
         (PlayerState::Broke, _, _, Action::ClaimFreeUsdc) => Ok(()),
@@ -146,21 +143,32 @@ pub fn validate_action(
         (_, GamePackState::InProgress, GameState::Level, Action::CashOut) => Ok(()),
         (_, GamePackState::InProgress, GameState::LevelComplete, Action::EnterShop) => Ok(()),
         (_, GamePackState::InProgress, GameState::LevelComplete, Action::CashOut) => Ok(()),
-        (_, GamePackState::InProgress, GameState::FiveOrDiePhase, Action::ConfirmFiveOrDie(_)) => Ok(()),
+        (
+            _, GamePackState::InProgress, GameState::FiveOrDiePhase, Action::ConfirmFiveOrDie(_),
+        ) => Ok(()),
         (_, GamePackState::InProgress, GameState::Shop, Action::BuyOrb(_)) => Ok(()),
         (_, GamePackState::InProgress, GameState::Shop, Action::GoToNextLevel) => Ok(()),
-
         (PlayerState::Broke, _, _, Action::BuyGamepack) => Err(ActionError::PlayerIsBroke),
-        (PlayerState::Stacked, _, _, Action::ClaimFreeUsdc) => Err(ActionError::PlayerIsAlreadyStacked),
+        (
+            PlayerState::Stacked, _, _, Action::ClaimFreeUsdc,
+        ) => Err(ActionError::PlayerIsAlreadyStacked),
         (_, GamePackState::Empty, _, _) => Err(ActionError::GamePackDNE),
         (_, _, GameState::Empty, _) => Err(ActionError::GameDNE),
         (_, GamePackState::Unopened, _, _) => Err(ActionError::InvalidGamePackState),
         (_, GamePackState::EndedEarly, _, _) => Err(ActionError::InvalidGamePackState),
         (_, GamePackState::Completed, _, _) => Err(ActionError::InvalidGamePackState),
-        (_, GamePackState::InProgress, GameState::New, _) => Err(ActionError::InvalidActionInNewGame),
-        (_, GamePackState::InProgress, GameState::Level, _) => Err(ActionError::InvalidActionInLevel),
-        (_, GamePackState::InProgress, GameState::LevelComplete, _) => Err(ActionError::InvalidActionInLevelComplete),
-        (_, GamePackState::InProgress, GameState::FiveOrDiePhase, _) => Err(ActionError::InvalidActionInFiveOrDiePhase),
+        (
+            _, GamePackState::InProgress, GameState::New, _,
+        ) => Err(ActionError::InvalidActionInNewGame),
+        (
+            _, GamePackState::InProgress, GameState::Level, _,
+        ) => Err(ActionError::InvalidActionInLevel),
+        (
+            _, GamePackState::InProgress, GameState::LevelComplete, _,
+        ) => Err(ActionError::InvalidActionInLevelComplete),
+        (
+            _, GamePackState::InProgress, GameState::FiveOrDiePhase, _,
+        ) => Err(ActionError::InvalidActionInFiveOrDiePhase),
         (_, GamePackState::InProgress, GameState::Shop, _) => Err(ActionError::InvalidActionInShop),
         (_, GamePackState::InProgress, GameState::GameOver, _) => Err(ActionError::GameOver),
     }

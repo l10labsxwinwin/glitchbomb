@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
-use super::shared::{UpdateError, shuffle};
 use super::constants::{MAX_HP, level_cost_in_moonrocks, milestones};
+use super::shared::{UpdateError, shuffle};
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GameState {
@@ -39,7 +39,7 @@ pub fn new_game_data() -> GameData {
         points: 0,
         milestone: milestones(1),
         hp: MAX_HP,
-        multiplier: 1,
+        multiplier: 100,
         glitch_chips: 0,
         temp_moonrocks: 0,
         moonrocks_spent: 0,
@@ -96,7 +96,6 @@ pub struct Game {
     pub gamepack_id: u32,
     #[key]
     pub game_id: u32,
-
     pub state: GameState,
     pub data: GameData,
 }
@@ -110,7 +109,6 @@ pub struct OrbsInGame {
     pub gamepack_id: u32,
     #[key]
     pub game_id: u32,
-
     pub non_buyable: Array<Orb>,
     pub common: Array<Orb>,
     pub rare: Array<Orb>,
@@ -118,233 +116,113 @@ pub struct OrbsInGame {
 }
 
 fn non_buyable_one_damage_bomb() -> Orb {
-    Orb {
-        effect: OrbEffect::Bomb(1),
-        count: 2,
-        base_price: 0,
-        current_price: 0,
-    }
+    Orb { effect: OrbEffect::Bomb(1), count: 2, base_price: 0, current_price: 0 }
 }
 
 fn non_buyable_two_damage_bomb() -> Orb {
-    Orb {
-        effect: OrbEffect::Bomb(2),
-        count: 1,
-        base_price: 0,
-        current_price: 0,
-    }
+    Orb { effect: OrbEffect::Bomb(2), count: 1, base_price: 0, current_price: 0 }
 }
 
 fn non_buyable_three_damage_bomb() -> Orb {
-    Orb {
-        effect: OrbEffect::Bomb(3),
-        count: 1,
-        base_price: 0,
-        current_price: 0,
-    }
+    Orb { effect: OrbEffect::Bomb(3), count: 1, base_price: 0, current_price: 0 }
 }
 
 fn non_buyable_point_per_orb_remaining() -> Orb {
-    Orb {
-        effect: OrbEffect::PointPerOrbRemaining(1),
-        count: 1,
-        base_price: 0,
-        current_price: 0,
-    }
+    Orb { effect: OrbEffect::PointPerOrbRemaining(1), count: 1, base_price: 0, current_price: 0 }
 }
 
 fn common_five_point_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Point(5),
-        count: 3,
-        base_price: 5,
-        current_price: 5,
-    }
+    Orb { effect: OrbEffect::Point(5), count: 3, base_price: 5, current_price: 5 }
 }
 
 fn common_glitch_chips_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::GlitchChips(15),
-        count: 0,
-        base_price: 5,
-        current_price: 5,
-    }
+    Orb { effect: OrbEffect::GlitchChips(15), count: 0, base_price: 5, current_price: 5 }
 }
 
 fn common_five_or_die_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::FiveOrDie,
-        count: 0,
-        base_price: 5,
-        current_price: 5,
-    }
+    Orb { effect: OrbEffect::FiveOrDie, count: 0, base_price: 5, current_price: 5 }
 }
 
 fn common_point_per_bomb_pulled_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::PointPerBombPulled(4),
-        count: 1,
-        base_price: 6,
-        current_price: 6,
-    }
+    Orb { effect: OrbEffect::PointPerBombPulled(4), count: 1, base_price: 6, current_price: 6 }
 }
 
 fn common_seven_point_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Point(7),
-        count: 0,
-        base_price: 8,
-        current_price: 8,
-    }
+    Orb { effect: OrbEffect::Point(7), count: 0, base_price: 8, current_price: 8 }
 }
 
 fn common_moonrocks_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Moonrocks(15),
-        count: 0,
-        base_price: 8,
-        current_price: 8,
-    }
+    Orb { effect: OrbEffect::Moonrocks(15), count: 0, base_price: 8, current_price: 8 }
 }
 
 fn common_point_rewind_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::PointRewind,
-        count: 0,
-        base_price: 8,
-        current_price: 8,
-    }
+    Orb { effect: OrbEffect::PointRewind, count: 0, base_price: 8, current_price: 8 }
 }
 
 fn common_half_multiplier_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Multiplier(50),
-        count: 0,
-        base_price: 9,
-        current_price: 9,
-    }
+    Orb { effect: OrbEffect::Multiplier(50), count: 0, base_price: 9, current_price: 9 }
 }
 
 fn common_health_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Health(1),
-        count: 1,
-        base_price: 9,
-        current_price: 9,
-    }
+    Orb { effect: OrbEffect::Health(1), count: 1, base_price: 9, current_price: 9 }
 }
 
 fn rare_eight_point_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Point(8),
-        count: 0,
-        base_price: 11,
-        current_price: 11,
-    }
+    Orb { effect: OrbEffect::Point(8), count: 0, base_price: 11, current_price: 11 }
 }
 
 fn rare_nine_point_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Point(9),
-        count: 0,
-        base_price: 13,
-        current_price: 13,
-    }
+    Orb { effect: OrbEffect::Point(9), count: 0, base_price: 13, current_price: 13 }
 }
 
 fn rare_one_multiplier_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Multiplier(100),
-        count: 1,
-        base_price: 14,
-        current_price: 14,
-    }
+    Orb { effect: OrbEffect::Multiplier(100), count: 1, base_price: 14, current_price: 14 }
 }
 
 fn rare_two_point_per_orb_remaining() -> Orb {
-    Orb {
-        effect: OrbEffect::PointPerOrbRemaining(2),
-        count: 0,
-        base_price: 15,
-        current_price: 15,
-    }
+    Orb { effect: OrbEffect::PointPerOrbRemaining(2), count: 0, base_price: 15, current_price: 15 }
 }
 
 fn rare_one_and_half_multiplier_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Multiplier(150),
-        count: 0,
-        base_price: 16,
-        current_price: 16,
-    }
+    Orb { effect: OrbEffect::Multiplier(150), count: 0, base_price: 16, current_price: 16 }
 }
 
 fn cosmic_three_health_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Health(3),
-        count: 0,
-        base_price: 21,
-        current_price: 21,
-    }
+    Orb { effect: OrbEffect::Health(3), count: 0, base_price: 21, current_price: 21 }
 }
 
 fn cosmic_forty_moonrocks_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::Moonrocks(40),
-        count: 0,
-        base_price: 23,
-        current_price: 23,
-    }
+    Orb { effect: OrbEffect::Moonrocks(40), count: 0, base_price: 23, current_price: 23 }
 }
 
 fn cosmic_bomb_immunity_orb() -> Orb {
-    Orb {
-        effect: OrbEffect::BombImmunity(3),
-        count: 0,
-        base_price: 24,
-        current_price: 24,
-    }
+    Orb { effect: OrbEffect::BombImmunity(3), count: 0, base_price: 24, current_price: 24 }
 }
 
 pub fn get_non_buyable_orbs() -> Array<Orb> {
     array![
-        non_buyable_one_damage_bomb(),
-        non_buyable_two_damage_bomb(),
-        non_buyable_three_damage_bomb(),
-        non_buyable_point_per_orb_remaining(),
+        non_buyable_one_damage_bomb(), non_buyable_two_damage_bomb(),
+        non_buyable_three_damage_bomb(), non_buyable_point_per_orb_remaining(),
     ]
 }
 
 pub fn get_common_orbs() -> Array<Orb> {
     array![
-        common_five_point_orb(),
-        common_glitch_chips_orb(),
-        common_five_or_die_orb(),
-        common_point_per_bomb_pulled_orb(),
-        common_seven_point_orb(),
-        common_moonrocks_orb(),
-        common_point_rewind_orb(),
-        common_half_multiplier_orb(),
-        common_health_orb(),
+        common_five_point_orb(), common_glitch_chips_orb(), common_five_or_die_orb(),
+        common_point_per_bomb_pulled_orb(), common_seven_point_orb(), common_moonrocks_orb(),
+        common_point_rewind_orb(), common_half_multiplier_orb(), common_health_orb(),
     ]
 }
 
 pub fn get_rare_orbs() -> Array<Orb> {
     array![
-        rare_eight_point_orb(),
-        rare_nine_point_orb(),
-        rare_one_multiplier_orb(),
-        rare_two_point_per_orb_remaining(),
-        rare_one_and_half_multiplier_orb(),
+        rare_eight_point_orb(), rare_nine_point_orb(), rare_one_multiplier_orb(),
+        rare_two_point_per_orb_remaining(), rare_one_and_half_multiplier_orb(),
     ]
 }
 
 pub fn get_cosmic_orbs() -> Array<Orb> {
-    array![
-        cosmic_three_health_orb(),
-        cosmic_forty_moonrocks_orb(),
-        cosmic_bomb_immunity_orb(),
-    ]
+    array![cosmic_three_health_orb(), cosmic_forty_moonrocks_orb(), cosmic_bomb_immunity_orb()]
 }
 
 pub fn orbs_to_effects(orb_arrays: Array<Array<Orb>>) -> Array<OrbEffect> {
@@ -358,21 +236,16 @@ pub fn orbs_to_effects(orb_arrays: Array<Array<Orb>>) -> Array<OrbEffect> {
                 i += 1;
             }
         }
-    };
+    }
 
     effects
 }
 
-fn apply_orb_effect_to_data(
-    effect: @OrbEffect,
-    data: GameData
-) -> Result<GameData, UpdateError> {
+fn apply_orb_effect_to_data(effect: @OrbEffect, data: GameData) -> Result<GameData, UpdateError> {
     let mut new_data = data.clone();
 
     match effect {
-        OrbEffect::Empty => {
-            return Err(UpdateError::InvalidData);
-        },
+        OrbEffect::Empty => { return Err(UpdateError::InvalidData); },
         OrbEffect::Point(points) => {
             let total_points = *points * new_data.multiplier / 100;
             new_data.points += total_points;
@@ -383,15 +256,14 @@ fn apply_orb_effect_to_data(
             new_data.points += total_points;
         },
         OrbEffect::PointPerBombPulled(point_per_bomb) => {
-            let total_points = new_data.bombs_pulled_in_level * *point_per_bomb * new_data.multiplier / 100;
+            let total_points = new_data.bombs_pulled_in_level
+                * *point_per_bomb
+                * new_data.multiplier
+                / 100;
             new_data.points += total_points;
         },
-        OrbEffect::GlitchChips(chips) => {
-            new_data.glitch_chips += *chips;
-        },
-        OrbEffect::Moonrocks(moonrocks) => {
-            new_data.moonrocks_earned += *moonrocks;
-        },
+        OrbEffect::GlitchChips(chips) => { new_data.glitch_chips += *chips; },
+        OrbEffect::Moonrocks(moonrocks) => { new_data.moonrocks_earned += *moonrocks; },
         OrbEffect::Health(health) => {
             new_data.hp = match new_data.hp + *health > MAX_HP {
                 true => MAX_HP,
@@ -400,9 +272,7 @@ fn apply_orb_effect_to_data(
         },
         OrbEffect::Bomb(damage) => {
             match new_data.bomb_immunity_turns > 0 {
-                true => {
-                    new_data.pullable_orbs.append(*effect);
-                },
+                true => { new_data.pullable_orbs.append(*effect); },
                 false => {
                     new_data.hp = match *damage >= new_data.hp {
                         true => 0,
@@ -410,15 +280,11 @@ fn apply_orb_effect_to_data(
                     };
                     new_data.bombs_pulled_in_level += 1;
                     new_data.consumed_orbs.append(*effect);
-                }
+                },
             }
         },
-        OrbEffect::Multiplier(multiplier) => {
-            new_data.multiplier += *multiplier;
-        },
-        OrbEffect::BombImmunity(turns) => {
-            new_data.bomb_immunity_turns += *turns + 1;
-        },
+        OrbEffect::Multiplier(multiplier) => { new_data.multiplier += *multiplier; },
+        OrbEffect::BombImmunity(turns) => { new_data.bomb_immunity_turns += *turns + 1; },
         OrbEffect::PointRewind => {
             // Find the lowest Point orb in consumed_orbs
             let mut lowest_point_orb: Option<OrbEffect> = Option::None;
@@ -450,8 +316,7 @@ fn apply_orb_effect_to_data(
                 new_data.pullable_orbs.append(orb_to_return);
             }
         },
-        OrbEffect::FiveOrDie => {
-            // No data changes for FiveOrDie, only state transition
+        OrbEffect::FiveOrDie => { // No data changes for FiveOrDie, only state transition
         },
     }
 
@@ -491,7 +356,7 @@ fn handle_cash_out(data: GameData) -> Result<(GameState, GameData), UpdateError>
             new_data.temp_moonrocks += new_data.moonrocks_earned;
             new_data.temp_moonrocks -= new_data.moonrocks_spent;
             Ok((GameState::GameOver, new_data))
-        }
+        },
     }
 }
 
@@ -508,18 +373,17 @@ fn handle_five_or_die_data(data: GameData) -> Result<GameData, UpdateError> {
             new_pullable.append(*orb_effect);
         } else {
             match orb_effect {
-                OrbEffect::FiveOrDie => {
-                    new_pullable.append(*orb_effect);
-                },
+                OrbEffect::FiveOrDie => { new_pullable.append(*orb_effect); },
                 _ => {
-                    // TODO: a way to track which orbs were pulled during five or die to display to user
+                    // TODO: a way to track which orbs were pulled during five or die to display to
+                    // user
                     let temp_data = (@current_data).clone();
                     current_data = apply_orb_effect_to_data(orb_effect, temp_data)?;
                     orbs_pulled += 1;
-                }
+                },
             }
         }
-    };
+    }
 
     current_data.pullable_orbs = new_pullable;
     current_data.multiplier -= 100;
@@ -544,12 +408,12 @@ fn handle_enter_shop(data: GameData) -> Result<(GameState, GameData), UpdateErro
 }
 
 pub fn update_game(
-    state: GameState,
-    data: GameData,
-    action: GameAction
+    state: GameState, data: GameData, action: GameAction,
 ) -> Result<(GameState, GameData), UpdateError> {
     match (state, action) {
-        (GameState::New, GameAction::StartGame) => {
+        (
+            GameState::New, GameAction::StartGame,
+        ) => {
             let game_cost = level_cost_in_moonrocks(data.level);
             match data.temp_moonrocks >= game_cost {
                 true => {
@@ -562,16 +426,16 @@ pub fn update_game(
                 false => Err(UpdateError::InsufficientMoonrocks),
             }
         },
-        (GameState::Level, GameAction::PullOrb) => {
+        (
+            GameState::Level, GameAction::PullOrb,
+        ) => {
             let mut new_data = data.clone();
 
             new_data.pullable_orbs = shuffle(new_data.pullable_orbs);
 
             let pulled_orb = match new_data.pullable_orbs.pop_front() {
                 Option::Some(orb) => orb,
-                Option::None => {
-                    return Ok((GameState::GameOver, data));
-                },
+                Option::None => { return Ok((GameState::GameOver, data)); },
             };
 
             new_data.pull_number += 1;
@@ -584,7 +448,9 @@ pub fn update_game(
         (GameState::Level, GameAction::CashOut) => handle_cash_out(data),
         (GameState::LevelComplete, GameAction::CashOut) => handle_cash_out(data),
         (GameState::LevelComplete, GameAction::EnterShop) => handle_enter_shop(data),
-        (GameState::FiveOrDiePhase, GameAction::ConfirmFiveOrDie(confirmed)) => {
+        (
+            GameState::FiveOrDiePhase, GameAction::ConfirmFiveOrDie(confirmed),
+        ) => {
             match confirmed {
                 true => {
                     let new_data = handle_five_or_die_data(data)?;
@@ -594,7 +460,9 @@ pub fn update_game(
                 false => Ok((GameState::Level, data)),
             }
         },
-        (GameState::Shop, GameAction::BuyOrb(orb_price)) => {
+        (
+            GameState::Shop, GameAction::BuyOrb(orb_price),
+        ) => {
             match data.glitch_chips >= orb_price {
                 true => {
                     let mut new_data = data.clone();
@@ -604,7 +472,9 @@ pub fn update_game(
                 false => Err(UpdateError::InsufficientGlitchChips),
             }
         },
-        (GameState::Shop, GameAction::GoToNextLevel) => {
+        (
+            GameState::Shop, GameAction::GoToNextLevel,
+        ) => {
             let next_level = data.level + 1;
 
             let mut new_data = new_game_data();

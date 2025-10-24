@@ -6,9 +6,9 @@ mod tests {
         ContractDef, ContractDefTrait, NamespaceDef, TestResource, WorldStorageTestTrait,
         spawn_test_world,
     };
+    use starknet::ContractAddress;
     use crate::models::{Direction, Moves, Position, m_Moves, m_Position};
     use crate::systems::actions::{IActionsDispatcher, IActionsDispatcherTrait, actions};
-    use starknet::ContractAddress;
 
     fn namespace_def() -> NamespaceDef {
         let ndef = NamespaceDef {

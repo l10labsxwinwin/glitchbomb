@@ -27,16 +27,13 @@ fn buy_orb_at_index(orbs: Array<Orb>, index: u32) -> Array<Orb> {
             new_orbs.append(orb);
         }
         current_index += 1;
-    };
+    }
 
     new_orbs
 }
 
 pub fn update_shop_orbs(
-    common: Array<Orb>,
-    rare: Array<Orb>,
-    cosmic: Array<Orb>,
-    orb_id: u32
+    common: Array<Orb>, rare: Array<Orb>, cosmic: Array<Orb>, orb_id: u32,
 ) -> Result<(Array<Orb>, Array<Orb>, Array<Orb>), UpdateError> {
     match orb_id {
         0 => {
@@ -63,17 +60,12 @@ pub fn update_shop_orbs(
             let new_cosmic = buy_orb_at_index(cosmic, COSMIC_1);
             Ok((common, rare, new_cosmic))
         },
-        _ => {
-            Err(UpdateError::InvalidData)
-        },
+        _ => { Err(UpdateError::InvalidData) },
     }
 }
 
 pub fn get_orb_price(
-    common: @Array<Orb>,
-    rare: @Array<Orb>,
-    cosmic: @Array<Orb>,
-    orb_id: u32
+    common: @Array<Orb>, rare: @Array<Orb>, cosmic: @Array<Orb>, orb_id: u32,
 ) -> u32 {
     match orb_id {
         0 => *common.at(0).current_price,

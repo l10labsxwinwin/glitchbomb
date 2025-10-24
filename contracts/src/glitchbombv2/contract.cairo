@@ -16,16 +16,18 @@ pub trait PlayerActionsV2<T> {
 pub mod gb_contract_v2 {
     use dojo::model::ModelStorage;
     use dojo::world::WorldStorage;
-    use super::PlayerActionsV2;
     use starknet::get_caller_address;
-    use crate::glitchbombv2::player::{Player, PlayerAction, update_player};
-    use crate::glitchbombv2::gamepack::{GamePack, GamePackAction, GamePackState, update_gamepack, new_gamepack_data};
     use crate::glitchbombv2::game::{
-        Game, GameAction, GameState, OrbsInGame, update_game, new_game_data,
-        get_non_buyable_orbs, get_common_orbs, get_rare_orbs, get_cosmic_orbs, orbs_to_effects
+        Game, GameAction, GameState, OrbsInGame, get_common_orbs, get_cosmic_orbs,
+        get_non_buyable_orbs, get_rare_orbs, new_game_data, orbs_to_effects, update_game,
     };
-    use crate::glitchbombv2::shared::shuffle;
+    use crate::glitchbombv2::gamepack::{
+        GamePack, GamePackAction, GamePackState, new_gamepack_data, update_gamepack,
+    };
     use crate::glitchbombv2::orbs::{get_orb_price, update_shop_orbs};
+    use crate::glitchbombv2::player::{Player, PlayerAction, update_player};
+    use crate::glitchbombv2::shared::shuffle;
+    use super::PlayerActionsV2;
 
     #[abi(embed_v0)]
     impl PlayerActionsV2Impl of PlayerActionsV2<ContractState> {
@@ -37,7 +39,8 @@ pub mod gb_contract_v2 {
 
             let action = PlayerAction::ClaimFreeUsdc;
 
-            let (new_player_state, new_data) = match update_player(player.state, player.data, action) {
+            let (new_player_state, new_data) =
+                match update_player(player.state, player.data, action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -56,7 +59,8 @@ pub mod gb_contract_v2 {
 
             let action = PlayerAction::BuyGamePack;
 
-            let (new_player_state, new_data) = match update_player(player.state, player.data, action) {
+            let (new_player_state, new_data) =
+                match update_player(player.state, player.data, action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -75,8 +79,10 @@ pub mod gb_contract_v2 {
             world.write_model(@new_gamepack);
         }
 
-        // NOTE: opening a gamepack starts the first game at game_id = 1, we need to increment this when game ends so player can "start_game" to play the next game.
-        // we need to also set the next game state to New instead of Empty, need to think about how we handle next game.
+        // NOTE: opening a gamepack starts the first game at game_id = 1, we need to increment this
+        // when game ends so player can "start_game" to play the next game.
+        // we need to also set the next game state to New instead of Empty, need to think about how
+        // we handle next game.
         fn open_gamepack(ref self: ContractState, gamepack_id: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
@@ -85,7 +91,8 @@ pub mod gb_contract_v2 {
 
             let action = GamePackAction::OpenPack;
 
-            let (new_gamepack_state, new_gamepack_data) = match update_gamepack(gamepack.state, gamepack.data, action) {
+            let (new_gamepack_state, new_gamepack_data) =
+                match update_gamepack(gamepack.state, gamepack.data, action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -111,10 +118,12 @@ pub mod gb_contract_v2 {
             let player_id = get_caller_address();
 
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             let game_action = GameAction::StartGame;
-            let (new_game_state, new_game_data) = match update_game(game.state, game.data, game_action) {
+            let (new_game_state, new_game_data) =
+                match update_game(game.state, game.data, game_action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -130,10 +139,8 @@ pub mod gb_contract_v2 {
             };
 
             let orb_arrays = array![
-                orbs_in_game.non_buyable.clone(),
-                orbs_in_game.common.clone(),
-                orbs_in_game.rare.clone(),
-                orbs_in_game.cosmic.clone(),
+                orbs_in_game.non_buyable.clone(), orbs_in_game.common.clone(),
+                orbs_in_game.rare.clone(), orbs_in_game.cosmic.clone(),
             ];
             let pullable_orbs = orbs_to_effects(orb_arrays);
 
@@ -151,7 +158,8 @@ pub mod gb_contract_v2 {
             let player_id = get_caller_address();
 
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             let action = GameAction::PullOrb;
 
@@ -171,7 +179,8 @@ pub mod gb_contract_v2 {
             let player_id = get_caller_address();
 
             let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             let action = GameAction::CashOut;
 
@@ -193,8 +202,10 @@ pub mod gb_contract_v2 {
             let player_id = get_caller_address();
 
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
-            let mut orbs_in_game: OrbsInGame = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut orbs_in_game: OrbsInGame = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             let action = GameAction::EnterShop;
 
@@ -219,7 +230,8 @@ pub mod gb_contract_v2 {
             let player_id = get_caller_address();
 
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             let action = GameAction::ConfirmFiveOrDie(confirmed);
 
@@ -242,14 +254,13 @@ pub mod gb_contract_v2 {
             assert!(orb_id <= 5, "Invalid orb_id: must be between 0 and 5");
 
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
-            let mut orbs_in_game: OrbsInGame = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut orbs_in_game: OrbsInGame = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             let orb_price = get_orb_price(
-                @orbs_in_game.common,
-                @orbs_in_game.rare,
-                @orbs_in_game.cosmic,
-                orb_id
+                @orbs_in_game.common, @orbs_in_game.rare, @orbs_in_game.cosmic, orb_id,
             );
 
             let action = GameAction::BuyOrb(orb_price);
@@ -259,12 +270,10 @@ pub mod gb_contract_v2 {
                 Result::Err(err) => panic!("{:?}", err),
             };
 
-            let (new_common, new_rare, new_cosmic) = match update_shop_orbs(
-                orbs_in_game.common,
-                orbs_in_game.rare,
-                orbs_in_game.cosmic,
-                orb_id
-            ) {
+            let (new_common, new_rare, new_cosmic) =
+                match update_shop_orbs(
+                    orbs_in_game.common, orbs_in_game.rare, orbs_in_game.cosmic, orb_id,
+                ) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -284,8 +293,10 @@ pub mod gb_contract_v2 {
             let player_id = get_caller_address();
 
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
-            let mut game: Game = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
-            let orbs_in_game: OrbsInGame = world.read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let orbs_in_game: OrbsInGame = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
             let action = GameAction::GoToNextLevel;
 
@@ -295,9 +306,7 @@ pub mod gb_contract_v2 {
             };
 
             let orb_arrays = array![
-                orbs_in_game.non_buyable,
-                orbs_in_game.common,
-                orbs_in_game.rare,
+                orbs_in_game.non_buyable, orbs_in_game.common, orbs_in_game.rare,
                 orbs_in_game.cosmic,
             ];
             let pullable_orbs = orbs_to_effects(orb_arrays);

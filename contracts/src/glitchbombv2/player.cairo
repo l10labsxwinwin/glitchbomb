@@ -1,6 +1,6 @@
 use starknet::ContractAddress;
-use super::shared::UpdateError;
 use super::constants::{FREE_USDC_AMOUNT, GAMEPACK_PRICE};
+use super::shared::UpdateError;
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum PlayerState {
@@ -16,10 +16,7 @@ pub struct PlayerData {
 }
 
 pub fn new_player_data() -> PlayerData {
-    PlayerData {
-        usdc: 0,
-        gamepacks_bought: 0,
-    }
+    PlayerData { usdc: 0, gamepacks_bought: 0 }
 }
 
 #[derive(Drop, Serde, Debug, Copy)]
@@ -33,27 +30,32 @@ pub enum PlayerAction {
 pub struct Player {
     #[key]
     pub player_id: ContractAddress,
-
     pub state: PlayerState,
     pub data: PlayerData,
 }
 
 pub fn update_player(
-    state: PlayerState,
-    data: PlayerData,
-    action: PlayerAction
+    state: PlayerState, data: PlayerData, action: PlayerAction,
 ) -> Result<(PlayerState, PlayerData), UpdateError> {
     match (state, action) {
-        (PlayerState::Broke, PlayerAction::ClaimFreeUsdc) => {
+        (
+            PlayerState::Broke, PlayerAction::ClaimFreeUsdc,
+        ) => {
             match data.usdc {
-                0 => Ok((
-                    PlayerState::Stacked,
-                    PlayerData { usdc: FREE_USDC_AMOUNT, gamepacks_bought: data.gamepacks_bought }
-                )),
+                0 => Ok(
+                    (
+                        PlayerState::Stacked,
+                        PlayerData {
+                            usdc: FREE_USDC_AMOUNT, gamepacks_bought: data.gamepacks_bought,
+                        },
+                    ),
+                ),
                 _ => Err(UpdateError::InvalidData),
             }
         },
-        (PlayerState::Stacked, PlayerAction::BuyGamePack) => {
+        (
+            PlayerState::Stacked, PlayerAction::BuyGamePack,
+        ) => {
             match data.usdc {
                 0 => Err(UpdateError::InvalidData),
                 _ => {
@@ -66,12 +68,16 @@ pub fn update_player(
                         } else {
                             PlayerState::Stacked
                         };
-                        Ok((
-                            new_state,
-                            PlayerData { usdc: new_usdc, gamepacks_bought: data.gamepacks_bought + 1 }
-                        ))
+                        Ok(
+                            (
+                                new_state,
+                                PlayerData {
+                                    usdc: new_usdc, gamepacks_bought: data.gamepacks_bought + 1,
+                                },
+                            ),
+                        )
                     }
-                }
+                },
             }
         },
         _ => Err(UpdateError::InvalidStateTransition),
