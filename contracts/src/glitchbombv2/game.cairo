@@ -201,23 +201,23 @@ fn cosmic_bomb_immunity_orb() -> Orb {
 
 pub fn get_non_buyable_orbs() -> Array<Orb> {
     array![
-        non_buyable_one_damage_bomb(), non_buyable_two_damage_bomb(),
-        non_buyable_three_damage_bomb(), non_buyable_point_per_orb_remaining(),
+        non_buyable_point_per_orb_remaining(), non_buyable_one_damage_bomb(),
+        non_buyable_two_damage_bomb(), non_buyable_three_damage_bomb(),
     ]
 }
 
 pub fn get_common_orbs() -> Array<Orb> {
     array![
-        common_five_point_orb(), common_glitch_chips_orb(), common_five_or_die_orb(),
-        common_point_per_bomb_pulled_orb(), common_seven_point_orb(), common_moonrocks_orb(),
+        common_five_point_orb(), common_seven_point_orb(), common_point_per_bomb_pulled_orb(),
+        common_glitch_chips_orb(), common_five_or_die_orb(), common_moonrocks_orb(),
         common_point_rewind_orb(), common_half_multiplier_orb(), common_health_orb(),
     ]
 }
 
 pub fn get_rare_orbs() -> Array<Orb> {
     array![
-        rare_eight_point_orb(), rare_nine_point_orb(), rare_one_multiplier_orb(),
-        rare_two_point_per_orb_remaining(), rare_one_and_half_multiplier_orb(),
+        rare_eight_point_orb(), rare_nine_point_orb(), rare_two_point_per_orb_remaining(),
+        rare_one_multiplier_orb(), rare_one_and_half_multiplier_orb(),
     ]
 }
 
@@ -339,7 +339,7 @@ fn apply_data_for_state(effect: @OrbEffect, data: @GameData) -> GameState {
         GameState::LevelComplete
     } else if *effect == OrbEffect::FiveOrDie {
         GameState::FiveOrDiePhase
-    } else if data.pullable_orbs.len() == 0 {
+    } else if data.pullable_orbs.is_empty() {
         GameState::GameOver
     } else {
         GameState::Level
@@ -418,7 +418,6 @@ pub fn update_game(
             match data.temp_moonrocks >= game_cost {
                 true => {
                     let mut new_data = data.clone();
-                    new_data.temp_moonrocks = data.temp_moonrocks - game_cost;
                     new_data.moonrocks_spent = data.moonrocks_spent + game_cost;
 
                     Ok((GameState::Level, new_data))

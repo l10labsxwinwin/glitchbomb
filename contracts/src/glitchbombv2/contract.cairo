@@ -139,8 +139,8 @@ pub mod gb_contract_v2 {
             };
 
             let orb_arrays = array![
-                orbs_in_game.non_buyable.clone(), orbs_in_game.common.clone(),
-                orbs_in_game.rare.clone(), orbs_in_game.cosmic.clone(),
+                orbs_in_game.common.clone(), orbs_in_game.rare.clone(), orbs_in_game.cosmic.clone(),
+                orbs_in_game.non_buyable.clone(),
             ];
             let pullable_orbs = orbs_to_effects(orb_arrays);
 

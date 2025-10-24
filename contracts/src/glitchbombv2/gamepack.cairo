@@ -45,12 +45,7 @@ pub fn update_gamepack(
     match (state, action) {
         (
             GamePackState::Unopened, GamePackAction::OpenPack,
-        ) => {
-            let new_data = GamePackData {
-                current_game_id: INITIAL_GAME_ID, accumulated_moonrocks: INITIAL_MOONROCKS,
-            };
-            Ok((GamePackState::InProgress, new_data))
-        },
+        ) => { Ok((GamePackState::InProgress, data)) },
         (
             GamePackState::InProgress, GamePackAction::SubmitScore,
         ) => {
