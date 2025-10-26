@@ -138,11 +138,15 @@ pub mod gb_contract_v2 {
                 cosmic: get_cosmic_orbs(),
             };
 
-            let orb_arrays = array![
+            let win_orb_arrays = array![
                 orbs_in_game.common.clone(), orbs_in_game.rare.clone(), orbs_in_game.cosmic.clone(),
                 orbs_in_game.non_buyable.clone(),
             ];
-            let pullable_orbs = orbs_to_effects(orb_arrays);
+            let lose_orb_arrays = array![
+                orbs_in_game.non_buyable.clone(), orbs_in_game.common.clone(),
+                orbs_in_game.rare.clone(), orbs_in_game.cosmic.clone(),
+            ];
+            let pullable_orbs = orbs_to_effects(lose_orb_arrays);
 
             game.state = new_game_state;
             game.data = new_game_data;
@@ -157,7 +161,7 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let mut game: Game = world
                 .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
@@ -170,6 +174,13 @@ pub mod gb_contract_v2 {
 
             game.state = new_game_state;
             game.data = new_game_data;
+
+            if new_game_state == GameState::GameOver {
+                game.data.temp_moonrocks += game.data.moonrocks_earned;
+                game.data.temp_moonrocks -= game.data.moonrocks_spent;
+                gamepack.data.accumulated_moonrocks = game.data.temp_moonrocks;
+                world.write_model(@gamepack);
+            }
 
             world.write_model(@game);
         }
@@ -229,7 +240,7 @@ pub mod gb_contract_v2 {
             let mut world = self.world_default();
             let player_id = get_caller_address();
 
-            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let mut game: Game = world
                 .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
@@ -242,6 +253,13 @@ pub mod gb_contract_v2 {
 
             game.state = new_game_state;
             game.data = new_game_data;
+
+            if new_game_state == GameState::GameOver {
+                game.data.temp_moonrocks += game.data.moonrocks_earned;
+                game.data.temp_moonrocks -= game.data.moonrocks_spent;
+                gamepack.data.accumulated_moonrocks = game.data.temp_moonrocks;
+                world.write_model(@gamepack);
+            }
 
             world.write_model(@game);
         }
