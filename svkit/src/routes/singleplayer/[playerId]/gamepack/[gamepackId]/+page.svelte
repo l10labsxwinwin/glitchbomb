@@ -392,7 +392,7 @@
 	let startingGames = $state(new Map<number, boolean>());
 	let pullingOrbs = $state(new Map<number, boolean>());
 	let pullingSpecificOrbs = $state(new Map<string, boolean>());
-	let buyingOrbs = $state(new Map<number, boolean>());
+	let buyingOrbs = $state(new Map<string, boolean>());
 	let enteringShop = $state(false);
 	let nextingLevel = $state(false);
 	let cashingOut = $state(false);
@@ -637,22 +637,63 @@
 		}
 	}
 
-	async function buyOrb(orbId: number) {
+	async function buyCommon(index: number) {
 		if (!$account || !$dojoProvider || !gamepackId) return;
 
-		buyingOrbs.set(orbId, true);
+		const key = `common-${index}`;
+		buyingOrbs.set(key, true);
 		try {
-			console.log(`Buying orb ${orbId}...`);
+			console.log(`Buying common orb ${index}...`);
 			const world = setupWorld($dojoProvider);
 			const gamepackIdInt = parseInt(gamepackId);
-			const result = await world.gb_contract_v2.buyOrb($account, gamepackIdInt, orbId);
-			console.log('✅ Orb bought!', result);
-			toasts.add(`Orb ${orbId} bought successfully!`, 'success');
+			const result = await world.gb_contract_v2.buyCommon($account, gamepackIdInt, index);
+			console.log('✅ Common orb bought!', result);
+			toasts.add(`Common orb ${index} bought successfully!`, 'success');
 		} catch (err) {
-			console.error('Failed to buy orb:', err);
-			toasts.add('Failed to buy orb', 'error');
+			console.error('Failed to buy common orb:', err);
+			toasts.add('Failed to buy common orb', 'error');
 		} finally {
-			buyingOrbs.delete(orbId);
+			buyingOrbs.delete(key);
+		}
+	}
+
+	async function buyRare(index: number) {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		const key = `rare-${index}`;
+		buyingOrbs.set(key, true);
+		try {
+			console.log(`Buying rare orb ${index}...`);
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.buyRare($account, gamepackIdInt, index);
+			console.log('✅ Rare orb bought!', result);
+			toasts.add(`Rare orb ${index} bought successfully!`, 'success');
+		} catch (err) {
+			console.error('Failed to buy rare orb:', err);
+			toasts.add('Failed to buy rare orb', 'error');
+		} finally {
+			buyingOrbs.delete(key);
+		}
+	}
+
+	async function buyCosmic(index: number) {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		const key = `cosmic-${index}`;
+		buyingOrbs.set(key, true);
+		try {
+			console.log(`Buying cosmic orb ${index}...`);
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.buyCosmic($account, gamepackIdInt, index);
+			console.log('✅ Cosmic orb bought!', result);
+			toasts.add(`Cosmic orb ${index} bought successfully!`, 'success');
+		} catch (err) {
+			console.error('Failed to buy cosmic orb:', err);
+			toasts.add('Failed to buy cosmic orb', 'error');
+		} finally {
+			buyingOrbs.delete(key);
 		}
 	}
 
@@ -764,7 +805,7 @@
 				{#if orbs.length > 0}
 					<div class="space-y-4">
 						{#each orbs as orb}
-							<ShopCard {orb} onBuyOrb={buyOrb} {buyingOrbs} />
+							<ShopCard {orb} onBuyCommon={buyCommon} onBuyRare={buyRare} onBuyCosmic={buyCosmic} {buyingOrbs} />
 						{/each}
 					</div>
 				{:else}

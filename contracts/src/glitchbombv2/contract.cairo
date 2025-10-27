@@ -9,7 +9,10 @@ pub trait PlayerActionsV2<T> {
     fn confirm_five_or_die(ref self: T, gamepack_id: u32, confirmed: bool);
     fn cash_out(ref self: T, gamepack_id: u32);
     fn enter_shop(ref self: T, gamepack_id: u32);
-    fn buy_orb(ref self: T, gamepack_id: u32, orb_id: u32);
+    // fn buy_orb(ref self: T, gamepack_id: u32, orb_id: u32);
+    fn buy_common(ref self: T, gamepack_id: u32, index: u32);
+    fn buy_rare(ref self: T, gamepack_id: u32, index: u32);
+    fn buy_cosmic(ref self: T, gamepack_id: u32, index: u32);
     fn next_level(ref self: T, gamepack_id: u32);
     fn next_game(ref self: T, gamepack_id: u32);
 }
@@ -26,7 +29,7 @@ pub mod gb_contract_v2 {
     use crate::glitchbombv2::gamepack::{
         GamePack, GamePackAction, GamePackState, new_gamepack_data, update_gamepack,
     };
-    use crate::glitchbombv2::orbs::{get_orb_price, update_shop_orbs};
+    use crate::glitchbombv2::orbs::{update_common_orbs, update_rare_orbs, update_cosmic_orbs};
     use crate::glitchbombv2::player::{Player, PlayerAction, update_player};
     use crate::glitchbombv2::shared::shuffle;
     use super::PlayerActionsV2;
@@ -303,12 +306,51 @@ pub mod gb_contract_v2 {
             world.write_model(@game);
         }
 
-        fn buy_orb(ref self: ContractState, gamepack_id: u32, orb_id: u32) {
+        // fn buy_orb(ref self: ContractState, gamepack_id: u32, orb_id: u32) {
+        //     let mut world = self.world_default();
+        //     let player_id = get_caller_address();
+
+        //     // early assert to save compute on incorrect contract call
+        //     assert!(orb_id <= 5, "Invalid orb_id: must be between 0 and 5");
+
+        //     let gamepack: GamePack = world.read_model((player_id, gamepack_id));
+        //     let mut game: Game = world
+        //         .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+        //     let mut orbs_in_game: OrbsInGame = world
+        //         .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+
+        //     let orb_price = get_orb_price(
+        //         @orbs_in_game.common, @orbs_in_game.rare, @orbs_in_game.cosmic, orb_id,
+        //     );
+
+        //     let action = GameAction::BuyOrb(orb_price);
+
+        //     let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+        //         Result::Ok(result) => result,
+        //         Result::Err(err) => panic!("{:?}", err),
+        //     };
+
+        //     let (new_common, new_rare, new_cosmic) =
+        //         match update_shop_orbs(
+        //             orbs_in_game.common, orbs_in_game.rare, orbs_in_game.cosmic, orb_id,
+        //         ) {
+        //         Result::Ok(result) => result,
+        //         Result::Err(err) => panic!("{:?}", err),
+        //     };
+
+        //     game.state = new_game_state;
+        //     game.data = new_game_data;
+        //     orbs_in_game.common = new_common;
+        //     orbs_in_game.rare = new_rare;
+        //     orbs_in_game.cosmic = new_cosmic;
+
+        //     world.write_model(@game);
+        //     world.write_model(@orbs_in_game);
+        // }
+
+        fn buy_common(ref self: ContractState, gamepack_id: u32, index: u32) {
             let mut world = self.world_default();
             let player_id = get_caller_address();
-
-            // early assert to save compute on incorrect contract call
-            assert!(orb_id <= 5, "Invalid orb_id: must be between 0 and 5");
 
             let gamepack: GamePack = world.read_model((player_id, gamepack_id));
             let mut game: Game = world
@@ -316,9 +358,7 @@ pub mod gb_contract_v2 {
             let mut orbs_in_game: OrbsInGame = world
                 .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
 
-            let orb_price = get_orb_price(
-                @orbs_in_game.common, @orbs_in_game.rare, @orbs_in_game.cosmic, orb_id,
-            );
+            let orb_price = *orbs_in_game.common.at(index).current_price;
 
             let action = GameAction::BuyOrb(orb_price);
 
@@ -327,13 +367,75 @@ pub mod gb_contract_v2 {
                 Result::Err(err) => panic!("{:?}", err),
             };
 
-            let (new_common, new_rare, new_cosmic) =
-                match update_shop_orbs(
-                    orbs_in_game.common, orbs_in_game.rare, orbs_in_game.cosmic, orb_id,
-                ) {
+            let (new_common, new_rare, new_cosmic) = update_common_orbs(
+                orbs_in_game.common, orbs_in_game.rare, orbs_in_game.cosmic, index,
+            );
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+            orbs_in_game.common = new_common;
+            orbs_in_game.rare = new_rare;
+            orbs_in_game.cosmic = new_cosmic;
+
+            world.write_model(@game);
+            world.write_model(@orbs_in_game);
+        }
+
+        fn buy_rare(ref self: ContractState, gamepack_id: u32, index: u32) {
+            let mut world = self.world_default();
+            let player_id = get_caller_address();
+
+            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let mut game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut orbs_in_game: OrbsInGame = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+
+            let orb_price = *orbs_in_game.rare.at(index).current_price;
+
+            let action = GameAction::BuyOrb(orb_price);
+
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
+
+            let (new_common, new_rare, new_cosmic) = update_rare_orbs(
+                orbs_in_game.common, orbs_in_game.rare, orbs_in_game.cosmic, index,
+            );
+
+            game.state = new_game_state;
+            game.data = new_game_data;
+            orbs_in_game.common = new_common;
+            orbs_in_game.rare = new_rare;
+            orbs_in_game.cosmic = new_cosmic;
+
+            world.write_model(@game);
+            world.write_model(@orbs_in_game);
+        }
+
+        fn buy_cosmic(ref self: ContractState, gamepack_id: u32, index: u32) {
+            let mut world = self.world_default();
+            let player_id = get_caller_address();
+
+            let gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let mut game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+            let mut orbs_in_game: OrbsInGame = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+
+            let orb_price = *orbs_in_game.cosmic.at(index).current_price;
+
+            let action = GameAction::BuyOrb(orb_price);
+
+            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            let (new_common, new_rare, new_cosmic) = update_cosmic_orbs(
+                orbs_in_game.common, orbs_in_game.rare, orbs_in_game.cosmic, index,
+            );
 
             game.state = new_game_state;
             game.data = new_game_data;

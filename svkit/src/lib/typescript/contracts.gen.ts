@@ -4,6 +4,48 @@ import * as models from "./models.gen";
 
 export function setupWorld(provider: DojoProvider) {
 
+	const build_gb_contract_v2_buyCommon_calldata = (gamepackId: BigNumberish, index: BigNumberish): DojoCall => {
+		return {
+			contractName: "gb_contract_v2",
+			entrypoint: "buy_common",
+			calldata: [gamepackId, index],
+		};
+	};
+
+	const gb_contract_v2_buyCommon = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish, index: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_gb_contract_v2_buyCommon_calldata(gamepackId, index),
+				"glitchbomb",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
+	const build_gb_contract_v2_buyCosmic_calldata = (gamepackId: BigNumberish, index: BigNumberish): DojoCall => {
+		return {
+			contractName: "gb_contract_v2",
+			entrypoint: "buy_cosmic",
+			calldata: [gamepackId, index],
+		};
+	};
+
+	const gb_contract_v2_buyCosmic = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish, index: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_gb_contract_v2_buyCosmic_calldata(gamepackId, index),
+				"glitchbomb",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_gb_contract_v2_buyGamepack_calldata = (): DojoCall => {
 		return {
 			contractName: "gb_contract_v2",
@@ -25,19 +67,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_buyOrb_calldata = (gamepackId: BigNumberish, orbId: BigNumberish): DojoCall => {
+	const build_gb_contract_v2_buyRare_calldata = (gamepackId: BigNumberish, index: BigNumberish): DojoCall => {
 		return {
 			contractName: "gb_contract_v2",
-			entrypoint: "buy_orb",
-			calldata: [gamepackId, orbId],
+			entrypoint: "buy_rare",
+			calldata: [gamepackId, index],
 		};
 	};
 
-	const gb_contract_v2_buyOrb = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish, orbId: BigNumberish) => {
+	const gb_contract_v2_buyRare = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish, index: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_buyOrb_calldata(gamepackId, orbId),
+				build_gb_contract_v2_buyRare_calldata(gamepackId, index),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -260,10 +302,14 @@ export function setupWorld(provider: DojoProvider) {
 
 	return {
 		gb_contract_v2: {
+			buyCommon: gb_contract_v2_buyCommon,
+			buildBuyCommonCalldata: build_gb_contract_v2_buyCommon_calldata,
+			buyCosmic: gb_contract_v2_buyCosmic,
+			buildBuyCosmicCalldata: build_gb_contract_v2_buyCosmic_calldata,
 			buyGamepack: gb_contract_v2_buyGamepack,
 			buildBuyGamepackCalldata: build_gb_contract_v2_buyGamepack_calldata,
-			buyOrb: gb_contract_v2_buyOrb,
-			buildBuyOrbCalldata: build_gb_contract_v2_buyOrb_calldata,
+			buyRare: gb_contract_v2_buyRare,
+			buildBuyRareCalldata: build_gb_contract_v2_buyRare_calldata,
 			cashOut: gb_contract_v2_cashOut,
 			buildCashOutCalldata: build_gb_contract_v2_cashOut_calldata,
 			claimFreeUsdc: gb_contract_v2_claimFreeUsdc,

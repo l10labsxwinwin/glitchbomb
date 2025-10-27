@@ -64,6 +64,21 @@ pub fn update_shop_orbs(
     }
 }
 
+pub fn update_common_orbs(common: Array<Orb>, rare: Array<Orb>, cosmic: Array<Orb>, index: u32) -> (Array<Orb>, Array<Orb>, Array<Orb>) {
+    let new_common = buy_orb_at_index(common, index);
+    (new_common, rare, cosmic)
+}
+
+pub fn update_rare_orbs(common: Array<Orb>, rare: Array<Orb>, cosmic: Array<Orb>, index: u32) -> (Array<Orb>, Array<Orb>, Array<Orb>) {
+    let new_rare = buy_orb_at_index(rare, index);
+    (common, new_rare, cosmic)
+}
+
+pub fn update_cosmic_orbs(common: Array<Orb>, rare: Array<Orb>, cosmic: Array<Orb>, index: u32) -> (Array<Orb>, Array<Orb>, Array<Orb>) {
+    let new_cosmic = buy_orb_at_index(cosmic, index);
+    (common, rare, new_cosmic)
+}
+
 pub fn get_orb_price(
     common: @Array<Orb>, rare: @Array<Orb>, cosmic: @Array<Orb>, orb_id: u32,
 ) -> u32 {

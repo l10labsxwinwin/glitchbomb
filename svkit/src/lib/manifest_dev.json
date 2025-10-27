@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x5c7ef08799ed2e573834d5836201a6dae45f818d23a6e8fe242b7c559aa82f3",
-      "class_hash": "0x4be9c19c3e71d1fa08fbb500e5eddf33b55cb0dc2b17f9f709a7e1abc7143b9",
+      "address": "0x2bd6f652ef47d400f3fdf3c1180f449daa7a25b842a3617ccaeb00ad815f9c1",
+      "class_hash": "0x5029a9e24d441a59b232bad23ff9ce0039b96c3a812fe9f8bdd7d533f6959f",
       "abi": [
         {
           "type": "impl",
@@ -1663,14 +1663,46 @@
             },
             {
               "type": "function",
-              "name": "buy_orb",
+              "name": "buy_common",
               "inputs": [
                 {
                   "name": "gamepack_id",
                   "type": "core::integer::u32"
                 },
                 {
-                  "name": "orb_id",
+                  "name": "index",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "buy_rare",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "index",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "buy_cosmic",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "index",
                   "type": "core::integer::u32"
                 }
               ],
@@ -1831,7 +1863,9 @@
         "confirm_five_or_die",
         "cash_out",
         "enter_shop",
-        "buy_orb",
+        "buy_common",
+        "buy_rare",
+        "buy_cosmic",
         "next_level",
         "next_game",
         "upgrade"

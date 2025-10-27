@@ -31,11 +31,13 @@
 
 	interface Props {
 		orb: OrbsInGame;
-		onBuyOrb?: (orbId: number) => void;
-		buyingOrbs?: Map<number, boolean>;
+		onBuyCommon?: (index: number) => void;
+		onBuyRare?: (index: number) => void;
+		onBuyCosmic?: (index: number) => void;
+		buyingOrbs?: Map<string, boolean>;
 	}
 
-	let { orb, onBuyOrb, buyingOrbs = new Map() }: Props = $props();
+	let { orb, onBuyCommon, onBuyRare, onBuyCosmic, buyingOrbs = new Map() }: Props = $props();
 
 	function formatOrbEffect(orb: OrbEffect): string {
 		for (const [key, value] of Object.entries(orb)) {
@@ -60,18 +62,22 @@
 			{#if orb?.common && orb.common.length > 0}
 				<div class="space-y-1 text-sm">
 					{#each orb.common as orbItem, index}
-						<button
-							onclick={() => onBuyOrb?.(index)}
-							disabled={buyingOrbs.get(index)}
-							class="w-full bg-black/50 hover:bg-green-600/30 px-2 py-1 rounded text-left disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
-						>
-							{#if buyingOrbs.get(index)}
-								Buying...
-							{:else}
-								<div>{formatOrbEffect(orbItem.effect)}</div>
-								<div class="text-xs opacity-60">Price: {orbItem.current_price} MR | Count: {orbItem.count} | Base: {orbItem.base_price}</div>
-							{/if}
-						</button>
+						{@const key = `common-${index}`}
+						{@const effectLabel = formatOrbEffect(orbItem.effect)}
+						{#if effectLabel}
+							<button
+								onclick={() => onBuyCommon?.(index)}
+								disabled={buyingOrbs.get(key)}
+								class="w-full bg-black/50 hover:bg-green-600/30 px-2 py-1 rounded text-left disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+							>
+								{#if buyingOrbs.get(key)}
+									Buying...
+								{:else}
+									<div>{effectLabel}</div>
+									<div class="text-xs opacity-60">Price: {orbItem.current_price} MR | Count: {orbItem.count} | Base: {orbItem.base_price}</div>
+								{/if}
+							</button>
+						{/if}
 					{/each}
 				</div>
 			{:else}
@@ -84,19 +90,22 @@
 			{#if orb?.rare && orb.rare.length > 0}
 				<div class="space-y-1 text-sm">
 					{#each orb.rare as orbItem, index}
-						{@const orbId = orb.common.length + index}
-						<button
-							onclick={() => onBuyOrb?.(orbId)}
-							disabled={buyingOrbs.get(orbId)}
-							class="w-full bg-black/50 hover:bg-blue-600/30 px-2 py-1 rounded text-left disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
-						>
-							{#if buyingOrbs.get(orbId)}
-								Buying...
-							{:else}
-								<div>{formatOrbEffect(orbItem.effect)}</div>
-								<div class="text-xs opacity-60">Price: {orbItem.current_price} MR | Count: {orbItem.count} | Base: {orbItem.base_price}</div>
-							{/if}
-						</button>
+						{@const key = `rare-${index}`}
+						{@const effectLabel = formatOrbEffect(orbItem.effect)}
+						{#if effectLabel}
+							<button
+								onclick={() => onBuyRare?.(index)}
+								disabled={buyingOrbs.get(key)}
+								class="w-full bg-black/50 hover:bg-blue-600/30 px-2 py-1 rounded text-left disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+							>
+								{#if buyingOrbs.get(key)}
+									Buying...
+								{:else}
+									<div>{effectLabel}</div>
+									<div class="text-xs opacity-60">Price: {orbItem.current_price} MR | Count: {orbItem.count} | Base: {orbItem.base_price}</div>
+								{/if}
+							</button>
+						{/if}
 					{/each}
 				</div>
 			{:else}
@@ -109,19 +118,22 @@
 			{#if orb?.cosmic && orb.cosmic.length > 0}
 				<div class="space-y-1 text-sm">
 					{#each orb.cosmic as orbItem, index}
-						{@const orbId = orb.common.length + orb.rare.length + index}
-						<button
-							onclick={() => onBuyOrb?.(orbId)}
-							disabled={buyingOrbs.get(orbId)}
-							class="w-full bg-black/50 hover:bg-purple-600/30 px-2 py-1 rounded text-left disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
-						>
-							{#if buyingOrbs.get(orbId)}
-								Buying...
-							{:else}
-								<div>{formatOrbEffect(orbItem.effect)}</div>
-								<div class="text-xs opacity-60">Price: {orbItem.current_price} MR | Count: {orbItem.count} | Base: {orbItem.base_price}</div>
-							{/if}
-						</button>
+						{@const key = `cosmic-${index}`}
+						{@const effectLabel = formatOrbEffect(orbItem.effect)}
+						{#if effectLabel}
+							<button
+								onclick={() => onBuyCosmic?.(index)}
+								disabled={buyingOrbs.get(key)}
+								class="w-full bg-black/50 hover:bg-purple-600/30 px-2 py-1 rounded text-left disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+							>
+								{#if buyingOrbs.get(key)}
+									Buying...
+								{:else}
+									<div>{effectLabel}</div>
+									<div class="text-xs opacity-60">Price: {orbItem.current_price} MR | Count: {orbItem.count} | Base: {orbItem.base_price}</div>
+								{/if}
+							</button>
+						{/if}
 					{/each}
 				</div>
 			{:else}
