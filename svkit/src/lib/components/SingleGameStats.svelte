@@ -1,29 +1,8 @@
 <script lang="ts">
-	interface GameData {
-		level: number;
-		pull_number: number;
-		points: number;
-		milestone: number;
-		hp: number;
-		multiplier: number;
-		glitch_chips: number;
-		moonrocks_spent: number;
-		moonrocks_earned: number;
-		temp_moonrocks: number;
-		bomb_immunity_turns: number;
-		bombs_pulled_in_level: number;
-	}
-
-	interface Game {
-		player_id: string;
-		gamepack_id: number;
-		game_id: number;
-		state: string;
-		data: GameData;
-	}
+	import type { Game } from '$lib/typescript/models.gen';
 
 	interface Props {
-		game: Game;
+		game: any;
 	}
 
 	let { game }: Props = $props();

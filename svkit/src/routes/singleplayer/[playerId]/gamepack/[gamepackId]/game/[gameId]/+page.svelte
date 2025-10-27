@@ -26,65 +26,7 @@
 		}
 	});
 
-	interface GamePackData {
-		current_game_id: number;
-		accumulated_moonrocks: number;
-	}
 
-	interface GamePack {
-		player_id: string;
-		gamepack_id: number;
-		state: string;
-		data: GamePackData;
-	}
-
-	interface OrbEffect {
-		Point?: number;
-		PointPerOrbRemaining?: number;
-		PointPerBombPulled?: number;
-		GlitchChips?: number;
-		Moonrocks?: number;
-		Health?: number;
-		Bomb?: number;
-		Multiplier?: number;
-		BombImmunity?: number;
-		option?: any;
-	}
-
-	interface GameData {
-		level: number;
-		pull_number: number;
-		points: number;
-		milestone: number;
-		hp: number;
-		multiplier: number;
-		glitch_chips: number;
-		moonrocks_spent: number;
-		moonrocks_earned: number;
-		temp_moonrocks: number;
-		bomb_immunity_turns: number;
-		bombs_pulled_in_level: number;
-		pullable_orbs: OrbEffect[];
-		consumed_orbs: OrbEffect[];
-	}
-
-	interface Game {
-		player_id: string;
-		gamepack_id: number;
-		game_id: number;
-		state: string;
-		data: GameData;
-	}
-
-	interface OrbsInGame {
-		player_id: string;
-		gamepack_id: number;
-		game_id: number;
-		non_buyable: any[];
-		common: any[];
-		rare: any[];
-		cosmic: any[];
-	}
 
 	const GET_GAMEPACK = gql`
 		query GetGamepack($playerId: String!, $gamepackId: Int!) {
@@ -377,9 +319,9 @@
 		}
 	`;
 
-	let gamepack = $state<GamePack | null>(null);
-	let game = $state<Game | null>(null);
-	let orbs = $state<OrbsInGame | null>(null);
+	let gamepack = $state<any | null>(null);
+	let game = $state<any | null>(null);
+	let orbs = $state<any | null>(null);
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let subscription: any = null;
@@ -492,6 +434,9 @@
 
 	let openingGamepack = $state(false);
 	let startingGame = $state(false);
+	let pullingOrb = $state(false);
+	let cashingOut = $state(false);
+	let enteringShop = $state(false);
 
 	async function openGamepack() {
 		if (!$account || !$dojoProvider || !gamepackId) return;
@@ -530,6 +475,63 @@
 			startingGame = false;
 		}
 	}
+
+	async function pullOrb() {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		pullingOrb = true;
+		try {
+			console.log('Pulling orb...');
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.pullOrb($account, gamepackIdInt);
+			console.log('✅ Orb pulled!', result);
+			toasts.add('Orb pulled successfully!', 'success');
+		} catch (err) {
+			console.error('Failed to pull orb:', err);
+			toasts.add('Failed to pull orb', 'error');
+		} finally {
+			pullingOrb = false;
+		}
+	}
+
+	async function cashOut() {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		cashingOut = true;
+		try {
+			console.log('Cashing out...');
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.cashOut($account, gamepackIdInt);
+			console.log('✅ Cashed out!', result);
+			toasts.add('Cashed out successfully!', 'success');
+		} catch (err) {
+			console.error('Failed to cash out:', err);
+			toasts.add('Failed to cash out', 'error');
+		} finally {
+			cashingOut = false;
+		}
+	}
+
+	async function enterShop() {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		enteringShop = true;
+		try {
+			console.log('Entering shop...');
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.enterShop($account, gamepackIdInt);
+			console.log('✅ Entered shop!', result);
+			toasts.add('Entered shop successfully!', 'success');
+		} catch (err) {
+			console.error('Failed to enter shop:', err);
+			toasts.add('Failed to enter shop', 'error');
+		} finally {
+			enteringShop = false;
+		}
+	}
 </script>
 
-<FullSingleGame {gamepack} {game} {orbs} {loading} {error} {openGamepack} {startGame} {openingGamepack} {startingGame} />
+<FullSingleGame {gamepack} {game} {orbs} {loading} {error} {openGamepack} {startGame} {openingGamepack} {startingGame} {pullOrb} {cashOut} {enterShop} {pullingOrb} {cashingOut} {enteringShop} />

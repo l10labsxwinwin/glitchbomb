@@ -1,79 +1,27 @@
 <script lang="ts">
 	import SingleGameStats from './SingleGameStats.svelte';
-
-	interface GamePackData {
-		current_game_id: number;
-		accumulated_moonrocks: number;
-	}
-
-	interface GamePack {
-		player_id: string;
-		gamepack_id: number;
-		state: string;
-		data: GamePackData;
-	}
-
-	interface OrbEffect {
-		Point?: number;
-		PointPerOrbRemaining?: number;
-		PointPerBombPulled?: number;
-		GlitchChips?: number;
-		Moonrocks?: number;
-		Health?: number;
-		Bomb?: number;
-		Multiplier?: number;
-		BombImmunity?: number;
-		option?: any;
-	}
-
-	interface GameData {
-		level: number;
-		pull_number: number;
-		points: number;
-		milestone: number;
-		hp: number;
-		multiplier: number;
-		glitch_chips: number;
-		moonrocks_spent: number;
-		moonrocks_earned: number;
-		temp_moonrocks: number;
-		bomb_immunity_turns: number;
-		bombs_pulled_in_level: number;
-		pullable_orbs: OrbEffect[];
-		consumed_orbs: OrbEffect[];
-	}
-
-	interface Game {
-		player_id: string;
-		gamepack_id: number;
-		game_id: number;
-		state: string;
-		data: GameData;
-	}
-
-	interface OrbsInGame {
-		player_id: string;
-		gamepack_id: number;
-		game_id: number;
-		non_buyable: any[];
-		common: any[];
-		rare: any[];
-		cosmic: any[];
-	}
+	import InLevelActions from './InLevelActions.svelte';
+	import PullableOrbsView from './PullableOrbsView.svelte';
 
 	interface Props {
-		gamepack: GamePack | null;
-		game: Game | null;
-		orbs: OrbsInGame | null;
+		gamepack: any | null;
+		game: any | null;
+		orbs: any | null;
 		loading: boolean;
 		error: string | null;
 		openGamepack: () => Promise<void>;
 		startGame: () => Promise<void>;
 		openingGamepack: boolean;
 		startingGame: boolean;
+		pullOrb: () => Promise<void>;
+		cashOut: () => Promise<void>;
+		enterShop: () => Promise<void>;
+		pullingOrb: boolean;
+		cashingOut: boolean;
+		enteringShop: boolean;
 	}
 
-	let { gamepack, game, orbs, loading, error, openGamepack, startGame, openingGamepack, startingGame }: Props = $props();
+	let { gamepack, game, orbs, loading, error, openGamepack, startGame, openingGamepack, startingGame, pullOrb, cashOut, enterShop, pullingOrb, cashingOut, enteringShop }: Props = $props();
 </script>
 
 <div class="min-h-screen flex flex-col">
@@ -115,7 +63,11 @@
 					</button>
 				</div>
 			{:else if game}
-				<SingleGameStats {game} />
+				<div class="space-y-6">
+					<SingleGameStats {game} />
+					<InLevelActions onPullOrb={pullOrb} onCashOut={cashOut} onEnterShop={enterShop} {pullingOrb} {cashingOut} {enteringShop} />
+					<PullableOrbsView pullableOrbs={game.data.pullable_orbs} />
+				</div>
 			{:else}
 				<p class="opacity-60">No data available</p>
 			{/if}
