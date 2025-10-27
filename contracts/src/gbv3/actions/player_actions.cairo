@@ -112,13 +112,13 @@ pub mod player_actions {
                 ref world, player_address, gamepack_id, gamepack.data.current_game_id,
             );
 
-            let orb_arrays = array![
-                orbs_in_game.non_buyable,
+            let win_orb_arrays = array![
                 orbs_in_game.common,
                 orbs_in_game.rare,
                 orbs_in_game.cosmic,
+                orbs_in_game.non_buyable,
             ];
-            let pullable_orbs = OrbInventorySystemTrait::orbs_to_effects(orb_arrays);
+            let pullable_orbs = OrbInventorySystemTrait::orbs_to_effects(win_orb_arrays);
             game.data.pullable_orbs = pullable_orbs;
 
             GameSystemTrait::save_game(ref world, @game);
@@ -131,6 +131,10 @@ pub mod player_actions {
             let mut gamepack: GamePack = world.read_model((player_address, gamepack_id));
             let mut game: Game = world
                 .read_model((player_address, gamepack_id, gamepack.data.current_game_id));
+
+            if game.state != GameState::Level {
+                panic!("Can only pull orbs when game state is Level");
+            }
 
             let (pulled_orb, new_state) = match PullSystemTrait::pull_orb(ref game.data) {
                 Result::Ok(result) => result,
@@ -277,13 +281,13 @@ pub mod player_actions {
                 Result::Err(err) => panic!("{:?}", err),
             };
 
-            let orb_arrays = array![
-                orbs_in_game.non_buyable,
+            let win_orb_arrays = array![
                 orbs_in_game.common,
                 orbs_in_game.rare,
                 orbs_in_game.cosmic,
+                orbs_in_game.non_buyable,
             ];
-            let pullable_orbs = OrbInventorySystemTrait::orbs_to_effects(orb_arrays);
+            let pullable_orbs = OrbInventorySystemTrait::orbs_to_effects(win_orb_arrays);
             game.data.pullable_orbs = pullable_orbs;
 
             GameSystemTrait::save_game(ref world, @game);
