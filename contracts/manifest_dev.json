@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x507bc54eb9480a54d3e60d9ada0749582d31d5ee480057f14f2620b088180ed",
-      "class_hash": "0x587f946f0455607b38010cf227f677e1a92cda47483503340221481aa4736e9",
+      "address": "0x5c7ef08799ed2e573834d5836201a6dae45f818d23a6e8fe242b7c559aa82f3",
+      "class_hash": "0x4be9c19c3e71d1fa08fbb500e5eddf33b55cb0dc2b17f9f709a7e1abc7143b9",
       "abi": [
         {
           "type": "impl",
@@ -1599,6 +1599,22 @@
               "inputs": [
                 {
                   "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "pull_specific",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                },
+                {
+                  "name": "orb_index",
                   "type": "core::integer::u32"
                 }
               ],
@@ -1811,6 +1827,7 @@
         "open_gamepack",
         "start_game",
         "pull_orb",
+        "pull_specific",
         "confirm_five_or_die",
         "cash_out",
         "enter_shop",

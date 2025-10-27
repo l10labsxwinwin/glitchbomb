@@ -366,6 +366,7 @@
 	let openingGamepack = $state(false);
 	let startingGames = $state(new Map<number, boolean>());
 	let pullingOrbs = $state(new Map<number, boolean>());
+	let pullingSpecificOrbs = $state(new Map<string, boolean>());
 	let cashingOut = $state(false);
 	let startingNextGame = $state(false);
 
@@ -531,6 +532,26 @@
 		}
 	}
 
+	async function pullSpecificOrb(gameId: number, orbIndex: number) {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		const key = `${gameId}-${orbIndex}`;
+		pullingSpecificOrbs.set(key, true);
+		try {
+			console.log(`Pulling orb at index ${orbIndex} for game ${gameId}...`);
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.pullSpecific($account, gamepackIdInt, orbIndex);
+			console.log('✅ Specific orb pulled!', result);
+			toasts.add(`Orb ${orbIndex} pulled successfully!`, 'success');
+		} catch (err) {
+			console.error('Failed to pull specific orb:', err);
+			toasts.add('Failed to pull orb', 'error');
+		} finally {
+			pullingSpecificOrbs.delete(key);
+		}
+	}
+
 	async function cashOut() {
 		if (!$account || !$dojoProvider || !gamepackId) return;
 
@@ -610,20 +631,18 @@
 					<div class="flex gap-4">
 						<button
 							onclick={openGamepack}
-							disabled={openingGamepack || gamepack.state !== 'Unopened'}
+							disabled={openingGamepack}
 							class="px-6 py-3 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
 						>
 							{openingGamepack ? 'Opening...' : 'Open Gamepack'}
 						</button>
-						{#if gamepack.state === 'InProgress' && games.length > 0 && games[0].state === 'GameOver'}
-							<button
-								onclick={nextGame}
-								disabled={startingNextGame}
-								class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
-							>
-								{startingNextGame ? 'Starting...' : 'Start Next Game'}
-							</button>
-						{/if}
+						<button
+							onclick={nextGame}
+							disabled={startingNextGame}
+							class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
+						>
+							{startingNextGame ? 'Starting...' : 'Start Next Game'}
+						</button>
 					</div>
 					</div>
 				</div>
@@ -637,9 +656,11 @@
 									{game}
 									onStartGame={startGame}
 									onPullOrb={pullOrb}
+									onPullSpecificOrb={pullSpecificOrb}
 									onCashOut={cashOut}
 									{startingGames}
 									{pullingOrbs}
+									{pullingSpecificOrbs}
 									{cashingOut}
 								/>
 							{/each}

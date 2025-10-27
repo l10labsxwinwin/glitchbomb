@@ -214,6 +214,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_gb_contract_v2_pullSpecific_calldata = (gamepackId: BigNumberish, orbIndex: BigNumberish): DojoCall => {
+		return {
+			contractName: "gb_contract_v2",
+			entrypoint: "pull_specific",
+			calldata: [gamepackId, orbIndex],
+		};
+	};
+
+	const gb_contract_v2_pullSpecific = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish, orbIndex: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_gb_contract_v2_pullSpecific_calldata(gamepackId, orbIndex),
+				"glitchbomb",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_gb_contract_v2_startGame_calldata = (gamepackId: BigNumberish): DojoCall => {
 		return {
 			contractName: "gb_contract_v2",
@@ -259,6 +280,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildOpenGamepackCalldata: build_gb_contract_v2_openGamepack_calldata,
 			pullOrb: gb_contract_v2_pullOrb,
 			buildPullOrbCalldata: build_gb_contract_v2_pullOrb_calldata,
+			pullSpecific: gb_contract_v2_pullSpecific,
+			buildPullSpecificCalldata: build_gb_contract_v2_pullSpecific_calldata,
 			startGame: gb_contract_v2_startGame,
 			buildStartGameCalldata: build_gb_contract_v2_startGame_calldata,
 		},

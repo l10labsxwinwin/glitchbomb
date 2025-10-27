@@ -41,9 +41,11 @@
 		game: Game;
 		onStartGame?: (gameId: number) => void;
 		onPullOrb?: (gameId: number) => void;
+		onPullSpecificOrb?: (gameId: number, orbIndex: number) => void;
 		onCashOut?: () => void;
 		startingGames?: Map<number, boolean>;
 		pullingOrbs?: Map<number, boolean>;
+		pullingSpecificOrbs?: Map<string, boolean>;
 		cashingOut?: boolean;
 	}
 
@@ -51,9 +53,11 @@
 		game,
 		onStartGame,
 		onPullOrb,
+		onPullSpecificOrb,
 		onCashOut,
 		startingGames = new Map(),
 		pullingOrbs = new Map(),
+		pullingSpecificOrbs = new Map(),
 		cashingOut = false
 	}: Props = $props();
 
@@ -154,8 +158,15 @@
 			</div>
 			{#if game.data.pullable_orbs.length > 0}
 				<div class="space-y-1 text-sm">
-					{#each game.data.pullable_orbs as orb}
-						<div class="bg-black/50 px-2 py-1 rounded">{formatOrbEffect(orb)}</div>
+					{#each game.data.pullable_orbs as orb, index}
+						{@const key = `${game.game_id}-${index}`}
+						<button
+							onclick={() => onPullSpecificOrb?.(game.game_id, index)}
+							disabled={pullingSpecificOrbs.get(key)}
+							class="w-full bg-black/50 hover:bg-purple-600/30 px-2 py-1 rounded text-left disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+						>
+							{pullingSpecificOrbs.get(key) ? 'Pulling...' : formatOrbEffect(orb)}
+						</button>
 					{/each}
 				</div>
 			{:else}
@@ -185,7 +196,7 @@
 		{#if onStartGame}
 			<button
 				onclick={() => onStartGame?.(game.game_id)}
-				disabled={startingGames.get(game.game_id) || game.state !== 'New'}
+				disabled={startingGames.get(game.game_id)}
 				class="px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
 			>
 				{startingGames.get(game.game_id) ? 'Starting...' : 'Start Game'}
@@ -194,7 +205,7 @@
 		{#if onPullOrb}
 			<button
 				onclick={() => onPullOrb?.(game.game_id)}
-				disabled={pullingOrbs.get(game.game_id) || game.data.hp === 0}
+				disabled={pullingOrbs.get(game.game_id)}
 				class="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
 			>
 				{pullingOrbs.get(game.game_id) ? 'Pulling...' : 'Pull Orb'}
@@ -203,7 +214,7 @@
 		{#if onCashOut}
 			<button
 				onclick={onCashOut}
-				disabled={cashingOut || game.data.points === 0}
+				disabled={cashingOut}
 				class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
 			>
 				{cashingOut ? 'Cashing Out...' : 'Cash Out'}
