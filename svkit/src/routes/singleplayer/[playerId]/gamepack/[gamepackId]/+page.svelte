@@ -11,6 +11,7 @@
 	import { toasts } from '$lib/stores/toast';
 	import BurnerWalletBar from '$lib/components/BurnerWalletBar.svelte';
 	import GameCard from '$lib/components/GameCard.svelte';
+	import ShopCard from '$lib/components/ShopCard.svelte';
 
 	const playerId = $derived($page.params.playerId);
 	const gamepackId = $derived($page.params.gamepackId);
@@ -168,6 +169,9 @@
 						gamepack_id
 						game_id
 						non_buyable {
+							count
+							base_price
+							current_price
 							effect {
 								Point
 								PointPerOrbRemaining
@@ -182,6 +186,9 @@
 							}
 						}
 						common {
+							count
+							base_price
+							current_price
 							effect {
 								Point
 								PointPerOrbRemaining
@@ -196,6 +203,9 @@
 							}
 						}
 						rare {
+							count
+							base_price
+							current_price
 							effect {
 								Point
 								PointPerOrbRemaining
@@ -210,6 +220,9 @@
 							}
 						}
 						cosmic {
+							count
+							base_price
+							current_price
 							effect {
 								Point
 								PointPerOrbRemaining
@@ -294,6 +307,9 @@
 						gamepack_id
 						game_id
 						non_buyable {
+							count
+							base_price
+							current_price
 							effect {
 								Point
 								PointPerOrbRemaining
@@ -308,6 +324,9 @@
 							}
 						}
 						common {
+							count
+							base_price
+							current_price
 							effect {
 								Point
 								PointPerOrbRemaining
@@ -322,6 +341,9 @@
 							}
 						}
 						rare {
+							count
+							base_price
+							current_price
 							effect {
 								Point
 								PointPerOrbRemaining
@@ -336,6 +358,9 @@
 							}
 						}
 						cosmic {
+							count
+							base_price
+							current_price
 							effect {
 								Point
 								PointPerOrbRemaining
@@ -367,6 +392,8 @@
 	let startingGames = $state(new Map<number, boolean>());
 	let pullingOrbs = $state(new Map<number, boolean>());
 	let pullingSpecificOrbs = $state(new Map<string, boolean>());
+	let buyingOrbs = $state(new Map<number, boolean>());
+	let enteringShop = $state(false);
 	let cashingOut = $state(false);
 	let startingNextGame = $state(false);
 
@@ -552,6 +579,25 @@
 		}
 	}
 
+	async function enterShop() {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		enteringShop = true;
+		try {
+			console.log('Entering shop...');
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.enterShop($account, gamepackIdInt);
+			console.log('✅ Entered shop!', result);
+			toasts.add('Entered shop successfully!', 'success');
+		} catch (err) {
+			console.error('Failed to enter shop:', err);
+			toasts.add('Failed to enter shop', 'error');
+		} finally {
+			enteringShop = false;
+		}
+	}
+
 	async function cashOut() {
 		if (!$account || !$dojoProvider || !gamepackId) return;
 
@@ -568,6 +614,25 @@
 			toasts.add('Failed to cash out', 'error');
 		} finally {
 			cashingOut = false;
+		}
+	}
+
+	async function buyOrb(orbId: number) {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		buyingOrbs.set(orbId, true);
+		try {
+			console.log(`Buying orb ${orbId}...`);
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.buyOrb($account, gamepackIdInt, orbId);
+			console.log('✅ Orb bought!', result);
+			toasts.add(`Orb ${orbId} bought successfully!`, 'success');
+		} catch (err) {
+			console.error('Failed to buy orb:', err);
+			toasts.add('Failed to buy orb', 'error');
+		} finally {
+			buyingOrbs.delete(orbId);
 		}
 	}
 
@@ -657,10 +722,12 @@
 									onStartGame={startGame}
 									onPullOrb={pullOrb}
 									onPullSpecificOrb={pullSpecificOrb}
+									onEnterShop={enterShop}
 									onCashOut={cashOut}
 									{startingGames}
 									{pullingOrbs}
 									{pullingSpecificOrbs}
+									{enteringShop}
 									{cashingOut}
 								/>
 							{/each}
@@ -670,38 +737,18 @@
 					{/if}
 				</div>
 
-				<div>
-					<h2 class="text-2xl font-bold mb-4">Orbs ({orbs.length})</h2>
-					{#if orbs.length > 0}
-						<div class="space-y-4">
-							{#each orbs as orb}
-								<div class="bg-black/30 border border-white/10 p-4 rounded-lg">
-									<h3 class="font-bold mb-3">Game #{orb.game_id} Orbs</h3>
-									<div class="grid grid-cols-4 gap-3 text-sm">
-										<div>
-											<div class="opacity-60">Non-Buyable:</div>
-											<div>{orb.non_buyable.length}</div>
-										</div>
-										<div>
-											<div class="opacity-60">Common:</div>
-											<div>{orb.common.length}</div>
-										</div>
-										<div>
-											<div class="opacity-60">Rare:</div>
-											<div>{orb.rare.length}</div>
-										</div>
-										<div>
-											<div class="opacity-60">Cosmic:</div>
-											<div>{orb.cosmic.length}</div>
-										</div>
-									</div>
-								</div>
-							{/each}
-						</div>
-					{:else}
-						<p class="opacity-60 text-sm">No orbs found</p>
-					{/if}
-				</div>
+			<div>
+				<h2 class="text-2xl font-bold mb-4">Shop ({orbs.length})</h2>
+				{#if orbs.length > 0}
+					<div class="space-y-4">
+						{#each orbs as orb}
+							<ShopCard {orb} onBuyOrb={buyOrb} {buyingOrbs} />
+						{/each}
+					</div>
+				{:else}
+					<p class="opacity-60 text-sm">No shop available</p>
+				{/if}
+			</div>
 			</div>
 		{:else}
 			<p class="opacity-60">Gamepack not found</p>

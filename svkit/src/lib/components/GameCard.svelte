@@ -42,10 +42,12 @@
 		onStartGame?: (gameId: number) => void;
 		onPullOrb?: (gameId: number) => void;
 		onPullSpecificOrb?: (gameId: number, orbIndex: number) => void;
+		onEnterShop?: () => void;
 		onCashOut?: () => void;
 		startingGames?: Map<number, boolean>;
 		pullingOrbs?: Map<number, boolean>;
 		pullingSpecificOrbs?: Map<string, boolean>;
+		enteringShop?: boolean;
 		cashingOut?: boolean;
 	}
 
@@ -54,10 +56,12 @@
 		onStartGame,
 		onPullOrb,
 		onPullSpecificOrb,
+		onEnterShop,
 		onCashOut,
 		startingGames = new Map(),
 		pullingOrbs = new Map(),
 		pullingSpecificOrbs = new Map(),
+		enteringShop = false,
 		cashingOut = false
 	}: Props = $props();
 
@@ -209,6 +213,15 @@
 				class="px-4 py-2 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
 			>
 				{pullingOrbs.get(game.game_id) ? 'Pulling...' : 'Pull Orb'}
+			</button>
+		{/if}
+		{#if onEnterShop}
+			<button
+				onclick={onEnterShop}
+				disabled={enteringShop}
+				class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
+			>
+				{enteringShop ? 'Entering...' : 'Enter Shop'}
 			</button>
 		{/if}
 		{#if onCashOut}
