@@ -5,18 +5,38 @@
 
 	let { consumedOrbs }: Props = $props();
 
-	function getOrbInitials(orb: any): { initials: string; value: number } | null {
-		if (!orb) return null;
-		if (orb.Point != null) return { initials: 'P', value: orb.Point };
-		if (orb.PointPerOrbRemaining != null) return { initials: 'PPO', value: orb.PointPerOrbRemaining };
-		if (orb.PointPerBombPulled != null) return { initials: 'PPB', value: orb.PointPerBombPulled };
-		if (orb.GlitchChips != null) return { initials: 'GC', value: orb.GlitchChips };
-		if (orb.Moonrocks != null) return { initials: 'MR', value: orb.Moonrocks };
-		if (orb.Health != null) return { initials: 'H', value: orb.Health };
-		if (orb.Bomb != null) return { initials: 'B', value: orb.Bomb };
-		if (orb.Multiplier != null) return { initials: 'X', value: orb.Multiplier };
-		if (orb.BombImmunity != null) return { initials: 'BI', value: orb.BombImmunity };
-		return null;
+	function getOrbInitials(orb: any): { initials: string; value: number | string } | null {
+		if (!orb || !orb.option) return null;
+		const option = orb.option;
+		
+		switch (option) {
+			case 'Empty':
+				return { initials: 'E', value: '-' };
+			case 'PointRewind':
+				return { initials: 'PR', value: '-' };
+			case 'FiveOrDie':
+				return { initials: '5D', value: '-' };
+			case 'Point':
+				return { initials: 'P', value: orb.Point ?? 0 };
+			case 'PointPerOrbRemaining':
+				return { initials: 'PPO', value: orb.PointPerOrbRemaining ?? 0 };
+			case 'PointPerBombPulled':
+				return { initials: 'PPB', value: orb.PointPerBombPulled ?? 0 };
+			case 'GlitchChips':
+				return { initials: 'GC', value: orb.GlitchChips ?? 0 };
+			case 'Moonrocks':
+				return { initials: 'MR', value: orb.Moonrocks ?? 0 };
+			case 'Health':
+				return { initials: 'H', value: orb.Health ?? 0 };
+			case 'Bomb':
+				return { initials: 'B', value: orb.Bomb ?? 0 };
+			case 'Multiplier':
+				return { initials: 'X', value: orb.Multiplier ?? 0 };
+			case 'BombImmunity':
+				return { initials: 'BI', value: orb.BombImmunity ?? 0 };
+			default:
+				return null;
+		}
 	}
 </script>
 

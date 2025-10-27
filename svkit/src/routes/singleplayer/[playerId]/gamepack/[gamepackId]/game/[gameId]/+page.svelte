@@ -26,6 +26,12 @@
 		}
 	});
 
+	$effect(() => {
+		if (game && game.state === 'Shop') {
+			goto(`/singleplayer/${playerId}/gamepack/${gamepackId}/game/${gameId}/shop`);
+		}
+	});
+
 
 
 	const GET_GAMEPACK = gql`

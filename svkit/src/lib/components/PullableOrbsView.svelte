@@ -32,18 +32,38 @@
 		}
 	}
 
-	function getOrbEffect(orb: any | null): { type: string; value: number } | null {
-		if (!orb) return null;
-		if (orb.Point != null) return { type: 'Points', value: orb.Point };
-		if (orb.PointPerOrbRemaining != null) return { type: 'Pts/Orb', value: orb.PointPerOrbRemaining };
-		if (orb.PointPerBombPulled != null) return { type: 'Pts/Bomb', value: orb.PointPerBombPulled };
-		if (orb.GlitchChips != null) return { type: 'Chips', value: orb.GlitchChips };
-		if (orb.Moonrocks != null) return { type: 'Moonrocks', value: orb.Moonrocks };
-		if (orb.Health != null) return { type: 'Health', value: orb.Health };
-		if (orb.Bomb != null) return { type: 'Bomb', value: orb.Bomb };
-		if (orb.Multiplier != null) return { type: 'Multiplier', value: orb.Multiplier };
-		if (orb.BombImmunity != null) return { type: 'Immunity', value: orb.BombImmunity };
-		return null;
+	function getOrbEffect(orb: any | null): { type: string; value: number | string } | null {
+		if (!orb || !orb.option) return null;
+		const option = orb.option;
+		
+		switch (option) {
+			case 'Empty':
+				return { type: 'Empty', value: '-' };
+			case 'PointRewind':
+				return { type: 'Pt Rewind', value: '-' };
+			case 'FiveOrDie':
+				return { type: '5 or Die', value: '-' };
+			case 'Point':
+				return { type: 'Points', value: orb.Point ?? 0 };
+			case 'PointPerOrbRemaining':
+				return { type: 'Pts/Orb', value: orb.PointPerOrbRemaining ?? 0 };
+			case 'PointPerBombPulled':
+				return { type: 'Pts/Bomb', value: orb.PointPerBombPulled ?? 0 };
+			case 'GlitchChips':
+				return { type: 'Chips', value: orb.GlitchChips ?? 0 };
+			case 'Moonrocks':
+				return { type: 'Moonrocks', value: orb.Moonrocks ?? 0 };
+			case 'Health':
+				return { type: 'Health', value: orb.Health ?? 0 };
+			case 'Bomb':
+				return { type: 'Bomb', value: orb.Bomb ?? 0 };
+			case 'Multiplier':
+				return { type: 'Multiplier', value: orb.Multiplier ?? 0 };
+			case 'BombImmunity':
+				return { type: 'Immunity', value: orb.BombImmunity ?? 0 };
+			default:
+				return null;
+		}
 	}
 </script>
 
