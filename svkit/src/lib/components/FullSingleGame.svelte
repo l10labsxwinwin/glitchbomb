@@ -19,9 +19,11 @@
 		pullingOrb: boolean;
 		cashingOut: boolean;
 		enteringShop: boolean;
+		pullSpecificOrb: (orbIndex: number) => Promise<void>;
+		pullingSpecificOrbs: Map<number, boolean>;
 	}
 
-	let { gamepack, game, orbs, loading, error, openGamepack, startGame, openingGamepack, startingGame, pullOrb, cashOut, enterShop, pullingOrb, cashingOut, enteringShop }: Props = $props();
+	let { gamepack, game, orbs, loading, error, openGamepack, startGame, openingGamepack, startingGame, pullOrb, cashOut, enterShop, pullingOrb, cashingOut, enteringShop, pullSpecificOrb, pullingSpecificOrbs }: Props = $props();
 </script>
 
 <div class="min-h-screen flex flex-col">
@@ -66,7 +68,7 @@
 				<div class="space-y-6">
 					<SingleGameStats {game} />
 					<InLevelActions onPullOrb={pullOrb} onCashOut={cashOut} onEnterShop={enterShop} {pullingOrb} {cashingOut} {enteringShop} />
-					<PullableOrbsView pullableOrbs={game.data.pullable_orbs} />
+					<PullableOrbsView pullableOrbs={game.data.pullable_orbs} onPullSpecific={pullSpecificOrb} {pullingSpecificOrbs} />
 				</div>
 			{:else}
 				<p class="opacity-60">No data available</p>

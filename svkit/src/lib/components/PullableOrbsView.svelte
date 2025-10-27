@@ -1,9 +1,11 @@
 <script lang="ts">
 	interface Props {
 		pullableOrbs: any[];
+		onPullSpecific: (orbIndex: number) => Promise<void>;
+		pullingSpecificOrbs: Map<number, boolean>;
 	}
 
-	let { pullableOrbs }: Props = $props();
+	let { pullableOrbs, onPullSpecific, pullingSpecificOrbs }: Props = $props();
 
 	let currentPage = $state(0);
 	const orbsPerPage = 9;
@@ -46,47 +48,53 @@
 </script>
 
 <div>
-	<h2 class="text-xl font-bold mb-4">Pullable Orbs</h2>
-	<div class="flex items-center gap-2">
+	<div class="flex items-center justify-between mb-4">
+		<h2 class="text-xl font-bold">Pullable Orbs</h2>
 		{#if totalPages > 1}
-			<button
-				onclick={prevPage}
-				disabled={currentPage === 0}
-				class="flex-shrink-0 px-2 py-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed rounded text-xl"
-			>
-				&lt;
-			</button>
+			<div class="flex items-center gap-2">
+				<button
+					onclick={prevPage}
+					disabled={currentPage === 0}
+					class="px-3 py-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed rounded text-lg"
+				>
+					&lt;
+				</button>
+				<span class="text-sm opacity-60">{currentPage + 1}</span>
+				<button
+					onclick={nextPage}
+					disabled={currentPage === totalPages - 1}
+					class="px-3 py-1 bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed rounded text-lg"
+				>
+					&gt;
+				</button>
+			</div>
 		{/if}
-		<div class="flex-1 bg-black/30 border border-white/10 p-3 rounded-lg">
-			<div class="grid grid-cols-3 gap-3">
-				{#each currentOrbs() as orb, i}
-					{@const effect = getOrbEffect(orb)}
-					{#if effect}
-						<div class="aspect-square bg-black/50 p-3 rounded border border-white/10 flex flex-col items-center justify-center">
+	</div>
+	<div class="bg-black/30 border border-white/10 p-3 rounded-lg">
+		<div class="grid grid-cols-3 gap-3">
+			{#each currentOrbs() as orb, i}
+				{@const effect = getOrbEffect(orb)}
+				{@const orbIndex = currentPage * orbsPerPage + i}
+				{@const isPulling = pullingSpecificOrbs.get(orbIndex) || false}
+				{#if effect}
+					<button
+						onclick={() => onPullSpecific(orbIndex)}
+						disabled={isPulling}
+						class="aspect-square bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed p-3 rounded border border-white/10 flex flex-col items-center justify-center transition-colors"
+					>
+						{#if isPulling}
+							<div class="text-xs opacity-80">Pulling...</div>
+						{:else}
 							<div class="text-xl font-bold mb-1">{effect.value}</div>
 							<div class="text-xs opacity-80">{effect.type}</div>
-						</div>
-					{:else}
-						<div class="aspect-square bg-black/20 p-3 rounded border border-white/5 flex items-center justify-center">
-							<div class="opacity-30 text-sm">Empty</div>
-						</div>
-					{/if}
-				{/each}
-			</div>
-			{#if totalPages > 1}
-				<div class="text-center mt-3 text-xs opacity-60">
-					Page {currentPage + 1} of {totalPages}
-				</div>
-			{/if}
+						{/if}
+					</button>
+				{:else}
+					<div class="aspect-square bg-black/20 p-3 rounded border border-white/5 flex items-center justify-center">
+						<div class="opacity-30 text-sm">Empty</div>
+					</div>
+				{/if}
+			{/each}
 		</div>
-		{#if totalPages > 1}
-			<button
-				onclick={nextPage}
-				disabled={currentPage === totalPages - 1}
-				class="flex-shrink-0 px-2 py-8 flex items-center justify-center bg-gray-700 hover:bg-gray-600 disabled:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed rounded text-xl"
-			>
-				&gt;
-			</button>
-		{/if}
 	</div>
 </div>

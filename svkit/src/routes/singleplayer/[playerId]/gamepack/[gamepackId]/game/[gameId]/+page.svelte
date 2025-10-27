@@ -437,6 +437,7 @@
 	let pullingOrb = $state(false);
 	let cashingOut = $state(false);
 	let enteringShop = $state(false);
+	let pullingSpecificOrbs = $state(new Map<number, boolean>());
 
 	async function openGamepack() {
 		if (!$account || !$dojoProvider || !gamepackId) return;
@@ -495,6 +496,25 @@
 		}
 	}
 
+	async function pullSpecificOrb(orbIndex: number) {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		pullingSpecificOrbs.set(orbIndex, true);
+		try {
+			console.log(`Pulling orb at index ${orbIndex}...`);
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.pullSpecific($account, gamepackIdInt, orbIndex);
+			console.log('✅ Specific orb pulled!', result);
+			toasts.add(`Orb ${orbIndex + 1} pulled successfully!`, 'success');
+		} catch (err) {
+			console.error('Failed to pull specific orb:', err);
+			toasts.add('Failed to pull orb', 'error');
+		} finally {
+			pullingSpecificOrbs.delete(orbIndex);
+		}
+	}
+
 	async function cashOut() {
 		if (!$account || !$dojoProvider || !gamepackId) return;
 
@@ -534,4 +554,4 @@
 	}
 </script>
 
-<FullSingleGame {gamepack} {game} {orbs} {loading} {error} {openGamepack} {startGame} {openingGamepack} {startingGame} {pullOrb} {cashOut} {enterShop} {pullingOrb} {cashingOut} {enteringShop} />
+<FullSingleGame {gamepack} {game} {orbs} {loading} {error} {openGamepack} {startGame} {openingGamepack} {startingGame} {pullOrb} {cashOut} {enterShop} {pullingOrb} {cashingOut} {enteringShop} {pullSpecificOrb} {pullingSpecificOrbs} />
