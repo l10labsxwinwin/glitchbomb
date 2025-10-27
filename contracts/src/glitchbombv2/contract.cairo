@@ -10,6 +10,7 @@ pub trait PlayerActionsV2<T> {
     fn enter_shop(ref self: T, gamepack_id: u32);
     fn buy_orb(ref self: T, gamepack_id: u32, orb_id: u32);
     fn next_level(ref self: T, gamepack_id: u32);
+    fn next_game(ref self: T, gamepack_id: u32);
 }
 
 #[dojo::contract]
@@ -334,6 +335,48 @@ pub mod gb_contract_v2 {
             game.data.pullable_orbs = pullable_orbs;
 
             world.write_model(@game);
+        }
+
+        fn next_game(ref self: ContractState, gamepack_id: u32) {
+            let mut world = self.world_default();
+            let player_id = get_caller_address();
+
+            let mut gamepack: GamePack = world.read_model((player_id, gamepack_id));
+            let current_game: Game = world
+                .read_model((player_id, gamepack_id, gamepack.data.current_game_id));
+
+            // Verify current game is in GameOver state
+            assert!(current_game.state == GameState::GameOver, "Current game must be in GameOver state");
+
+            let action = GamePackAction::NextGame;
+
+            let (new_gamepack_state, new_gamepack_data) =
+                match update_gamepack(gamepack.state, gamepack.data, action) {
+                Result::Ok(result) => result,
+                Result::Err(err) => panic!("{:?}", err),
+            };
+
+            gamepack.state = new_gamepack_state;
+            gamepack.data = new_gamepack_data;
+
+            // If gamepack completed, save and exit
+            if new_gamepack_state == GamePackState::Completed {
+                world.write_model(@gamepack);
+                panic!("GamePack completed - maximum games reached");
+            }
+
+            // Create new game with incremented game_id
+            let mut new_game = Game {
+                player_id,
+                gamepack_id: gamepack.gamepack_id,
+                game_id: new_gamepack_data.current_game_id,
+                state: GameState::New,
+                data: new_game_data(),
+            };
+            new_game.data.temp_moonrocks = gamepack.data.accumulated_moonrocks;
+
+            world.write_model(@gamepack);
+            world.write_model(@new_game);
         }
     }
 

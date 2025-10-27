@@ -5,7 +5,7 @@ pub const GAMEPACK_PRICE: u32 = 1;
 
 pub const INITIAL_GAME_ID: u32 = 1;
 pub const INITIAL_MOONROCKS: u32 = 100;
-pub const MAX_GAMES_PER_PACK: u32 = 10;
+pub const MAX_GAMES_PER_PACK: u32 = 3;
 
 // Will not use to avoid out of bound indexing
 // pub const MILESTONES: [u32; 7] = [12, 18, 28, 44, 70, 100, 150];

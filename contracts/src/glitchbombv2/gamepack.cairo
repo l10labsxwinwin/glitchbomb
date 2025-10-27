@@ -25,6 +25,7 @@ pub fn new_gamepack_data() -> GamePackData {
 #[derive(Drop, Serde, Debug, Copy)]
 pub enum GamePackAction {
     OpenPack,
+    NextGame,
     SubmitScore,
 }
 
@@ -46,6 +47,18 @@ pub fn update_gamepack(
         (
             GamePackState::Unopened, GamePackAction::OpenPack,
         ) => { Ok((GamePackState::InProgress, data)) },
+        (
+            GamePackState::InProgress, GamePackAction::NextGame,
+        ) => {
+            let next_game_id = data.current_game_id + 1;
+            if next_game_id > MAX_GAMES_PER_PACK {
+                Ok((GamePackState::Completed, data))
+            } else {
+                let mut new_data = data;
+                new_data.current_game_id = next_game_id;
+                Ok((GamePackState::InProgress, new_data))
+            }
+        },
         (
             GamePackState::InProgress, GamePackAction::SubmitScore,
         ) => {

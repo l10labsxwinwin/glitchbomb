@@ -1479,8 +1479,8 @@
   },
   "contracts": [
     {
-      "address": "0x2b29dd7930ad309988c60c2253b28c9d5fcfd963cf7465e012199bbe0e9bcef",
-      "class_hash": "0x9aa58d81b08f990ddb5d0920b50e2516dc9447a733c60931ef256581b8983c",
+      "address": "0x507bc54eb9480a54d3e60d9ada0749582d31d5ee480057f14f2620b088180ed",
+      "class_hash": "0x587f946f0455607b38010cf227f677e1a92cda47483503340221481aa4736e9",
       "abi": [
         {
           "type": "impl",
@@ -1672,6 +1672,18 @@
               ],
               "outputs": [],
               "state_mutability": "external"
+            },
+            {
+              "type": "function",
+              "name": "next_game",
+              "inputs": [
+                {
+                  "name": "gamepack_id",
+                  "type": "core::integer::u32"
+                }
+              ],
+              "outputs": [],
+              "state_mutability": "external"
             }
           ]
         },
@@ -1804,6 +1816,7 @@
         "enter_shop",
         "buy_orb",
         "next_level",
+        "next_game",
         "upgrade"
       ]
     }

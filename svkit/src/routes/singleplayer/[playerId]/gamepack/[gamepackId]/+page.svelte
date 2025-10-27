@@ -357,7 +357,7 @@
 
 	let gamepack = $state<GamePack | null>(null);
 	let gameMap = new SvelteMap<string, Game>();
-	let games = $derived(Array.from(gameMap.values()));
+	let games = $derived(Array.from(gameMap.values()).sort((a, b) => b.game_id - a.game_id));
 	let orbsMap = new SvelteMap<string, OrbsInGame>();
 	let orbs = $derived(Array.from(orbsMap.values()));
 	let loading = $state(true);
@@ -367,6 +367,7 @@
 	let startingGames = $state(new Map<number, boolean>());
 	let pullingOrbs = $state(new Map<number, boolean>());
 	let cashingOut = $state(false);
+	let startingNextGame = $state(false);
 
 	async function loadGamepackData() {
 		if (!gamepackId || !accountReady) return;
@@ -548,6 +549,25 @@
 			cashingOut = false;
 		}
 	}
+
+	async function nextGame() {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		startingNextGame = true;
+		try {
+			console.log('Starting next game...');
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.nextGame($account, gamepackIdInt);
+			console.log('✅ Next game created!', result);
+			toasts.add('Next game started! You can now play again.', 'success');
+		} catch (err) {
+			console.error('Failed to start next game:', err);
+			toasts.add('Failed to start next game', 'error');
+		} finally {
+			startingNextGame = false;
+		}
+	}
 </script>
 
 <div class="min-h-screen flex flex-col">
@@ -587,6 +607,7 @@
 								<div>{gamepack.data.accumulated_moonrocks}</div>
 							</div>
 						</div>
+					<div class="flex gap-4">
 						<button
 							onclick={openGamepack}
 							disabled={openingGamepack || gamepack.state !== 'Unopened'}
@@ -594,6 +615,16 @@
 						>
 							{openingGamepack ? 'Opening...' : 'Open Gamepack'}
 						</button>
+						{#if gamepack.state === 'InProgress' && games.length > 0 && games[0].state === 'GameOver'}
+							<button
+								onclick={nextGame}
+								disabled={startingNextGame}
+								class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
+							>
+								{startingNextGame ? 'Starting...' : 'Start Next Game'}
+							</button>
+						{/if}
+					</div>
 					</div>
 				</div>
 
