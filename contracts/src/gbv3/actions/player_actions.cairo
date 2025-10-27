@@ -12,6 +12,7 @@ pub trait IPlayerActions<T> {
     fn enter_shop(ref self: T, gamepack_id: u32);
     fn buy_orb(ref self: T, gamepack_id: u32, orb_id: u32);
     fn next_level(ref self: T, gamepack_id: u32);
+    fn next_game(ref self: T, gamepack_id: u32);
 }
 
 #[dojo::contract]
@@ -25,7 +26,7 @@ pub mod player_actions {
     use crate::gbv3::models::gamepack::GamePack;
     use crate::gbv3::models::game::{Game, OrbsInGame};
     use crate::gbv3::models::enums::GameState;
-    use crate::gbv3::constants::{GAMEPACK_PRICE, level_cost_in_moonrocks};
+    use crate::gbv3::constants::{GAMEPACK_PRICE, level_cost_in_moonrocks, MAX_GAMES_PER_PACK};
 
     use crate::gbv3::systems::player_system::PlayerSystemTrait;
     use crate::gbv3::systems::currency_system::CurrencySystemTrait;
@@ -286,6 +287,38 @@ pub mod player_actions {
             game.data.pullable_orbs = pullable_orbs;
 
             GameSystemTrait::save_game(ref world, @game);
+        }
+
+        fn next_game(ref self: ContractState, gamepack_id: u32) {
+            let mut world = self.world_default();
+            let player_address = get_caller_address();
+
+            let mut gamepack: GamePack = world.read_model((player_address, gamepack_id));
+            let current_game: Game = world
+                .read_model((player_address, gamepack_id, gamepack.data.current_game_id));
+
+            if current_game.state != GameState::GameOver {
+                panic!("Current game must be in GameOver state");
+            }
+
+            let next_game_id = gamepack.data.current_game_id + 1;
+
+            if next_game_id > MAX_GAMES_PER_PACK {
+                match GamePackSystemTrait::complete_gamepack(ref gamepack) {
+                    Result::Ok(_) => {},
+                    Result::Err(err) => panic!("{:?}", err),
+                };
+                GamePackSystemTrait::save_gamepack(ref world, @gamepack);
+                panic!("GamePack completed - maximum games reached");
+            }
+
+            gamepack.data.current_game_id = next_game_id;
+
+            let _new_game = GameSystemTrait::create_game(
+                ref world, player_address, gamepack_id, next_game_id, gamepack.data.accumulated_moonrocks,
+            );
+
+            GamePackSystemTrait::save_gamepack(ref world, @gamepack);
         }
     }
 

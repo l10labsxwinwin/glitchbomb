@@ -42,9 +42,11 @@
 		onStartGame?: (gameId: number) => void;
 		onPullOrb?: (gameId: number) => void;
 		onCashOut?: () => void;
+		onNextGame?: () => void;
 		startingGames?: Map<number, boolean>;
 		pullingOrbs?: Map<number, boolean>;
 		cashingOut?: boolean;
+		startingNextGame?: boolean;
 	}
 
 	let {
@@ -52,9 +54,11 @@
 		onStartGame,
 		onPullOrb,
 		onCashOut,
+		onNextGame,
 		startingGames = new Map(),
 		pullingOrbs = new Map(),
-		cashingOut = false
+		cashingOut = false,
+		startingNextGame = false
 	}: Props = $props();
 
 	function formatOrbEffect(orb: OrbEffect): string {
@@ -181,7 +185,7 @@
 	</div>
 
 	<!-- Action Buttons -->
-	<div class="flex gap-2">
+	<div class="flex gap-2 flex-wrap">
 		{#if onStartGame}
 			<button
 				onclick={() => onStartGame?.(game.game_id)}
@@ -207,6 +211,15 @@
 				class="px-4 py-2 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
 			>
 				{cashingOut ? 'Cashing Out...' : 'Cash Out'}
+			</button>
+		{/if}
+		{#if onNextGame && game.state === 'GameOver'}
+			<button
+				onclick={onNextGame}
+				disabled={startingNextGame}
+				class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
+			>
+				{startingNextGame ? 'Starting Next Game...' : '🎮 Start Next Game'}
 			</button>
 		{/if}
 	</div>

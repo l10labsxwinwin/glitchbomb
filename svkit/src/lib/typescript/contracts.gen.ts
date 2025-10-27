@@ -130,6 +130,27 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
+	const build_player_actions_nextGame_calldata = (gamepackId: BigNumberish): DojoCall => {
+		return {
+			contractName: "player_actions",
+			entrypoint: "next_game",
+			calldata: [gamepackId],
+		};
+	};
+
+	const player_actions_nextGame = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
+		try {
+			return await provider.execute(
+				snAccount,
+				build_player_actions_nextGame_calldata(gamepackId),
+				"glitchbomb",
+			);
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	};
+
 	const build_player_actions_nextLevel_calldata = (gamepackId: BigNumberish): DojoCall => {
 		return {
 			contractName: "player_actions",
@@ -230,6 +251,8 @@ export function setupWorld(provider: DojoProvider) {
 			buildConfirmFiveOrDieCalldata: build_player_actions_confirmFiveOrDie_calldata,
 			enterShop: player_actions_enterShop,
 			buildEnterShopCalldata: build_player_actions_enterShop_calldata,
+			nextGame: player_actions_nextGame,
+			buildNextGameCalldata: build_player_actions_nextGame_calldata,
 			nextLevel: player_actions_nextLevel,
 			buildNextLevelCalldata: build_player_actions_nextLevel_calldata,
 			openGamepack: player_actions_openGamepack,

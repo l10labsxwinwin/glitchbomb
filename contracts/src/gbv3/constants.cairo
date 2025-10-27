@@ -5,7 +5,7 @@ pub const GAMEPACK_PRICE: u32 = 1;
 
 pub const INITIAL_GAME_ID: u32 = 1;
 pub const INITIAL_MOONROCKS: u32 = 100;
-pub const MAX_GAMES_PER_PACK: u32 = 10;
+pub const MAX_GAMES_PER_PACK: u32 = 3;
 
 pub const PRICE_INCREASE_PERCENTAGE: u32 = 20;
 

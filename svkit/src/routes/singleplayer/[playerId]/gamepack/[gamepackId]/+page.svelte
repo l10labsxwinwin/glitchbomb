@@ -357,9 +357,9 @@
 
 	let gamepack = $state<GamePack | null>(null);
 	let gameMap = new SvelteMap<string, Game>();
-	let games = $derived(Array.from(gameMap.values()));
+	let games = $derived(Array.from(gameMap.values()).sort((a, b) => b.game_id - a.game_id));
 	let orbsMap = new SvelteMap<string, OrbsInGame>();
-	let orbs = $derived(Array.from(orbsMap.values()));
+	let orbs = $derived(Array.from(orbsMap.values()).sort((a, b) => b.game_id - a.game_id));
 	let loading = $state(true);
 	let error = $state<string | null>(null);
 	let subscription: any = null;
@@ -367,6 +367,7 @@
 	let startingGames = $state(new Map<number, boolean>());
 	let pullingOrbs = $state(new Map<number, boolean>());
 	let cashingOut = $state(false);
+	let startingNextGame = $state(false);
 
 	async function loadGamepackData() {
 		if (!gamepackId || !accountReady) return;
@@ -548,6 +549,25 @@
 			cashingOut = false;
 		}
 	}
+
+	async function nextGame() {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		startingNextGame = true;
+		try {
+			console.log('Starting next game...');
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.player_actions.nextGame($account, gamepackIdInt);
+			console.log('✅ Next game created!', result);
+			toasts.add('Next game started! You can now play again.', 'success');
+		} catch (err) {
+			console.error('Failed to start next game:', err);
+			toasts.add('Failed to start next game', 'error');
+		} finally {
+			startingNextGame = false;
+		}
+	}
 </script>
 
 <div class="min-h-screen flex flex-col">
@@ -607,9 +627,11 @@
 									onStartGame={startGame}
 									onPullOrb={pullOrb}
 									onCashOut={cashOut}
+									onNextGame={nextGame}
 									{startingGames}
 									{pullingOrbs}
 									{cashingOut}
+									{startingNextGame}
 								/>
 							{/each}
 						</div>
