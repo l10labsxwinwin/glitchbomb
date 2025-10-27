@@ -1479,12 +1479,12 @@
   },
   "contracts": [
     {
-      "address": "0x2b29dd7930ad309988c60c2253b28c9d5fcfd963cf7465e012199bbe0e9bcef",
-      "class_hash": "0x9aa58d81b08f990ddb5d0920b50e2516dc9447a733c60931ef256581b8983c",
+      "address": "0x5f4508bfc11f223dda8e938393eae80f7cef650c3d43704d1ef5ffbc6b71860",
+      "class_hash": "0x161e21f03e14d8c5367993337503ff35d559b4fd821f03a67846d14e7489a2b",
       "abi": [
         {
           "type": "impl",
-          "name": "gb_contract_v2__ContractImpl",
+          "name": "player_actions__ContractImpl",
           "interface_name": "dojo::contract::interface::IContract"
         },
         {
@@ -1534,8 +1534,8 @@
         },
         {
           "type": "impl",
-          "name": "PlayerActionsV2Impl",
-          "interface_name": "glitchbomb::glitchbombv2::contract::PlayerActionsV2"
+          "name": "PlayerActionsImpl",
+          "interface_name": "glitchbomb::gbv3::actions::player_actions::IPlayerActions"
         },
         {
           "type": "enum",
@@ -1553,7 +1553,7 @@
         },
         {
           "type": "interface",
-          "name": "glitchbomb::glitchbombv2::contract::PlayerActionsV2",
+          "name": "glitchbomb::gbv3::actions::player_actions::IPlayerActions",
           "items": [
             {
               "type": "function",
@@ -1774,7 +1774,7 @@
         },
         {
           "type": "event",
-          "name": "glitchbomb::glitchbombv2::contract::gb_contract_v2::Event",
+          "name": "glitchbomb::gbv3::actions::player_actions::player_actions::Event",
           "kind": "enum",
           "variants": [
             {
@@ -1791,8 +1791,8 @@
         }
       ],
       "init_calldata": [],
-      "tag": "glitchbomb-gb_contract_v2",
-      "selector": "0x7852d7f9504b09ffb2334af7c715e1dc03bfad56fb32f91d50d79c179980a83",
+      "tag": "glitchbomb-player_actions",
+      "selector": "0x78d47c548d41b149c3e475cf97114132edf678362a04ce4aad061a4c1165c98",
       "systems": [
         "claim_free_usdc",
         "buy_gamepack",
@@ -1812,25 +1812,25 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x5a09fbe0993ecdfa1aa20214d0bfe37e41d283b409e692e5097f4313370a4e8",
+      "class_hash": "0x3da6a3a9e1bcaa2e402795584ee2e3bc85af712f532b3dce74b5e3c0199028e",
       "tag": "glitchbomb-Game",
       "selector": "0x24b5e6dd68463f27991d99c66043ff038cc0018a54982d584626ea84dadb312"
     },
     {
       "members": [],
-      "class_hash": "0x634f21744c392ff4994a2460947ba386fc9a236f9f79f2155a81eeb2027c9c2",
+      "class_hash": "0x636a635c8c741dfae24a602820b37df89f70f663b19fc2ecbacb20a4bc919e9",
       "tag": "glitchbomb-GamePack",
       "selector": "0x7b8f7a36699ae315115ebc8f8ea14a7820388bdf157967587c8120a5eaf751"
     },
     {
       "members": [],
-      "class_hash": "0x5cdbc2b725a84cdd55cb0e27d7cdb49d6a006e5f77a81da2bd1f4a29bdc5a10",
+      "class_hash": "0x1e565476ae842fe9225af9d6e5821ecae1237db9b86b375235f2726b8319727",
       "tag": "glitchbomb-OrbsInGame",
       "selector": "0x18053f443255be1b89ec5c21c826c664d4e45977ecb0c46c20d09f3e750b280"
     },
     {
       "members": [],
-      "class_hash": "0x6bae5c5382363e272071f604c9f620ac52a8584ce3ee37091f96f6ed612f68c",
+      "class_hash": "0x767ac52534467409d8128bd4cf71ae6018d09c5b37321f7719f00c4f112b446",
       "tag": "glitchbomb-Player",
       "selector": "0x636658d36f9cf1eeafd449fa3242f0fd75d6522b204e5f8367ff071ad4beba2"
     }

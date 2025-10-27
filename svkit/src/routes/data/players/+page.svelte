@@ -11,7 +11,7 @@
 	}
 
 	interface Player {
-		player_id: string;
+		player: string;
 		state: string;
 		data: PlayerData;
 	}
@@ -21,7 +21,7 @@
 			glitchbombPlayerModels {
 				edges {
 					node {
-						player_id
+						player
 						state
 						data {
 							usdc
@@ -41,7 +41,7 @@
 				models {
 					__typename
 					... on glitchbomb_Player {
-						player_id
+						player
 						state
 						data {
 							usdc
@@ -66,10 +66,10 @@
 				fetchPolicy: 'network-only'
 			});
 
-			const nodes = result.data.glitchbombPlayerModels?.edges?.map((edge: any) => edge.node) || [];
-			nodes.forEach((player: Player) => {
-				playerMap.set(getPlayerKey(player.player_id), player);
-			});
+		const nodes = result.data.glitchbombPlayerModels?.edges?.map((edge: any) => edge.node) || [];
+		nodes.forEach((player: Player) => {
+			playerMap.set(getPlayerKey(player.player), player);
+		});
 			loading = false;
 
 			subscription = client.subscribe({
@@ -78,12 +78,12 @@
 				next: (data) => {
 					if (data.data?.entityUpdated?.models) {
 						const models = data.data.entityUpdated.models;
-						models.forEach((model: any) => {
-							if (model.__typename === 'glitchbomb_Player') {
-								const key = getPlayerKey(model.player_id);
-								playerMap.set(key, model);
-							}
-						});
+				models.forEach((model: any) => {
+					if (model.__typename === 'glitchbomb_Player') {
+						const key = getPlayerKey(model.player);
+						playerMap.set(key, model);
+					}
+				});
 					}
 				},
 				error: (err) => {
@@ -121,7 +121,7 @@
 			{#each players as player}
 				<div class="border border-white p-4">
 					<div class="grid grid-cols-2 gap-2 text-sm">
-						<div><span class="opacity-60">Player ID:</span> {player.player_id}</div>
+						<div><span class="opacity-60">Player:</span> {player.player}</div>
 						<div><span class="opacity-60">State:</span> {player.state}</div>
 						<div><span class="opacity-60">USDC:</span> {player.data.usdc}</div>
 						<div><span class="opacity-60">Gamepacks Bought:</span> {player.data.gamepacks_bought}</div>

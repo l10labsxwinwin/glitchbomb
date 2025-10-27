@@ -5,7 +5,7 @@
 	}
 
 	interface GamePack {
-		player_id: string;
+		player: string;
 		gamepack_id: number;
 		state: string;
 		data: GamePackData;
@@ -19,7 +19,7 @@
 </script>
 
 <a
-	href="/singleplayer/{gamepack.player_id}/gamepack/{gamepack.gamepack_id}"
+	href="/singleplayer/{gamepack.player}/gamepack/{gamepack.gamepack_id}"
 	class="grid grid-cols-4 gap-2 sm:gap-4 items-center bg-black/30 border border-white/10 px-3 py-2 rounded hover:border-white/30 transition-colors text-sm"
 >
 	<div class="font-bold">#{gamepack.gamepack_id}</div>

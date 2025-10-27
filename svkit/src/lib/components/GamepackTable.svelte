@@ -7,7 +7,7 @@
 	}
 
 	interface GamePack {
-		player_id: string;
+		player: string;
 		gamepack_id: number;
 		state: string;
 		data: GamePackData;

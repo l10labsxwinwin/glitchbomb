@@ -5,7 +5,7 @@
 	}
 
 	interface Player {
-		player_id: string;
+		player: string;
 		state: string;
 		data: PlayerData;
 	}
@@ -24,7 +24,7 @@
 				<div class="flex items-center gap-2">
 					<span class="opacity-60">Player:</span>
 					<code class="bg-black/50 px-2 py-1 rounded text-xs">
-						{player.player_id.slice(0, 6)}...{player.player_id.slice(-4)}
+						{player.player.slice(0, 6)}...{player.player.slice(-4)}
 					</code>
 				</div>
 				<div class="flex items-center gap-2">

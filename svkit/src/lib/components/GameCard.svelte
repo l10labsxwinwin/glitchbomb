@@ -30,7 +30,7 @@
 	}
 
 	interface Game {
-		player_id: string;
+		player: string;
 		gamepack_id: number;
 		game_id: number;
 		state: string;

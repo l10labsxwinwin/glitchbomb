@@ -5,7 +5,7 @@ export const GET_PLAYERS = gql`
 		glitchbombPlayerModels {
 			edges {
 				node {
-					player_id
+					player
 					state
 					data {
 						usdc
@@ -19,10 +19,10 @@ export const GET_PLAYERS = gql`
 
 export const GET_GAMEPACKS = gql`
 	query GetGamepacks($playerId: String!) {
-		glitchbombGamePackModels(where: { player_id: $playerId }) {
+		glitchbombGamePackModels(where: { player: $playerId }) {
 			edges {
 				node {
-					player_id
+					player
 					gamepack_id
 					state
 					data {
@@ -43,7 +43,7 @@ export const ENTITY_UPDATED = gql`
 			models {
 				__typename
 				... on glitchbomb_Player {
-					player_id
+					player
 					state
 					data {
 						usdc

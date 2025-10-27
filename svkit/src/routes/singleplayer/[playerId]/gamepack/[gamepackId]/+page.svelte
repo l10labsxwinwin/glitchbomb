@@ -34,7 +34,7 @@
 	}
 
 	interface GamePack {
-		player_id: string;
+		player: string;
 		gamepack_id: number;
 		state: string;
 		data: GamePackData;
@@ -71,7 +71,7 @@
 	}
 
 	interface Game {
-		player_id: string;
+		player: string;
 		gamepack_id: number;
 		game_id: number;
 		state: string;
@@ -79,7 +79,7 @@
 	}
 
 	interface OrbsInGame {
-		player_id: string;
+		player: string;
 		gamepack_id: number;
 		game_id: number;
 		non_buyable: any[];
@@ -90,10 +90,10 @@
 
 	const GET_GAMEPACK = gql`
 		query GetGamepack($playerId: String!, $gamepackId: Int!) {
-			glitchbombGamePackModels(where: { player_id: $playerId, gamepack_id: $gamepackId }) {
+			glitchbombGamePackModels(where: { player: $playerId, gamepack_id: $gamepackId }) {
 				edges {
 					node {
-						player_id
+						player
 						gamepack_id
 						state
 						data {
@@ -108,10 +108,10 @@
 
 	const GET_GAMES = gql`
 		query GetGames($playerId: String!, $gamepackId: Int!) {
-			glitchbombGameModels(where: { player_id: $playerId, gamepack_id: $gamepackId }) {
+			glitchbombGameModels(where: { player: $playerId, gamepack_id: $gamepackId }) {
 				edges {
 					node {
-						player_id
+						player
 						gamepack_id
 						game_id
 						state
@@ -161,10 +161,10 @@
 
 	const GET_ORBS = gql`
 		query GetOrbs($playerId: String!, $gamepackId: Int!) {
-			glitchbombOrbsInGameModels(where: { player_id: $playerId, gamepack_id: $gamepackId }) {
+			glitchbombOrbsInGameModels(where: { player: $playerId, gamepack_id: $gamepackId }) {
 				edges {
 					node {
-						player_id
+						player
 						gamepack_id
 						game_id
 						non_buyable {
@@ -237,7 +237,7 @@
 				models {
 					__typename
 					... on glitchbomb_GamePack {
-						player_id
+						player
 						gamepack_id
 						state
 						data {
@@ -246,7 +246,7 @@
 						}
 					}
 					... on glitchbomb_Game {
-						player_id
+						player
 						gamepack_id
 						game_id
 						state
@@ -290,7 +290,7 @@
 						}
 					}
 					... on glitchbomb_OrbsInGame {
-						player_id
+						player
 						gamepack_id
 						game_id
 						non_buyable {
@@ -401,13 +401,13 @@
 			const gameNodes =
 				gamesResult.data.glitchbombGameModels?.edges?.map((edge: any) => edge.node) || [];
 			gameNodes.forEach((game: Game) => {
-				gameMap.set(getGameKey(game.player_id, game.gamepack_id, game.game_id), game);
+				gameMap.set(getGameKey(game.player, game.gamepack_id, game.game_id), game);
 			});
 
 			const orbNodes =
 				orbsResult.data.glitchbombOrbsInGameModels?.edges?.map((edge: any) => edge.node) || [];
 			orbNodes.forEach((orb: OrbsInGame) => {
-				orbsMap.set(getOrbsKey(orb.player_id, orb.gamepack_id, orb.game_id), orb);
+				orbsMap.set(getOrbsKey(orb.player, orb.gamepack_id, orb.game_id), orb);
 			});
 
 			loading = false;
@@ -423,23 +423,23 @@
 							models.forEach((model: any) => {
 								if (
 									model.__typename === 'glitchbomb_GamePack' &&
-									model.player_id === playerId &&
+									model.player === playerId &&
 									model.gamepack_id === gamepackIdInt
 								) {
 									gamepack = model;
 								} else if (
 									model.__typename === 'glitchbomb_Game' &&
-									model.player_id === playerId &&
+									model.player === playerId &&
 									model.gamepack_id === gamepackIdInt
 								) {
-									const key = getGameKey(model.player_id, model.gamepack_id, model.game_id);
+									const key = getGameKey(model.player, model.gamepack_id, model.game_id);
 									gameMap.set(key, model);
 								} else if (
 									model.__typename === 'glitchbomb_OrbsInGame' &&
-									model.player_id === playerId &&
+									model.player === playerId &&
 									model.gamepack_id === gamepackIdInt
 								) {
-									const key = getOrbsKey(model.player_id, model.gamepack_id, model.game_id);
+									const key = getOrbsKey(model.player, model.gamepack_id, model.game_id);
 									orbsMap.set(key, model);
 								}
 							});
@@ -481,7 +481,7 @@
 			console.log('Opening gamepack...');
 			const world = setupWorld($dojoProvider);
 			const gamepackIdInt = parseInt(gamepackId);
-			const result = await world.gb_contract_v2.openGamepack($account, gamepackIdInt);
+			const result = await world.player_actions.openGamepack($account, gamepackIdInt);
 			console.log('✅ Gamepack opened!', result);
 			toasts.add('Gamepack opened successfully!', 'success');
 		} catch (err) {
@@ -500,7 +500,7 @@
 			console.log(`Starting game ${gameId}...`);
 			const world = setupWorld($dojoProvider);
 			const gamepackIdInt = parseInt(gamepackId);
-			const result = await world.gb_contract_v2.startGame($account, gamepackIdInt);
+			const result = await world.player_actions.startGame($account, gamepackIdInt);
 			console.log('✅ Game started!', result);
 			toasts.add(`Game ${gameId} started successfully!`, 'success');
 		} catch (err) {
@@ -519,7 +519,7 @@
 			console.log(`Pulling orb for game ${gameId}...`);
 			const world = setupWorld($dojoProvider);
 			const gamepackIdInt = parseInt(gamepackId);
-			const result = await world.gb_contract_v2.pullOrb($account, gamepackIdInt);
+			const result = await world.player_actions.pullOrb($account, gamepackIdInt);
 			console.log('✅ Orb pulled!', result);
 			toasts.add('Orb pulled successfully!', 'success');
 		} catch (err) {
@@ -538,7 +538,7 @@
 			console.log('Cashing out...');
 			const world = setupWorld($dojoProvider);
 			const gamepackIdInt = parseInt(gamepackId);
-			const result = await world.gb_contract_v2.cashOut($account, gamepackIdInt);
+			const result = await world.player_actions.cashOut($account, gamepackIdInt);
 			console.log('✅ Cashed out!', result);
 			toasts.add('Cashed out successfully!', 'success');
 		} catch (err) {

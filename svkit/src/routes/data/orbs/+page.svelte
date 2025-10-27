@@ -6,7 +6,7 @@
 	import { getOrbsKey } from '$lib/keys';
 
 	interface OrbsInGame {
-		player_id: string;
+		player: string;
 		gamepack_id: number;
 		game_id: number;
 		non_buyable: any[];
@@ -20,7 +20,7 @@
 			glitchbombOrbsInGameModels {
 				edges {
 					node {
-						player_id
+						player
 						gamepack_id
 						game_id
 						non_buyable {
@@ -93,7 +93,7 @@
 				models {
 					__typename
 					... on glitchbomb_OrbsInGame {
-						player_id
+						player
 						gamepack_id
 						game_id
 						non_buyable {
@@ -173,7 +173,7 @@
 
 			const nodes = result.data.glitchbombOrbsInGameModels?.edges?.map((edge: any) => edge.node) || [];
 			nodes.forEach((orb: OrbsInGame) => {
-				orbsMap.set(getOrbsKey(orb.player_id, orb.gamepack_id, orb.game_id), orb);
+				orbsMap.set(getOrbsKey(orb.player, orb.gamepack_id, orb.game_id), orb);
 			});
 			loading = false;
 
@@ -185,7 +185,7 @@
 						const models = data.data.entityUpdated.models;
 						models.forEach((model: any) => {
 							if (model.__typename === 'glitchbomb_OrbsInGame') {
-								const key = getOrbsKey(model.player_id, model.gamepack_id, model.game_id);
+								const key = getOrbsKey(model.player, model.gamepack_id, model.game_id);
 								orbsMap.set(key, model);
 							}
 						});
@@ -226,7 +226,7 @@
 			{#each orbs as orb}
 				<div class="border border-white p-4">
 					<div class="grid grid-cols-2 gap-2 text-sm mb-2">
-						<div><span class="opacity-60">Player ID:</span> {orb.player_id}</div>
+						<div><span class="opacity-60">Player ID:</span> {orb.player}</div>
 						<div><span class="opacity-60">Game ID:</span> {orb.game_id}</div>
 						<div><span class="opacity-60">Gamepack ID:</span> {orb.gamepack_id}</div>
 					</div>

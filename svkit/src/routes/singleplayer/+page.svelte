@@ -24,7 +24,7 @@
 	}
 
 	interface Player {
-		player_id: string;
+		player: string;
 		state: string;
 		data: PlayerData;
 	}
@@ -35,7 +35,7 @@
 	}
 
 	interface GamePack {
-		player_id: string;
+		player: string;
 		gamepack_id: number;
 		state: string;
 		data: GamePackData;
@@ -88,7 +88,7 @@
 			const nodes =
 				queryResult.data.glitchbombPlayerModels?.edges?.map((edge: any) => edge.node) || [];
 			nodes.forEach((player: Player) => {
-				playerMap.set(getPlayerKey(player.player_id), player);
+				playerMap.set(getPlayerKey(player.player), player);
 			});
 
 			const gamepackResult = await client.query({
@@ -115,11 +115,11 @@
 							const models = data.data.entityUpdated.models;
 							models.forEach((model: any) => {
 								if (model.__typename === 'glitchbomb_Player') {
-									const key = getPlayerKey(model.player_id);
+									const key = getPlayerKey(model.player);
 									const currentPlayerData = playerMap.get(key);
 									playerMap.set(key, model);
 									
-									if (model.player_id === burnerAddress && currentPlayerData) {
+									if (model.player === burnerAddress && currentPlayerData) {
 										if (model.data.gamepacks_bought > currentPlayerData.data.gamepacks_bought) {
 											console.log('New gamepack detected, reloading gamepacks...');
 											loadGamepacks(burnerAddress);
@@ -180,7 +180,7 @@
 		try {
 			console.log('Claiming free USDC...');
 			const world = setupWorld(dojoProvider);
-			const result = await world.gb_contract_v2.claimFreeUsdc(account);
+			const result = await world.player_actions.claimFreeUsdc(account);
 			console.log('✅ Free USDC claimed!', result);
 			toasts.add('Free USDC claimed successfully!', 'success');
 		} catch (err) {
@@ -198,7 +198,7 @@
 		try {
 			console.log('Buying gamepack...');
 			const world = setupWorld(dojoProvider);
-			const result = await world.gb_contract_v2.buyGamepack(account);
+			const result = await world.player_actions.buyGamepack(account);
 			console.log('✅ Gamepack bought!', result);
 			toasts.add('Gamepack bought successfully!', 'success');
 		} catch (err) {

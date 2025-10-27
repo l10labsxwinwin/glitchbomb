@@ -2,16 +2,16 @@ import type { SchemaType as ISchemaType } from "@dojoengine/sdk";
 
 import { CairoCustomEnum, BigNumberish } from 'starknet';
 
-// Type definition for `glitchbomb::glitchbombv2::game::Game` struct
+// Type definition for `glitchbomb::gbv3::models::game::Game` struct
 export interface Game {
-	player_id: string;
+	player: string;
 	gamepack_id: BigNumberish;
 	game_id: BigNumberish;
 	state: GameStateEnum;
 	data: GameData;
 }
 
-// Type definition for `glitchbomb::glitchbombv2::game::GameData` struct
+// Type definition for `glitchbomb::gbv3::models::game::GameData` struct
 export interface GameData {
 	level: BigNumberish;
 	pull_number: BigNumberish;
@@ -29,17 +29,9 @@ export interface GameData {
 	consumed_orbs: Array<OrbEffectEnum>;
 }
 
-// Type definition for `glitchbomb::glitchbombv2::game::Orb` struct
-export interface Orb {
-	effect: OrbEffectEnum;
-	count: BigNumberish;
-	base_price: BigNumberish;
-	current_price: BigNumberish;
-}
-
-// Type definition for `glitchbomb::glitchbombv2::game::OrbsInGame` struct
+// Type definition for `glitchbomb::gbv3::models::game::OrbsInGame` struct
 export interface OrbsInGame {
-	player_id: string;
+	player: string;
 	gamepack_id: BigNumberish;
 	game_id: BigNumberish;
 	non_buyable: Array<Orb>;
@@ -48,36 +40,53 @@ export interface OrbsInGame {
 	cosmic: Array<Orb>;
 }
 
-// Type definition for `glitchbomb::glitchbombv2::gamepack::GamePack` struct
+// Type definition for `glitchbomb::gbv3::models::gamepack::GamePack` struct
 export interface GamePack {
-	player_id: string;
+	player: string;
 	gamepack_id: BigNumberish;
 	state: GamePackStateEnum;
 	data: GamePackData;
 }
 
-// Type definition for `glitchbomb::glitchbombv2::gamepack::GamePackData` struct
+// Type definition for `glitchbomb::gbv3::models::gamepack::GamePackData` struct
 export interface GamePackData {
 	current_game_id: BigNumberish;
 	accumulated_moonrocks: BigNumberish;
 }
 
-// Type definition for `glitchbomb::glitchbombv2::player::Player` struct
+// Type definition for `glitchbomb::gbv3::models::orb::Orb` struct
+export interface Orb {
+	effect: OrbEffectEnum;
+	count: BigNumberish;
+	base_price: BigNumberish;
+	current_price: BigNumberish;
+}
+
+// Type definition for `glitchbomb::gbv3::models::player::Player` struct
 export interface Player {
-	player_id: string;
+	player: string;
 	state: PlayerStateEnum;
 	data: PlayerData;
 }
 
-// Type definition for `glitchbomb::glitchbombv2::player::PlayerData` struct
+// Type definition for `glitchbomb::gbv3::models::player::PlayerData` struct
 export interface PlayerData {
 	usdc: BigNumberish;
 	gamepacks_bought: BigNumberish;
 }
 
-// Type definition for `glitchbomb::glitchbombv2::game::GameState` enum
+// Type definition for `glitchbomb::gbv3::models::enums::GamePackState` enum
+export const gamePackState = [
+	'Unopened',
+	'InProgress',
+	'EndedEarly',
+	'Completed',
+] as const;
+export type GamePackState = { [key in typeof gamePackState[number]]: string };
+export type GamePackStateEnum = CairoCustomEnum;
+
+// Type definition for `glitchbomb::gbv3::models::enums::GameState` enum
 export const gameState = [
-	'Empty',
 	'New',
 	'Level',
 	'LevelComplete',
@@ -88,7 +97,7 @@ export const gameState = [
 export type GameState = { [key in typeof gameState[number]]: string };
 export type GameStateEnum = CairoCustomEnum;
 
-// Type definition for `glitchbomb::glitchbombv2::game::OrbEffect` enum
+// Type definition for `glitchbomb::gbv3::models::enums::OrbEffect` enum
 export const orbEffect = [
 	'Empty',
 	'PointRewind',
@@ -106,18 +115,7 @@ export const orbEffect = [
 export type OrbEffect = { [key in typeof orbEffect[number]]: string };
 export type OrbEffectEnum = CairoCustomEnum;
 
-// Type definition for `glitchbomb::glitchbombv2::gamepack::GamePackState` enum
-export const gamePackState = [
-	'Empty',
-	'Unopened',
-	'InProgress',
-	'EndedEarly',
-	'Completed',
-] as const;
-export type GamePackState = { [key in typeof gamePackState[number]]: string };
-export type GamePackStateEnum = CairoCustomEnum;
-
-// Type definition for `glitchbomb::glitchbombv2::player::PlayerState` enum
+// Type definition for `glitchbomb::gbv3::models::enums::PlayerState` enum
 export const playerState = [
 	'Broke',
 	'Stacked',
@@ -129,10 +127,10 @@ export interface SchemaType extends ISchemaType {
 	glitchbomb: {
 		Game: Game,
 		GameData: GameData,
-		Orb: Orb,
 		OrbsInGame: OrbsInGame,
 		GamePack: GamePack,
 		GamePackData: GamePackData,
+		Orb: Orb,
 		Player: Player,
 		PlayerData: PlayerData,
 	},
@@ -140,12 +138,11 @@ export interface SchemaType extends ISchemaType {
 export const schema: SchemaType = {
 	glitchbomb: {
 		Game: {
-			player_id: "",
+			player: "",
 			gamepack_id: 0,
 			game_id: 0,
 		state: new CairoCustomEnum({ 
-					Empty: "",
-				New: undefined,
+					New: "",
 				Level: undefined,
 				LevelComplete: undefined,
 				FiveOrDiePhase: undefined,
@@ -217,26 +214,8 @@ export const schema: SchemaType = {
 				Multiplier: undefined,
 				BombImmunity: undefined, })],
 		},
-		Orb: {
-		effect: new CairoCustomEnum({ 
-					Empty: "",
-				PointRewind: undefined,
-				FiveOrDie: undefined,
-				Point: undefined,
-				PointPerOrbRemaining: undefined,
-				PointPerBombPulled: undefined,
-				GlitchChips: undefined,
-				Moonrocks: undefined,
-				Health: undefined,
-				Bomb: undefined,
-				Multiplier: undefined,
-				BombImmunity: undefined, }),
-			count: 0,
-			base_price: 0,
-			current_price: 0,
-		},
 		OrbsInGame: {
-			player_id: "",
+			player: "",
 			gamepack_id: 0,
 			game_id: 0,
 			non_buyable: [{ effect: new CairoCustomEnum({ 
@@ -293,11 +272,10 @@ export const schema: SchemaType = {
 				BombImmunity: undefined, }), count: 0, base_price: 0, current_price: 0, }],
 		},
 		GamePack: {
-			player_id: "",
+			player: "",
 			gamepack_id: 0,
 		state: new CairoCustomEnum({ 
-					Empty: "",
-				Unopened: undefined,
+					Unopened: "",
 				InProgress: undefined,
 				EndedEarly: undefined,
 				Completed: undefined, }),
@@ -307,8 +285,26 @@ export const schema: SchemaType = {
 			current_game_id: 0,
 			accumulated_moonrocks: 0,
 		},
+		Orb: {
+		effect: new CairoCustomEnum({ 
+					Empty: "",
+				PointRewind: undefined,
+				FiveOrDie: undefined,
+				Point: undefined,
+				PointPerOrbRemaining: undefined,
+				PointPerBombPulled: undefined,
+				GlitchChips: undefined,
+				Moonrocks: undefined,
+				Health: undefined,
+				Bomb: undefined,
+				Multiplier: undefined,
+				BombImmunity: undefined, }),
+			count: 0,
+			base_price: 0,
+			current_price: 0,
+		},
 		Player: {
-			player_id: "",
+			player: "",
 		state: new CairoCustomEnum({ 
 					Broke: "",
 				Stacked: undefined, }),
@@ -321,16 +317,16 @@ export const schema: SchemaType = {
 	},
 };
 export enum ModelsMapping {
+	GamePackState = 'glitchbomb-GamePackState',
+	GameState = 'glitchbomb-GameState',
+	OrbEffect = 'glitchbomb-OrbEffect',
+	PlayerState = 'glitchbomb-PlayerState',
 	Game = 'glitchbomb-Game',
 	GameData = 'glitchbomb-GameData',
-	GameState = 'glitchbomb-GameState',
-	Orb = 'glitchbomb-Orb',
-	OrbEffect = 'glitchbomb-OrbEffect',
 	OrbsInGame = 'glitchbomb-OrbsInGame',
 	GamePack = 'glitchbomb-GamePack',
 	GamePackData = 'glitchbomb-GamePackData',
-	GamePackState = 'glitchbomb-GamePackState',
+	Orb = 'glitchbomb-Orb',
 	Player = 'glitchbomb-Player',
 	PlayerData = 'glitchbomb-PlayerData',
-	PlayerState = 'glitchbomb-PlayerState',
 }

@@ -4,19 +4,19 @@ import * as models from "./models.gen";
 
 export function setupWorld(provider: DojoProvider) {
 
-	const build_gb_contract_v2_buyGamepack_calldata = (): DojoCall => {
+	const build_player_actions_buyGamepack_calldata = (): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "buy_gamepack",
 			calldata: [],
 		};
 	};
 
-	const gb_contract_v2_buyGamepack = async (snAccount: Account | AccountInterface) => {
+	const player_actions_buyGamepack = async (snAccount: Account | AccountInterface) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_buyGamepack_calldata(),
+				build_player_actions_buyGamepack_calldata(),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -25,19 +25,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_buyOrb_calldata = (gamepackId: BigNumberish, orbId: BigNumberish): DojoCall => {
+	const build_player_actions_buyOrb_calldata = (gamepackId: BigNumberish, orbId: BigNumberish): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "buy_orb",
 			calldata: [gamepackId, orbId],
 		};
 	};
 
-	const gb_contract_v2_buyOrb = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish, orbId: BigNumberish) => {
+	const player_actions_buyOrb = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish, orbId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_buyOrb_calldata(gamepackId, orbId),
+				build_player_actions_buyOrb_calldata(gamepackId, orbId),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -46,19 +46,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_cashOut_calldata = (gamepackId: BigNumberish): DojoCall => {
+	const build_player_actions_cashOut_calldata = (gamepackId: BigNumberish): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "cash_out",
 			calldata: [gamepackId],
 		};
 	};
 
-	const gb_contract_v2_cashOut = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
+	const player_actions_cashOut = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_cashOut_calldata(gamepackId),
+				build_player_actions_cashOut_calldata(gamepackId),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -67,19 +67,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_claimFreeUsdc_calldata = (): DojoCall => {
+	const build_player_actions_claimFreeUsdc_calldata = (): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "claim_free_usdc",
 			calldata: [],
 		};
 	};
 
-	const gb_contract_v2_claimFreeUsdc = async (snAccount: Account | AccountInterface) => {
+	const player_actions_claimFreeUsdc = async (snAccount: Account | AccountInterface) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_claimFreeUsdc_calldata(),
+				build_player_actions_claimFreeUsdc_calldata(),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -88,19 +88,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_confirmFiveOrDie_calldata = (gamepackId: BigNumberish, confirmed: boolean): DojoCall => {
+	const build_player_actions_confirmFiveOrDie_calldata = (gamepackId: BigNumberish, confirmed: boolean): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "confirm_five_or_die",
 			calldata: [gamepackId, confirmed],
 		};
 	};
 
-	const gb_contract_v2_confirmFiveOrDie = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish, confirmed: boolean) => {
+	const player_actions_confirmFiveOrDie = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish, confirmed: boolean) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_confirmFiveOrDie_calldata(gamepackId, confirmed),
+				build_player_actions_confirmFiveOrDie_calldata(gamepackId, confirmed),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -109,19 +109,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_enterShop_calldata = (gamepackId: BigNumberish): DojoCall => {
+	const build_player_actions_enterShop_calldata = (gamepackId: BigNumberish): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "enter_shop",
 			calldata: [gamepackId],
 		};
 	};
 
-	const gb_contract_v2_enterShop = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
+	const player_actions_enterShop = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_enterShop_calldata(gamepackId),
+				build_player_actions_enterShop_calldata(gamepackId),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -130,19 +130,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_nextLevel_calldata = (gamepackId: BigNumberish): DojoCall => {
+	const build_player_actions_nextLevel_calldata = (gamepackId: BigNumberish): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "next_level",
 			calldata: [gamepackId],
 		};
 	};
 
-	const gb_contract_v2_nextLevel = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
+	const player_actions_nextLevel = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_nextLevel_calldata(gamepackId),
+				build_player_actions_nextLevel_calldata(gamepackId),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -151,19 +151,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_openGamepack_calldata = (gamepackId: BigNumberish): DojoCall => {
+	const build_player_actions_openGamepack_calldata = (gamepackId: BigNumberish): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "open_gamepack",
 			calldata: [gamepackId],
 		};
 	};
 
-	const gb_contract_v2_openGamepack = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
+	const player_actions_openGamepack = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_openGamepack_calldata(gamepackId),
+				build_player_actions_openGamepack_calldata(gamepackId),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -172,19 +172,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_pullOrb_calldata = (gamepackId: BigNumberish): DojoCall => {
+	const build_player_actions_pullOrb_calldata = (gamepackId: BigNumberish): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "pull_orb",
 			calldata: [gamepackId],
 		};
 	};
 
-	const gb_contract_v2_pullOrb = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
+	const player_actions_pullOrb = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_pullOrb_calldata(gamepackId),
+				build_player_actions_pullOrb_calldata(gamepackId),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -193,19 +193,19 @@ export function setupWorld(provider: DojoProvider) {
 		}
 	};
 
-	const build_gb_contract_v2_startGame_calldata = (gamepackId: BigNumberish): DojoCall => {
+	const build_player_actions_startGame_calldata = (gamepackId: BigNumberish): DojoCall => {
 		return {
-			contractName: "gb_contract_v2",
+			contractName: "player_actions",
 			entrypoint: "start_game",
 			calldata: [gamepackId],
 		};
 	};
 
-	const gb_contract_v2_startGame = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
+	const player_actions_startGame = async (snAccount: Account | AccountInterface, gamepackId: BigNumberish) => {
 		try {
 			return await provider.execute(
 				snAccount,
-				build_gb_contract_v2_startGame_calldata(gamepackId),
+				build_player_actions_startGame_calldata(gamepackId),
 				"glitchbomb",
 			);
 		} catch (error) {
@@ -217,27 +217,27 @@ export function setupWorld(provider: DojoProvider) {
 
 
 	return {
-		gb_contract_v2: {
-			buyGamepack: gb_contract_v2_buyGamepack,
-			buildBuyGamepackCalldata: build_gb_contract_v2_buyGamepack_calldata,
-			buyOrb: gb_contract_v2_buyOrb,
-			buildBuyOrbCalldata: build_gb_contract_v2_buyOrb_calldata,
-			cashOut: gb_contract_v2_cashOut,
-			buildCashOutCalldata: build_gb_contract_v2_cashOut_calldata,
-			claimFreeUsdc: gb_contract_v2_claimFreeUsdc,
-			buildClaimFreeUsdcCalldata: build_gb_contract_v2_claimFreeUsdc_calldata,
-			confirmFiveOrDie: gb_contract_v2_confirmFiveOrDie,
-			buildConfirmFiveOrDieCalldata: build_gb_contract_v2_confirmFiveOrDie_calldata,
-			enterShop: gb_contract_v2_enterShop,
-			buildEnterShopCalldata: build_gb_contract_v2_enterShop_calldata,
-			nextLevel: gb_contract_v2_nextLevel,
-			buildNextLevelCalldata: build_gb_contract_v2_nextLevel_calldata,
-			openGamepack: gb_contract_v2_openGamepack,
-			buildOpenGamepackCalldata: build_gb_contract_v2_openGamepack_calldata,
-			pullOrb: gb_contract_v2_pullOrb,
-			buildPullOrbCalldata: build_gb_contract_v2_pullOrb_calldata,
-			startGame: gb_contract_v2_startGame,
-			buildStartGameCalldata: build_gb_contract_v2_startGame_calldata,
+		player_actions: {
+			buyGamepack: player_actions_buyGamepack,
+			buildBuyGamepackCalldata: build_player_actions_buyGamepack_calldata,
+			buyOrb: player_actions_buyOrb,
+			buildBuyOrbCalldata: build_player_actions_buyOrb_calldata,
+			cashOut: player_actions_cashOut,
+			buildCashOutCalldata: build_player_actions_cashOut_calldata,
+			claimFreeUsdc: player_actions_claimFreeUsdc,
+			buildClaimFreeUsdcCalldata: build_player_actions_claimFreeUsdc_calldata,
+			confirmFiveOrDie: player_actions_confirmFiveOrDie,
+			buildConfirmFiveOrDieCalldata: build_player_actions_confirmFiveOrDie_calldata,
+			enterShop: player_actions_enterShop,
+			buildEnterShopCalldata: build_player_actions_enterShop_calldata,
+			nextLevel: player_actions_nextLevel,
+			buildNextLevelCalldata: build_player_actions_nextLevel_calldata,
+			openGamepack: player_actions_openGamepack,
+			buildOpenGamepackCalldata: build_player_actions_openGamepack_calldata,
+			pullOrb: player_actions_pullOrb,
+			buildPullOrbCalldata: build_player_actions_pullOrb_calldata,
+			startGame: player_actions_startGame,
+			buildStartGameCalldata: build_player_actions_startGame_calldata,
 		},
 	};
 }

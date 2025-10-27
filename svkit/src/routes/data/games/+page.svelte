@@ -21,7 +21,7 @@
 	}
 
 	interface Game {
-		player_id: string;
+		player: string;
 		gamepack_id: number;
 		game_id: number;
 		state: string;
@@ -33,7 +33,7 @@
 			glitchbombGameModels {
 				edges {
 					node {
-						player_id
+						player
 						gamepack_id
 						game_id
 						state
@@ -65,7 +65,7 @@
 				models {
 					__typename
 					... on glitchbomb_Game {
-						player_id
+						player
 						gamepack_id
 						game_id
 						state
@@ -104,7 +104,7 @@
 
 			const nodes = result.data.glitchbombGameModels?.edges?.map((edge: any) => edge.node) || [];
 			nodes.forEach((game: Game) => {
-				gameMap.set(getGameKey(game.player_id, game.gamepack_id, game.game_id), game);
+				gameMap.set(getGameKey(game.player, game.gamepack_id, game.game_id), game);
 			});
 			loading = false;
 
@@ -116,7 +116,7 @@
 						const models = data.data.entityUpdated.models;
 						models.forEach((model: any) => {
 							if (model.__typename === 'glitchbomb_Game') {
-								const key = getGameKey(model.player_id, model.gamepack_id, model.game_id);
+								const key = getGameKey(model.player, model.gamepack_id, model.game_id);
 								gameMap.set(key, model);
 							}
 						});
@@ -157,7 +157,7 @@
 			{#each games as game}
 				<div class="border border-white p-4">
 					<div class="grid grid-cols-2 gap-2 text-sm">
-						<div><span class="opacity-60">Player ID:</span> {game.player_id}</div>
+						<div><span class="opacity-60">Player ID:</span> {game.player}</div>
 						<div><span class="opacity-60">Game ID:</span> {game.game_id}</div>
 						<div><span class="opacity-60">Gamepack ID:</span> {game.gamepack_id}</div>
 						<div><span class="opacity-60">State:</span> {game.state}</div>
