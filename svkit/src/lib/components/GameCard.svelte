@@ -43,11 +43,13 @@
 		onPullOrb?: (gameId: number) => void;
 		onPullSpecificOrb?: (gameId: number, orbIndex: number) => void;
 		onEnterShop?: () => void;
+		onNextLevel?: () => void;
 		onCashOut?: () => void;
 		startingGames?: Map<number, boolean>;
 		pullingOrbs?: Map<number, boolean>;
 		pullingSpecificOrbs?: Map<string, boolean>;
 		enteringShop?: boolean;
+		nextingLevel?: boolean;
 		cashingOut?: boolean;
 	}
 
@@ -57,11 +59,13 @@
 		onPullOrb,
 		onPullSpecificOrb,
 		onEnterShop,
+		onNextLevel,
 		onCashOut,
 		startingGames = new Map(),
 		pullingOrbs = new Map(),
 		pullingSpecificOrbs = new Map(),
 		enteringShop = false,
+		nextingLevel = false,
 		cashingOut = false
 	}: Props = $props();
 
@@ -222,6 +226,15 @@
 				class="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
 			>
 				{enteringShop ? 'Entering...' : 'Enter Shop'}
+			</button>
+		{/if}
+		{#if onNextLevel}
+			<button
+				onclick={onNextLevel}
+				disabled={nextingLevel}
+				class="px-4 py-2 bg-cyan-600 hover:bg-cyan-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded font-bold text-sm"
+			>
+				{nextingLevel ? 'Advancing...' : 'Next Level'}
 			</button>
 		{/if}
 		{#if onCashOut}

@@ -394,6 +394,7 @@
 	let pullingSpecificOrbs = $state(new Map<string, boolean>());
 	let buyingOrbs = $state(new Map<number, boolean>());
 	let enteringShop = $state(false);
+	let nextingLevel = $state(false);
 	let cashingOut = $state(false);
 	let startingNextGame = $state(false);
 
@@ -598,6 +599,25 @@
 		}
 	}
 
+	async function nextLevel() {
+		if (!$account || !$dojoProvider || !gamepackId) return;
+
+		nextingLevel = true;
+		try {
+			console.log('Advancing to next level...');
+			const world = setupWorld($dojoProvider);
+			const gamepackIdInt = parseInt(gamepackId);
+			const result = await world.gb_contract_v2.nextLevel($account, gamepackIdInt);
+			console.log('✅ Advanced to next level!', result);
+			toasts.add('Advanced to next level!', 'success');
+		} catch (err) {
+			console.error('Failed to advance level:', err);
+			toasts.add('Failed to advance level', 'error');
+		} finally {
+			nextingLevel = false;
+		}
+	}
+
 	async function cashOut() {
 		if (!$account || !$dojoProvider || !gamepackId) return;
 
@@ -723,11 +743,13 @@
 									onPullOrb={pullOrb}
 									onPullSpecificOrb={pullSpecificOrb}
 									onEnterShop={enterShop}
+									onNextLevel={nextLevel}
 									onCashOut={cashOut}
 									{startingGames}
 									{pullingOrbs}
 									{pullingSpecificOrbs}
 									{enteringShop}
+									{nextingLevel}
 									{cashingOut}
 								/>
 							{/each}
