@@ -2,6 +2,7 @@
 	import SingleGameStats from './SingleGameStats.svelte';
 	import InLevelActions from './InLevelActions.svelte';
 	import PullableOrbsView from './PullableOrbsView.svelte';
+	import RecentPulls from './RecentPulls.svelte';
 
 	interface Props {
 		gamepack: any | null;
@@ -69,6 +70,7 @@
 					<SingleGameStats {game} />
 					<InLevelActions onPullOrb={pullOrb} onCashOut={cashOut} onEnterShop={enterShop} {pullingOrb} {cashingOut} {enteringShop} />
 					<PullableOrbsView pullableOrbs={game.data.pullable_orbs} onPullSpecific={pullSpecificOrb} {pullingSpecificOrbs} />
+					<RecentPulls consumedOrbs={game.data.consumed_orbs} />
 				</div>
 			{:else}
 				<p class="opacity-60">No data available</p>
