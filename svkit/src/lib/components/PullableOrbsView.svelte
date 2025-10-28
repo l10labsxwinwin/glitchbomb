@@ -100,7 +100,7 @@
 					<button
 						onclick={() => onPullSpecific(orbIndex)}
 						disabled={isPulling}
-						class="aspect-square bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed p-3 rounded border border-white/10 flex flex-col items-center justify-center transition-colors"
+						class="aspect-square bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer p-3 rounded border border-white/10 flex flex-col items-center justify-center transition-colors"
 					>
 						{#if isPulling}
 							<div class="text-xs opacity-80">Pulling...</div>

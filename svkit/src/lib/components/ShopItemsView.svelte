@@ -1,9 +1,13 @@
 <script lang="ts">
 	interface Props {
 		orbsInBag: any | null;
+		onBuyCommon: (index: number) => Promise<void>;
+		onBuyRare: (index: number) => Promise<void>;
+		onBuyCosmic: (index: number) => Promise<void>;
+		buyingOrbs: Map<string, boolean>;
 	}
 
-	let { orbsInBag }: Props = $props();
+	let { orbsInBag, onBuyCommon, onBuyRare, onBuyCosmic, buyingOrbs }: Props = $props();
 
 	let currentPage = $state(0);
 	const orbsPerPage = 9;
@@ -45,13 +49,13 @@
 
 	const allOrbs = $derived(() => {
 		if (!orbsInBag) return [];
-		return [
-			...(orbsInBag.common || []),
-			...(orbsInBag.rare || []),
-			...(orbsInBag.cosmic || [])
-		]
-		.filter(orb => getOrbEffect(orb) !== null)
-		.sort((a, b) => a.current_price - b.current_price);
+		const common = (orbsInBag.common || []).map((orb: any, idx: number) => ({ ...orb, rarity: 'common', index: idx }));
+		const rare = (orbsInBag.rare || []).map((orb: any, idx: number) => ({ ...orb, rarity: 'rare', index: idx }));
+		const cosmic = (orbsInBag.cosmic || []).map((orb: any, idx: number) => ({ ...orb, rarity: 'cosmic', index: idx }));
+		
+		return [...common, ...rare, ...cosmic]
+			.filter(orb => getOrbEffect(orb) !== null)
+			.sort((a, b) => a.current_price - b.current_price);
 	});
 
 	const totalPages = $derived(Math.max(1, Math.ceil(allOrbs().length / orbsPerPage)));
@@ -104,13 +108,27 @@
 		<div class="grid grid-cols-3 gap-3">
 			{#each currentOrbs() as orb}
 				{@const effect = getOrbEffect(orb)}
+				{@const buyKey = `${orb.rarity}-${orb.index}`}
+				{@const isBuying = buyingOrbs.get(buyKey) || false}
 				{#if effect}
-					<div class="aspect-square bg-black/50 p-3 rounded border border-white/10 flex flex-col items-center justify-center">
-						<div class="text-xl font-bold mb-1">{effect.value}</div>
-						<div class="text-xs opacity-80 mb-2">{effect.type}</div>
-						<div class="text-xs opacity-60">Price: {orb.current_price}</div>
-						<div class="text-xs opacity-60">Count: {orb.count}</div>
-					</div>
+					<button
+						onclick={() => {
+							if (orb.rarity === 'common') onBuyCommon(orb.index);
+							else if (orb.rarity === 'rare') onBuyRare(orb.index);
+							else if (orb.rarity === 'cosmic') onBuyCosmic(orb.index);
+						}}
+						disabled={isBuying}
+						class="aspect-square bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer p-3 rounded border border-white/10 flex flex-col items-center justify-center transition-colors"
+					>
+						{#if isBuying}
+							<div class="text-xs opacity-80">Buying...</div>
+						{:else}
+							<div class="text-xl font-bold mb-1">{effect.value}</div>
+							<div class="text-xs opacity-80 mb-2">{effect.type}</div>
+							<div class="text-xs opacity-60">Price: {orb.current_price}</div>
+							<div class="text-xs opacity-60">Count: {orb.count}</div>
+						{/if}
+					</button>
 				{:else}
 					<div class="aspect-square bg-black/20 p-3 rounded border border-white/5 flex items-center justify-center">
 						<div class="opacity-30 text-sm">Empty</div>

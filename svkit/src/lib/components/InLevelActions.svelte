@@ -18,21 +18,21 @@
 			<button
 				onclick={onPullOrb}
 				disabled={pullingOrb}
-				class="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
+				class="px-6 py-3 bg-purple-600 hover:bg-purple-700 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer rounded-lg font-bold"
 			>
 				{pullingOrb ? 'Pulling...' : 'Pull Orb'}
 			</button>
 			<button
 				onclick={onCashOut}
 				disabled={cashingOut}
-				class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
+				class="px-6 py-3 bg-yellow-600 hover:bg-yellow-700 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer rounded-lg font-bold"
 			>
 				{cashingOut ? 'Cashing Out...' : 'Cash Out'}
 			</button>
 			<button
 				onclick={onEnterShop}
 				disabled={enteringShop}
-				class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed rounded-lg font-bold"
+				class="px-6 py-3 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer rounded-lg font-bold"
 			>
 				{enteringShop ? 'Entering...' : 'Enter Shop'}
 			</button>
