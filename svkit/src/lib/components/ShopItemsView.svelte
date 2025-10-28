@@ -110,6 +110,7 @@
 				{@const effect = getOrbEffect(orb)}
 				{@const buyKey = `${orb.rarity}-${orb.index}`}
 				{@const isBuying = buyingOrbs.get(buyKey) || false}
+				{@const borderColor = orb.rarity === 'common' ? 'border-white/50' : orb.rarity === 'rare' ? 'border-blue-500/70' : 'border-purple-500/70'}
 				{#if effect}
 					<button
 						onclick={() => {
@@ -118,7 +119,7 @@
 							else if (orb.rarity === 'cosmic') onBuyCosmic(orb.index);
 						}}
 						disabled={isBuying}
-						class="aspect-square bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer p-3 rounded border border-white/10 flex flex-col transition-colors"
+						class="aspect-square bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer p-3 rounded border-2 {borderColor} flex flex-col transition-colors"
 					>
 						{#if isBuying}
 							<div class="text-xs opacity-80 text-center flex-1 flex items-center justify-center">Buying...</div>

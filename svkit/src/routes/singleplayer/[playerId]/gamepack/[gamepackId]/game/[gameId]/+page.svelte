@@ -29,6 +29,8 @@
 	$effect(() => {
 		if (game && game.state === 'Shop') {
 			goto(`/singleplayer/${playerId}/gamepack/${gamepackId}/game/${gameId}/shop`);
+		} else if (game && game.state === 'GameOver') {
+			goto(`/singleplayer/${playerId}/gamepack/${gamepackId}/game/${gameId}/gameover`);
 		}
 	});
 
