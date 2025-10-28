@@ -119,25 +119,25 @@
 							else if (orb.rarity === 'cosmic') onBuyCosmic(orb.index);
 						}}
 						disabled={isBuying}
-						class="aspect-square bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer p-3 rounded border-2 {borderColor} flex flex-col transition-colors"
+						class="aspect-square w-[120px] bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer p-3 rounded border-2 {borderColor} flex flex-col transition-colors"
 					>
 						{#if isBuying}
 							<div class="text-xs opacity-80 text-center flex-1 flex items-center justify-center">Buying...</div>
 						{:else}
-							<div class="flex-1 flex flex-col justify-center items-center">
-								<div class="text-lg font-bold text-center mb-2">{effect.type}</div>
-								<div class="text-xl opacity-80 text-center min-h-[1.75rem]">
-									{effect.value || ''}
-								</div>
+						<div class="flex-1 flex flex-col justify-center items-center">
+							<div class="text-sm font-bold text-center mb-1">{effect.type}</div>
+							<div class="text-sm opacity-80 text-center">
+								{effect.value || ''}
 							</div>
-							<div class="grid grid-cols-2 gap-2 w-full text-xs opacity-60">
-								<div class="text-left">Price: {orb.current_price}</div>
-								<div class="text-right">Count: {orb.count}</div>
-							</div>
+						</div>
+						<div class="grid grid-cols-2 gap-2 w-full text-xs opacity-60">
+							<div class="text-left">{orb.current_price} GC</div>
+							<div class="text-right">{orb.count}x</div>
+						</div>
 						{/if}
 					</button>
 				{:else}
-					<div class="aspect-square bg-black/20 p-3 rounded border border-white/5 flex items-center justify-center">
+					<div class="aspect-square w-[120px] bg-black/20 p-3 rounded border border-white/5 flex items-center justify-center">
 						<div class="opacity-30 text-sm">Empty</div>
 					</div>
 				{/if}

@@ -90,8 +90,8 @@
 			</div>
 		{/if}
 	</div>
-	<div class="bg-black/30 border border-white/10 p-3 rounded-lg">
-		<div class="grid grid-cols-3 gap-3">
+	<div class="bg-black/30 border border-white/10 p-3 rounded-lg flex items-center justify-center">
+		<div class="grid grid-cols-3 gap-3 w-fit">
 			{#each currentOrbs() as orb, i}
 				{@const effect = getOrbEffect(orb)}
 				{@const orbIndex = currentPage * orbsPerPage + i}
@@ -100,7 +100,7 @@
 					<button
 						onclick={() => onPullSpecific(orbIndex)}
 						disabled={isPulling}
-						class="aspect-square bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer p-3 rounded border border-white/10 flex flex-col items-center justify-center transition-colors"
+						class="aspect-square w-[100px] bg-black/50 hover:bg-black/70 disabled:bg-gray-600 disabled:cursor-not-allowed cursor-pointer p-3 rounded border border-white/10 flex flex-col items-center justify-center transition-colors"
 					>
 						{#if isPulling}
 							<div class="text-xs opacity-80">Pulling...</div>
@@ -110,7 +110,7 @@
 						{/if}
 					</button>
 				{:else}
-					<div class="aspect-square bg-black/20 p-3 rounded border border-white/5 flex items-center justify-center">
+					<div class="aspect-square w-[100px] bg-black/20 p-3 rounded border border-white/5 flex items-center justify-center">
 						<div class="opacity-30 text-sm">Empty</div>
 					</div>
 				{/if}
