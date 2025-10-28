@@ -4,12 +4,12 @@ import { getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
 
 const httpLink = new HttpLink({
-	uri: 'http://localhost:8080/graphql'
+	uri: 'https://api.cartridge.gg/x/glitchbomb-dev/torii/graphql'
 });
 
 const wsLink = new GraphQLWsLink(
 	createClient({
-		url: 'ws://localhost:8080/graphql'
+		url: 'wss://api.cartridge.gg/x/glitchbomb-dev/torii/graphql'
 	})
 );
 

@@ -1,9 +1,9 @@
 {
   "world": {
     "class_hash": "0x57994b6a75fad550ca18b41ee82e2110e158c59028c4478109a67965a0e5b1e",
-    "address": "0x3a7e28319f3617da4135893c711c79a1306adcd87cca4fbd0ceda50ae397683",
-    "seed": "dojo_starter",
-    "name": "Dojo starter",
+    "address": "0x22018cf61f8cfbbcd2579123d63c7b88d16e754c6e50fa1f6797e3b7b899759",
+    "seed": "glitchbomb",
+    "name": "Glitchbomb",
     "entrypoints": [
       "uuid",
       "set_metadata",
@@ -1479,7 +1479,7 @@
   },
   "contracts": [
     {
-      "address": "0x2bd6f652ef47d400f3fdf3c1180f449daa7a25b842a3617ccaeb00ad815f9c1",
+      "address": "0x554e1572bde3539ba06588fe56d0510725f5ed7e222ef85c3aaff360a921a2f",
       "class_hash": "0x5029a9e24d441a59b232bad23ff9ce0039b96c3a812fe9f8bdd7d533f6959f",
       "abi": [
         {
