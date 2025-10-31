@@ -1,6 +1,4 @@
-use starknet::ContractAddress;
 use super::constants::{INITIAL_GAME_ID, INITIAL_MOONROCKS, MAX_GAMES_PER_PACK};
-use super::player::Player;
 use super::shared::UpdateError;
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
@@ -34,8 +32,6 @@ pub enum GamePackAction {
 #[dojo::model]
 pub struct GamePack {
     #[key]
-    pub player_id: ContractAddress,
-    #[key]
     pub gamepack_id: u32,
     pub state: GamePackState,
     pub data: GamePackData,
@@ -43,15 +39,8 @@ pub struct GamePack {
 
 #[generate_trait]
 pub impl GamePackImpl of GamePackTrait {
-    fn create_for_player(ref player: Player, player_id: ContractAddress) -> GamePack {
-        player.gamepacks_bought += 1;
-
-        GamePack {
-            player_id,
-            gamepack_id: player.gamepacks_bought,
-            state: GamePackState::Unopened,
-            data: new_gamepack_data(),
-        }
+    fn create_for_player(id: u32) -> GamePack {
+        GamePack { gamepack_id: id, state: GamePackState::Unopened, data: new_gamepack_data() }
     }
 }
 

@@ -1,4 +1,3 @@
-use starknet::ContractAddress;
 use super::constants::{MAX_HP, level_cost_in_moonrocks, milestones};
 use super::gamepack::GamePack;
 use super::orbs::{get_common_orbs, get_cosmic_orbs, get_non_buyable_orbs, get_rare_orbs};
@@ -90,8 +89,6 @@ pub enum GameAction {
 #[dojo::model]
 pub struct Game {
     #[key]
-    pub player_id: ContractAddress,
-    #[key]
     pub gamepack_id: u32,
     #[key]
     pub game_id: u32,
@@ -103,7 +100,6 @@ pub struct Game {
 pub impl GameImpl of GameTrait {
     fn create_first_for_gamepack(gamepack: @GamePack) -> Game {
         let mut new_game = Game {
-            player_id: *gamepack.player_id,
             gamepack_id: *gamepack.gamepack_id,
             game_id: 1,
             state: GameState::New,
@@ -118,8 +114,6 @@ pub impl GameImpl of GameTrait {
 #[dojo::model]
 pub struct OrbsInGame {
     #[key]
-    pub player_id: ContractAddress,
-    #[key]
     pub gamepack_id: u32,
     #[key]
     pub game_id: u32,
@@ -131,11 +125,8 @@ pub struct OrbsInGame {
 
 #[generate_trait]
 pub impl OrbsInGameImpl of OrbsInGameTrait {
-    fn create_for_game(
-        player_id: ContractAddress, gamepack_id: u32, game_id: u32,
-    ) -> OrbsInGame {
+    fn create_for_game(gamepack_id: u32, game_id: u32) -> OrbsInGame {
         OrbsInGame {
-            player_id,
             gamepack_id,
             game_id,
             non_buyable: get_non_buyable_orbs(),
