@@ -18,7 +18,7 @@ btb = "sozo build --typescript --bindings-output ../svkit/src/lib"
 
 [dependencies]
 openzeppelin.workspace = true
-# alexandria_encoding.workspace = true
+alexandria_encoding.workspace = true
 dojo.workspace = true
 starknet.workspace = true
 

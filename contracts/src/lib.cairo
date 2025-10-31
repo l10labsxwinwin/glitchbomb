@@ -8,7 +8,6 @@ pub mod glitchbombv2 {
     pub mod orbs;
     pub mod shared;
 }
-
 pub mod models {
     pub mod config;
 }
@@ -27,3 +26,4 @@ pub mod types {
     pub mod image;
     pub mod random;
 }
+

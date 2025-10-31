@@ -12,16 +12,14 @@ pub const MINTER_ROLE: felt252 = selector!("MINTER_ROLE");
 
 #[dojo::contract]
 pub mod Collection {
-    // use alexandria_encoding::base64::Base64ByteArrayEncoder;
+    use alexandria_encoding::base64::Base64ByteArrayEncoder;
     use dojo::world::{WorldStorage, WorldStorageTrait};
     use openzeppelin::access::accesscontrol::{AccessControlComponent, DEFAULT_ADMIN_ROLE};
     use openzeppelin::access::ownable::OwnableComponent;
     use openzeppelin::introspection::src5::SRC5Component;
     use openzeppelin::token::erc721::interface::IERC721Metadata;
     use openzeppelin::token::erc721::{ERC721Component, ERC721HooksEmptyImpl};
-    use openzeppelin::upgrades::UpgradeableComponent;
-    use openzeppelin::upgrades::interface::IUpgradeable;
-    use starknet::{ClassHash, ContractAddress};
+    use starknet::ContractAddress;
     use crate::constants::NAMESPACE;
     use crate::glitchbombv2::contract::NAME as GAME_NAME;
     use crate::types::image::Image;
@@ -39,7 +37,6 @@ pub mod Collection {
     component!(path: OwnableComponent, storage: ownable, event: OwnableEvent);
     component!(path: ERC721Component, storage: erc721, event: ERC721Event);
     component!(path: SRC5Component, storage: src5, event: SRC5Event);
-    component!(path: UpgradeableComponent, storage: upgradeable, event: UpgradeableEvent);
 
     // AccessControl
     #[abi(embed_v0)]
@@ -57,21 +54,16 @@ pub mod Collection {
     impl ERC721Impl = ERC721Component::ERC721Impl<ContractState>;
     impl ERC721InternalImpl = ERC721Component::InternalImpl<ContractState>;
 
-    // Upgradeable
-    impl UpgradeableInternalImpl = UpgradeableComponent::InternalImpl<ContractState>;
-
     #[storage]
     pub struct Storage {
         #[substorage(v0)]
-        accesscontrol: AccessControlComponent::Storage,
+        pub accesscontrol: AccessControlComponent::Storage,
         #[substorage(v0)]
         pub ownable: OwnableComponent::Storage,
         #[substorage(v0)]
         pub erc721: ERC721Component::Storage,
         #[substorage(v0)]
         pub src5: SRC5Component::Storage,
-        #[substorage(v0)]
-        pub upgradeable: UpgradeableComponent::Storage,
     }
 
     #[event]
@@ -85,37 +77,24 @@ pub mod Collection {
         ERC721Event: ERC721Component::Event,
         #[flat]
         SRC5Event: SRC5Component::Event,
-        #[flat]
-        UpgradeableEvent: UpgradeableComponent::Event,
     }
 
     /// Assigns `owner` as the contract owner.
     /// Sets the token `name` and `symbol`.
     /// Mints the `token_ids` tokens to `recipient` and sets
     /// the base URI.
-    #[constructor]
-    fn constructor(ref self: ContractState) {
+    fn dojo_init(ref self: ContractState) {
         // [Setup] World
         let world: WorldStorage = self.world(@NAMESPACE());
         // [Effect] Initialize components
         let deployer_account = starknet::get_tx_info().unbox().account_contract_address;
         self.accesscontrol.initializer();
         self.ownable.initializer(deployer_account);
-        self.erc721.initializer("Glitch Bombs", "GLITCHBOMBS", "");
+        self.erc721.initializer("Glitch Bomb", "GLITCH-BOMB", "");
         // [Effect] Grant roles
         let game_address = world.dns_address(@GAME_NAME()).expect('Game contract not found!');
         self.accesscontrol._grant_role(DEFAULT_ADMIN_ROLE, deployer_account);
         self.accesscontrol._grant_role(MINTER_ROLE, game_address);
-    }
-
-    #[abi(embed_v0)]
-    impl UpgradeableImpl of IUpgradeable<ContractState> {
-        /// Upgrades the contract class hash to `new_class_hash`.
-        /// This may only be called by the contract owner.
-        fn upgrade(ref self: ContractState, new_class_hash: ClassHash) {
-            self.ownable.assert_only_owner();
-            self.upgradeable.upgrade(new_class_hash);
-        }
     }
 
     #[abi(embed_v0)]
@@ -129,24 +108,24 @@ pub mod Collection {
         }
 
         fn token_uri(self: @ContractState, token_id: u256) -> ByteArray {
-            // // [Check] Token exists
-            // let owner = self.erc721.owner_of(token_id);
-            // if (owner.into() == 0) {
-            //     return "";
-            // }
-            // // [Return] Token URI
-            // let name: ByteArray = format!("Glitch Bomb #{}", token_id);
-            // let description: ByteArray = "Glitch Bomb";
-            // let image: ByteArray = Base64ByteArrayEncoder::encode(Image::get());
-            // Base64ByteArrayEncoder::encode(
-            //     format!(
-            //         "{{\"name\": \"{}\", \"description\": \"{}\", \"image\": \"{}\"}}",
-            //         name,
-            //         description,
-            //         image,
-            //     ),
-            // )
-            ""
+            // [Check] Token exists
+            let owner = self.erc721.owner_of(token_id);
+            if (owner.into() == 0) {
+                return "";
+            }
+            // [Return] Token URI
+            let name: ByteArray = format!("Glitch Bomb #{}", token_id);
+            let description: ByteArray = "Glitch Bomb";
+            let image: ByteArray = Base64ByteArrayEncoder::encode(Image::get());
+            "data:application/json;base64,"
+                + Base64ByteArrayEncoder::encode(
+                    format!(
+                        "{{\"name\": \"{}\", \"description\": \"{}\", \"image\": \"data:image/svg+xml;base64,{}\"}}",
+                        name,
+                        description,
+                        image,
+                    ),
+                )
         }
     }
 

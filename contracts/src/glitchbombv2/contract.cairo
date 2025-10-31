@@ -51,7 +51,7 @@ pub mod gb_contract_v2 {
         vrf_address: Option<ContractAddress>,
     ) {
         // [Setup] World and Store
-        let mut world = self.world(@NAMESPACE());
+        let mut world = self.world_default();
         // [Effect] Create config
         let collection_address = if let Option::Some(collection_address) = collection_address {
             collection_address
@@ -86,13 +86,11 @@ pub mod gb_contract_v2 {
             token.transfer_from(player, contract_address, DEFAULT_ENTRY_PRICE);
 
             // [Effect] Store new GamePack
-            let gamepack_id: u32 = world.dispatcher.uuid();
+            let gamepack_id: u32 = world.dispatcher.uuid() + 1;
             let new_gamepack = GamePackTrait::create_for_player(gamepack_id);
             world.write_model(@new_gamepack);
 
             // [Interaction] Mint NFT
-            let config: Config = world.read_model(CONFIG_ID);
-            let player = get_caller_address();
             let collection = ICollectionDispatcher { contract_address: config.collection };
             collection.mint(player, gamepack_id.into());
         }
@@ -437,7 +435,7 @@ pub mod gb_contract_v2 {
     #[generate_trait]
     impl InternalImpl of InternalTrait {
         fn world_default(self: @ContractState) -> WorldStorage {
-            self.world(@"glitchbomb")
+            self.world(@NAMESPACE())
         }
 
         fn assert_token_owner(self: @ContractState, ref world: WorldStorage, gamepack_id: u32) {

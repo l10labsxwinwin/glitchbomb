@@ -1,0 +1,42 @@
+[world]
+name = "Glitch Bomb"
+description = "Glitch Bomb World"
+website = "https://github.com/l10labsxwinwin/glitchbomb"
+seed = "GB-1.0.0"
+
+[namespace]
+default = "GLITCHBOMB"
+
+[env]
+rpc_url = "http://localhost:5050/"
+world_address = "0x063d4a0854146d7f6e773b9c38d42156cefc3310524414cc75e61d593792c443"
+account_address = "0x127fd5f1fe78a71f8bcd1fec63e3fe2f0486b6ecd5c86a0466c3a21fa5cfcec"
+private_key = "0xc5b2fcab997346f3ea1c00b002ecf6f382c5f9c9659a3894eb783c5320f912"
+
+[migration]
+order_inits = [
+    "GLITCHBOMB-VRF",
+    "GLITCHBOMB-Token",
+    "GLITCHBOMB-Collection",
+    "GLITCHBOMB-gb_contract_v2",
+]
+skip_contracts = ["GLITCHBOMB-VRF"]
+disable_multicall = true
+
+[writers]
+"GLITCHBOMB" = [
+    "GLITCHBOMB-gb_contract_v2",
+    "GLITCHBOMB-Collection",
+    "GLITCHBOMB-Token",
+    "GLITCHBOMB-VRF",
+]
+
+[init_call_args]
+"GLITCHBOMB-Collection" = []
+"GLITCHBOMB-Token" = []
+"GLITCHBOMB-VRF" = []
+"GLITCHBOMB-gb_contract_v2" = [
+    "0x1", # Collection: Option None
+    "0x1", # Token: Option None
+    "0x1", # VRF: Option None
+]

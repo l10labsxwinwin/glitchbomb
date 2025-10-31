@@ -2,6 +2,59 @@
 version = 1
 
 [[package]]
+name = "alexandria_bytes"
+version = "0.6.1"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:b1a402330fe5356ca0a4f24d2b8dd1fb0a7e2568bf35c349319cadb53f0ed6fd"
+dependencies = [
+ "alexandria_data_structures",
+ "alexandria_math",
+]
+
+[[package]]
+name = "alexandria_data_structures"
+version = "0.6.1"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:f011951982ca26ce64c212ca5aa739bd16461dae96a4fb9a8f8e360b1c5e7b94"
+
+[[package]]
+name = "alexandria_encoding"
+version = "0.6.1"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:19f58f8007245477972989c673aa5523ea6a711cdbee4d8e290809a550306376"
+dependencies = [
+ "alexandria_bytes",
+ "alexandria_data_structures",
+ "alexandria_math",
+ "alexandria_numeric",
+]
+
+[[package]]
+name = "alexandria_math"
+version = "0.6.1"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:19160f0993a6643e8e71a3bce03e54a37f26b8cad94f21668d7cc9afd08d2047"
+
+[[package]]
+name = "alexandria_numeric"
+version = "0.6.1"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:607ceb7572c64cd7b7b8f433604d5cffe3b36d6b4c64f9b3f126e0621df5f4eb"
+dependencies = [
+ "alexandria_math",
+ "alexandria_searching",
+]
+
+[[package]]
+name = "alexandria_searching"
+version = "0.6.1"
+source = "registry+https://scarbs.xyz/"
+checksum = "sha256:8a05a9729f886595e5f43df9152a9b58c396faf5962d83c778cce2cb9e8e3d0f"
+dependencies = [
+ "alexandria_data_structures",
+]
+
+[[package]]
 name = "dojo"
 version = "1.7.2"
 source = "registry+https://scarbs.xyz/"
@@ -29,6 +82,7 @@ dependencies = [
 name = "glitchbomb"
 version = "1.0.0"
 dependencies = [
+ "alexandria_encoding",
  "dojo",
  "dojo_cairo_test",
  "openzeppelin",
