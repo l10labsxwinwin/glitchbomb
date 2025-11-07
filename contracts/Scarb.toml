@@ -1,8 +1,8 @@
 [package]
-cairo-version = "2.12.2"
+cairo-version.workspace = true
+edition.workspace = true
 name = "glitchbomb"
-version = "1.7.1"
-edition = "2024_07"
+version = "1.0.0"
 
 [cairo]
 sierra-replace-ids = true
@@ -17,15 +17,17 @@ watch = "find src -name '*.cairo' | entr -c sozo build"
 btb = "sozo build --typescript --bindings-output ../svkit/src/lib"
 
 [dependencies]
-dojo = "1.7.1"
-starknet = "2.12.2"
+openzeppelin.workspace = true
+alexandria_encoding.workspace = true
+dojo.workspace = true
+starknet.workspace = true
+
+[dev-dependencies]
+dojo_cairo_test.workspace = true
+cairo_test.workspace = true
 
 [[target.starknet-contract]]
 build-external-contracts = ["dojo::world::world_contract::world"]
 
 [tool.scarb]
 allow-prebuilt-plugins = ["dojo_cairo_macros"]
-
-[dev-dependencies]
-cairo_test = "2.12.2"
-dojo_cairo_test = "1.7.1"
