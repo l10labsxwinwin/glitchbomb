@@ -1,18 +1,9 @@
 import type { Orb } from './GameDataTypes'
-import { OrbCategory } from './GameDataTypes'
+import { OrbCategory, orbCategoryColors } from './GameDataTypes'
 
 interface RecentOrbsDisplayProps {
   consumedOrbs: Orb[]
   width?: number
-}
-
-// Map categories to colors (matching donut chart colors)
-const categoryColors: Record<OrbCategory, string> = {
-  [OrbCategory.Point]: "var(--chart-1)",
-  [OrbCategory.Health]: "var(--chart-2)",
-  [OrbCategory.Bomb]: "var(--chart-3)",
-  [OrbCategory.Multiplier]: "var(--chart-4)",
-  [OrbCategory.Special]: "var(--chart-5)",
 }
 
 export default function RecentOrbsDisplay({ consumedOrbs, width }: RecentOrbsDisplayProps) {
@@ -30,12 +21,12 @@ export default function RecentOrbsDisplay({ consumedOrbs, width }: RecentOrbsDis
         </span>
         <div className="flex items-center gap-1.5 md:gap-2">
           {reversedOrbs.map((orb, index) => {
-            const colorVar = categoryColors[orb.category]
+            const colorVar = orbCategoryColors[orb.category]
             
             return (
               <div
                 key={index}
-                className="w-4 h-4 md:w-5 md:h-5 rounded-full flex-shrink-0"
+                className="w-4 h-4 md:w-5 md:h-5 rounded-full shrink-0"
                 style={{
                   backgroundColor: colorVar,
                   boxShadow: `0 0 8px ${colorVar}, 0 0 16px ${colorVar}`,
