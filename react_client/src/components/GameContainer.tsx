@@ -60,7 +60,7 @@ export default function GameContainer({
             <Multiplier value={gameData.multiplier} />
           </div>
         </div>
-        <div className="w-full shrink-0">
+        <div className="w-full shrink-0 mt-4 md:mt-6">
           <RecentOrbsDisplay consumedOrbs={gameData.consumed_orbs} width={topRowWidth} />
         </div>
         <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-start md:justify-center gap-2 md:gap-4">
