@@ -71,11 +71,11 @@ export function DonutChart({
   }, [data])
 
   return (
-    <div className={cn("relative w-full flex flex-col items-center justify-center", className)}>
-      <div className="relative w-full aspect-square max-w-[400px]">
+    <div className={cn("relative w-full h-full flex flex-col items-center justify-center", className)}>
+      <div className="relative w-full h-full aspect-square max-w-full max-h-full">
         <ChartContainer
           config={config}
-          className="mx-auto aspect-square max-h-[400px] w-full"
+          className="mx-auto aspect-square w-full h-full max-w-full max-h-full"
         >
           <PieChart>
             <ChartTooltip

@@ -43,30 +43,34 @@ export default function GameContainer({
   }, [gameData])
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-start bg-black text-white pt-12 md:pt-16 px-6 md:px-8">
-      <div className="flex flex-col items-center gap-8 md:gap-12 w-full max-w-7xl flex-1 pb-12 md:pb-16">
-        <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full">
+    <div className="h-screen overflow-hidden flex flex-col items-center justify-center bg-black text-white px-4 md:px-6 py-6 md:py-8">
+      <div className="flex flex-col items-center justify-between w-full max-w-7xl h-full gap-1 md:gap-2">
+        <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full flex-shrink-0">
           <div ref={topRowRef} className="flex flex-row items-center gap-4 md:gap-8">
             <CashOutButton onClick={onCashOut} />
             <StatsDisplay gameData={gameData} />
             <Multiplier value={gameData.multiplier} />
           </div>
         </div>
-        <ChartLineDots width={topRowWidth} />
-        <DonutChart 
-          className="w-full max-w-md md:max-w-lg"
-          innerRadius={120}
-          outerRadius={150}
-          data={donutChartData}
-          config={donutChartConfig}
-        >
-          <PullOrbDisplay 
-            onClick={onPullOrb} 
-            orbs={gameData.pullable_orbs.length}
-            health={gameData.health}
-          />
-        </DonutChart>
-        <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full">
+        <div className="flex-shrink min-h-0 w-full flex items-center justify-center">
+          <ChartLineDots width={topRowWidth} />
+        </div>
+        <div className="flex-1 min-h-0 w-full flex items-center justify-center">
+          <DonutChart 
+            className="w-full h-full"
+            innerRadius={120}
+            outerRadius={150}
+            data={donutChartData}
+            config={donutChartConfig}
+          >
+            <PullOrbDisplay 
+              onClick={onPullOrb} 
+              orbs={gameData.pullable_orbs.length}
+              health={gameData.health}
+            />
+          </DonutChart>
+        </div>
+        <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full flex-shrink-0">
           <BottomBarDisplay 
             bombOrbs={gameData.pullable_orbs.filter(orb => orb.category === OrbCategory.Bomb)} 
             width={bottomBarWidth} 
