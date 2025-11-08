@@ -1,15 +1,16 @@
 import { Menu, ArrowDown } from 'lucide-react'
 import BombsDisplay from './BombsDisplay'
+import type { Orb } from './GameDataTypes'
 
 interface BottomBarDisplayProps {
-  bombs: number
+  bombOrbs: Orb[]
   onLeftButtonClick?: () => void
   onRightButtonClick?: () => void
   width?: number
 }
 
 export default function BottomBarDisplay({ 
-  bombs, 
+  bombOrbs, 
   onLeftButtonClick,
   onRightButtonClick,
   width
@@ -25,7 +26,7 @@ export default function BottomBarDisplay({
       >
         <Menu size={24} className="md:w-6 md:h-6" />
       </button>
-      <BombsDisplay bombs={bombs} />
+      <BombsDisplay bombOrbs={bombOrbs} />
       <button
         onClick={onRightButtonClick}
         className="flex items-center justify-center w-12 h-12 md:w-16 md:h-16 border-2 border-white text-white hover:bg-white hover:text-black transition-colors rounded-lg"

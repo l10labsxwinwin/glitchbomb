@@ -6,6 +6,7 @@ import PullOrbDisplay from './PullOrbDisplay'
 import BottomBarDisplay from './BottomBarDisplay'
 import { DonutChart } from './DonutChart'
 import type { GameData } from './GameDataTypes'
+import { OrbCategory } from './GameDataTypes'
 import type { ChartConfig } from './ui/chart'
 
 interface GameContainerProps {
@@ -62,7 +63,10 @@ export default function GameContainer({
           />
         </DonutChart>
         <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full">
-          <BottomBarDisplay bombs={gameData.bombs} width={bottomBarWidth} />
+          <BottomBarDisplay 
+            bombOrbs={gameData.pullable_orbs.filter(orb => orb.category === OrbCategory.Bomb)} 
+            width={bottomBarWidth} 
+          />
         </div>
       </div>
     </div>
