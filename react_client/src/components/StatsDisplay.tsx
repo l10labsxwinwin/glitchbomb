@@ -11,10 +11,14 @@ export default function StatsDisplay({ gameData }: StatsDisplayProps) {
     <div className="flex flex-col items-center gap-3 md:gap-4 text-white">
       <div className="flex flex-row gap-4 md:gap-8 items-center">
         <StatColumn value={gameData.moonRocks} />
-        <span className="text-6xl md:text-8xl font-bold">{gameData.points}</span>
+        <div className="min-w-[120px] sm:min-w-[160px] md:min-w-[200px] flex items-center justify-center">
+          <span className="text-6xl md:text-8xl font-bold">{gameData.points}</span>
+        </div>
         <StatColumn value={gameData.glitchChips} />
       </div>
-      <PointsProgressBar points={gameData.points} milestone={gameData.milestone} />
+      <div className="w-full">
+        <PointsProgressBar points={gameData.points} milestone={gameData.milestone} />
+      </div>
     </div>
   )
 }

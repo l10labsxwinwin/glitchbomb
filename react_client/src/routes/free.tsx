@@ -10,9 +10,9 @@ export const Route = createFileRoute('/free')({
 function FreePlay() {
   const mockGameData = {
     moonRocks: 80,
-    points: 140,
+    points: 15,
     glitchChips: 36,
-    milestone: 200,
+    milestone: 30,
     multiplier: 2.5,
   }
 
