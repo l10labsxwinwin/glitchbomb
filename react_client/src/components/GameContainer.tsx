@@ -47,7 +47,7 @@ export default function GameContainer({
 
   return (
     <div className="h-screen overflow-hidden flex flex-col items-center justify-center bg-black text-white px-4 md:px-6 py-6 md:py-8">
-      <div className="flex flex-col items-center justify-between w-full max-w-7xl h-full gap-1 md:gap-2">
+      <div className="flex flex-col items-center w-full max-w-7xl h-full gap-2 md:gap-4">
         <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full shrink-0">
           <div ref={topRowRef} className="flex flex-row items-center gap-4 md:gap-8">
             <CashOutButton onClick={onCashOut} />
@@ -56,9 +56,9 @@ export default function GameContainer({
           </div>
         </div>
         <div className="w-full shrink-0">
-          <RecentOrbsDisplay consumedOrbs={gameData.consumed_orbs} />
+          <RecentOrbsDisplay consumedOrbs={gameData.consumed_orbs} width={topRowWidth} />
         </div>
-        <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-start md:justify-center gap-2 md:gap-3">
+        <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-start md:justify-center gap-2 md:gap-4">
           <div className="flex-1 min-h-0 w-full flex items-center justify-center">
             <ChartLineDots width={topRowWidth} data={lineData} />
           </div>

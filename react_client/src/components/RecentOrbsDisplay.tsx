@@ -3,6 +3,7 @@ import { OrbCategory } from './GameDataTypes'
 
 interface RecentOrbsDisplayProps {
   consumedOrbs: Orb[]
+  width?: number
 }
 
 // Map categories to colors (matching donut chart colors)
@@ -14,13 +15,16 @@ const categoryColors: Record<OrbCategory, string> = {
   [OrbCategory.Special]: "var(--chart-5)",
 }
 
-export default function RecentOrbsDisplay({ consumedOrbs }: RecentOrbsDisplayProps) {
+export default function RecentOrbsDisplay({ consumedOrbs, width }: RecentOrbsDisplayProps) {
   // Reverse the array so most recent (last pulled) is first (leftmost)
   const reversedOrbs = [...consumedOrbs].reverse()
 
   return (
     <div className="w-full flex items-center justify-center">
-      <div className="flex items-center justify-between w-full max-w-7xl px-3 md:px-4 py-1.5 md:py-2 bg-black border-2 border-white rounded-full">
+      <div 
+        className="flex items-center justify-start px-3 md:px-4 py-1.5 md:py-2 bg-black border-2 border-white rounded-full gap-3 md:gap-4"
+        style={width ? { width: `${width}px` } : undefined}
+      >
         <span className="text-white font-mono text-xs md:text-sm font-bold tracking-wider">
           RECENT
         </span>
