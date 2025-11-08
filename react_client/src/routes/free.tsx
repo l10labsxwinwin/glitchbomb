@@ -3,6 +3,7 @@ import StatsDisplay from '../components/StatsDisplay'
 import Multiplier from '../components/Multiplier'
 import CashOutButton from '../components/CashOutButton'
 import PullOrbDisplay from '../components/PullOrbDisplay'
+import BombsDisplay from '../components/BombsDisplay'
 import type { GameData } from '@/components/GameDataTypes'
 
 export const Route = createFileRoute('/free')({
@@ -16,8 +17,9 @@ function FreePlay() {
     glitchChips: 36,
     milestone: 30,
     multiplier: 2.5,
-    bombs: 4,
+    bombs: 5,
     health: 5,
+    orbs: 12,
   }
 
   return (
@@ -30,9 +32,10 @@ function FreePlay() {
         </div>
         <PullOrbDisplay 
           onClick={() => console.log('Pull Orb clicked')} 
-          bombs={mockGameData.bombs}
+          orbs={mockGameData.orbs}
           health={mockGameData.health}
         />
+        <BombsDisplay bombs={mockGameData.bombs} />
       </div>
     </div>
   )

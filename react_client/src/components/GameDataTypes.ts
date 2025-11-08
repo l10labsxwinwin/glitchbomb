@@ -6,5 +6,6 @@ export interface GameData {
   multiplier: number
   bombs: number
   health: number
+  orbs: number
 }
 
