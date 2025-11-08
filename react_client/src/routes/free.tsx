@@ -49,6 +49,7 @@ const mockLineData: LineDataPoint[] = [
   { pull_number: 5, level: 1, aggregate_score: 5, point_type: PointType.Bomb },
   { pull_number: 6, level: 1, aggregate_score: 8, point_type: PointType.NonBomb },
   { pull_number: 7, level: 1, aggregate_score: 18, point_type: PointType.NonBomb },
+  { pull_number: 8, level: 1, aggregate_score: 25, point_type: PointType.NonBomb },
 ]
 
 // Group pullable orbs by category

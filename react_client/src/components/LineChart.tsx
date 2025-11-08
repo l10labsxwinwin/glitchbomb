@@ -67,9 +67,10 @@ export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
             />
             <Line
               dataKey="aggregate_score"
-              type="natural"
+              type="linear"
               stroke="white"
               strokeWidth={2}
+              animationDuration={500}
               dot={(props: any) => {
                 const { cx, cy, payload } = props
                 const color = payload.point_type === PointType.Bomb ? "#ff3333" : "#33ff33"
@@ -79,8 +80,6 @@ export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
                     cy={cy}
                     r={10}
                     fill={color}
-                    stroke="white"
-                    strokeWidth={2}
                   />
                 )
               }}
