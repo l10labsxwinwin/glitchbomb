@@ -5,6 +5,7 @@ import CashOutButton from './CashOutButton'
 import PullOrbDisplay from './PullOrbDisplay'
 import BottomBarDisplay from './BottomBarDisplay'
 import { DonutChart } from './DonutChart'
+import { ChartLineDots } from './LineChart'
 import type { GameData } from './GameDataTypes'
 import { OrbCategory } from './GameDataTypes'
 import type { ChartConfig } from './ui/chart'
@@ -49,6 +50,7 @@ export default function GameContainer({
             <Multiplier value={gameData.multiplier} />
           </div>
         </div>
+        <ChartLineDots />
         <DonutChart 
           className="w-full max-w-md md:max-w-lg"
           innerRadius={120}
