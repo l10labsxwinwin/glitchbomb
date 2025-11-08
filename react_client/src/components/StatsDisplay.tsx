@@ -1,4 +1,5 @@
 import type { GameData } from './GameDataTypes'
+import StatColumn from './StatColumn'
 
 interface StatsDisplayProps {
   gameData: GameData
@@ -6,16 +7,10 @@ interface StatsDisplayProps {
 
 export default function StatsDisplay({ gameData }: StatsDisplayProps) {
   return (
-    <div className="flex flex-row items-center justify-center gap-8 text-white">
-      <div className="flex flex-col items-center">
-        <span className="text-2xl font-bold">{gameData.moonRocks}</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <span className="text-2xl font-bold">{gameData.points}</span>
-      </div>
-      <div className="flex flex-col items-center">
-        <span className="text-2xl font-bold">{gameData.glitchChips}</span>
-      </div>
+    <div className="flex flex-row gap-8 items-center text-white">
+      <StatColumn value={gameData.moonRocks} />
+      <span className="text-8xl font-bold">{gameData.points}</span>
+      <StatColumn value={gameData.glitchChips} />
     </div>
   )
 }
