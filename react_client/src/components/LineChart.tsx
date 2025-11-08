@@ -10,7 +10,6 @@ import {
   ChartConfig,
   ChartContainer,
   ChartTooltip,
-  ChartTooltipContent,
 } from "@/components/ui/chart"
 import type { LineDataPoint } from "./GameDataTypes"
 import { PointType } from "./GameDataTypes"
@@ -28,6 +27,67 @@ interface ChartLineDotsProps {
 }
 
 export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
+  // Calculate domain with lowest value as minimum aggregate_score
+  const calculateDomain = () => {
+    if (data.length === 0) return [0, 0]
+    
+    const scores = data.map(d => d.aggregate_score)
+    const min = Math.min(...scores)
+    const max = Math.max(...scores)
+    
+    // Add padding to min and max
+    const range = max - min
+    const padding = range * 0.1 || 10
+    return [min - padding, max + padding]
+  }
+
+  // Calculate ticks that include 0 and only integers in multiples of 5 or 10
+  const calculateTicks = () => {
+    const domain = calculateDomain()
+    const [min, max] = domain
+    const range = max - min
+    
+    // Determine step size: prefer 10, use 5 if range is small
+    let step = 10
+    if (range < 50) {
+      step = 5
+    }
+    
+    // Round min down to nearest multiple of step
+    const startTick = Math.floor(min / step) * step
+    // Round max up to nearest multiple of step
+    const endTick = Math.ceil(max / step) * step
+    
+    const ticks: number[] = []
+    // Generate ticks in multiples of step
+    for (let i = startTick; i <= endTick; i += step) {
+      ticks.push(i)
+    }
+    
+    // Always include 0 if it's within the domain
+    if (min <= 0 && max >= 0 && !ticks.includes(0)) {
+      ticks.push(0)
+    }
+    
+    return ticks.sort((a, b) => a - b)
+  }
+
+  const domain = calculateDomain()
+  const ticks = calculateTicks()
+
+  // Custom tooltip that only shows the value
+  const CustomTooltip = ({ active, payload }: any) => {
+    if (active && payload && payload.length) {
+      const value = payload[0].value
+      return (
+        <div className="rounded-md border bg-popover px-3 py-1 text-sm text-popover-foreground shadow-md">
+          {value}
+        </div>
+      )
+    }
+    return null
+  }
+
   return (
     <Card 
       className="w-full h-full bg-transparent border-0 shadow-none"
@@ -54,16 +114,21 @@ export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+              hide={true}
             />
             <YAxis
               tickLine={false}
               axisLine={false}
               tickMargin={8}
               width={40}
+              domain={domain}
+              ticks={ticks}
+              allowDecimals={false}
+              tickFormatter={(value) => Math.round(value).toString()}
             />
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              content={<CustomTooltip />}
             />
             <Line
               dataKey="aggregate_score"
