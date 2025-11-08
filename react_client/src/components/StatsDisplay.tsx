@@ -8,7 +8,7 @@ interface StatsDisplayProps {
 
 export default function StatsDisplay({ gameData }: StatsDisplayProps) {
   return (
-    <div className="flex flex-col items-center gap-3 md:gap-4 text-white">
+    <div className="flex flex-col items-center gap-3 md:gap-4" style={{ color: '#55DD63' }}>
       <div className="flex flex-row gap-4 md:gap-8 items-center">
         <StatColumn value={gameData.moonRocks} />
         <div className="min-w-[120px] sm:min-w-[160px] md:min-w-[200px] flex items-center justify-center">

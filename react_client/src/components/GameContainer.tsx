@@ -46,7 +46,12 @@ export default function GameContainer({
   }, [gameData])
 
   return (
-    <div className="h-screen overflow-hidden flex flex-col items-center justify-center bg-black text-white px-4 md:px-6 py-6 md:py-8">
+    <div 
+      className="h-screen overflow-hidden flex flex-col items-center justify-center text-white px-4 md:px-6 py-6 md:py-8"
+      style={{
+        background: 'linear-gradient(to bottom, #0C1806, #000000)'
+      }}
+    >
       <div className="flex flex-col items-center w-full max-w-7xl h-full gap-2 md:gap-4">
         <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full shrink-0">
           <div ref={topRowRef} className="flex flex-row items-center gap-4 md:gap-8">
@@ -63,19 +68,19 @@ export default function GameContainer({
             <ChartLineDots width={topRowWidth} data={lineData} />
           </div>
           <div className="flex-1 min-h-0 w-full flex items-center justify-center">
-            <DonutChart 
+        <DonutChart 
               className="w-full h-full"
-              innerRadius={120}
-              outerRadius={150}
-              data={donutChartData}
-              config={donutChartConfig}
-            >
-              <PullOrbDisplay 
-                onClick={onPullOrb} 
+          innerRadius={120}
+          outerRadius={150}
+          data={donutChartData}
+          config={donutChartConfig}
+        >
+          <PullOrbDisplay 
+            onClick={onPullOrb} 
                 orbs={gameData.pullable_orbs.length}
-                health={gameData.health}
-              />
-            </DonutChart>
+            health={gameData.health}
+          />
+        </DonutChart>
           </div>
         </div>
         <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full shrink-0">

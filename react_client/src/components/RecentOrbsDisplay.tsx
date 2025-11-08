@@ -22,10 +22,10 @@ export default function RecentOrbsDisplay({ consumedOrbs, width }: RecentOrbsDis
   return (
     <div className="w-full flex items-center justify-center">
       <div 
-        className="flex items-center justify-start px-3 md:px-4 py-1.5 md:py-2 bg-black border-2 border-white rounded-full gap-3 md:gap-4"
+        className="flex items-center justify-start px-3 md:px-4 py-1.5 md:py-2 bg-black rounded-full gap-3 md:gap-4"
         style={width ? { width: `${width}px` } : undefined}
       >
-        <span className="text-white font-mono text-xs md:text-sm font-bold tracking-wider">
+        <span className="font-mono text-xs md:text-sm font-bold tracking-wider" style={{ color: '#55DD63' }}>
           RECENT
         </span>
         <div className="flex items-center gap-1.5 md:gap-2">

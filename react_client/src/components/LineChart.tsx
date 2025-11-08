@@ -125,6 +125,7 @@ export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
               ticks={ticks}
               allowDecimals={false}
               tickFormatter={(value) => Math.round(value).toString()}
+              tick={{ fill: '#55DD63' }}
             />
             <ChartTooltip
               cursor={false}
@@ -133,12 +134,12 @@ export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
             <Line
               dataKey="aggregate_score"
               type="linear"
-              stroke="white"
+              stroke="#55DD63"
               strokeWidth={2}
               animationDuration={500}
               dot={(props: any) => {
                 const { cx, cy, payload } = props
-                const color = payload.point_type === PointType.Bomb ? "#ff3333" : "#33ff33"
+                const color = payload.point_type === PointType.Bomb ? "#FF1E00" : "#55DD63"
                 return (
                   <circle
                     cx={cx}
