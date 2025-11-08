@@ -33,17 +33,24 @@ const chartConfig = {
   },
 } satisfies ChartConfig
 
-export function ChartLineDots() {
+interface ChartLineDotsProps {
+  width?: number
+}
+
+export function ChartLineDots({ width }: ChartLineDotsProps) {
   return (
-    <Card className="w-full max-w-md bg-transparent border-white/20">
-      <CardContent className="p-4">
+    <Card 
+      className="w-full bg-transparent border-0 shadow-none"
+      style={width ? { width: `${width}px` } : undefined}
+    >
+      <CardContent className="p-0">
         <ChartContainer config={chartConfig}>
           <LineChart
             accessibilityLayer
             data={chartData}
             margin={{
-              left: 12,
-              right: 12,
+              left: 0,
+              right: 0,
             }}
           >
             <CartesianGrid vertical={false} strokeDasharray="3 3" />
@@ -58,6 +65,7 @@ export function ChartLineDots() {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
+              width={40}
             />
             <ChartTooltip
               cursor={false}

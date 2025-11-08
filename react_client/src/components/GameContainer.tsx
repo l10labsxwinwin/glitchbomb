@@ -27,11 +27,13 @@ export default function GameContainer({
 }: GameContainerProps) {
   const topRowRef = useRef<HTMLDivElement>(null)
   const [bottomBarWidth, setBottomBarWidth] = useState<number | undefined>(undefined)
+  const [topRowWidth, setTopRowWidth] = useState<number | undefined>(undefined)
 
   useEffect(() => {
     const updateWidth = () => {
       if (topRowRef.current) {
         setBottomBarWidth(topRowRef.current.offsetWidth)
+        setTopRowWidth(topRowRef.current.offsetWidth)
       }
     }
 
@@ -42,7 +44,7 @@ export default function GameContainer({
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-start bg-black text-white pt-12 md:pt-16 px-6 md:px-8">
-      <div className="flex flex-col items-center justify-between w-full max-w-7xl flex-1 pb-12 md:pb-16">
+      <div className="flex flex-col items-center gap-8 md:gap-12 w-full max-w-7xl flex-1 pb-12 md:pb-16">
         <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full">
           <div ref={topRowRef} className="flex flex-row items-center gap-4 md:gap-8">
             <CashOutButton onClick={onCashOut} />
@@ -50,7 +52,7 @@ export default function GameContainer({
             <Multiplier value={gameData.multiplier} />
           </div>
         </div>
-        <ChartLineDots />
+        <ChartLineDots width={topRowWidth} />
         <DonutChart 
           className="w-full max-w-md md:max-w-lg"
           innerRadius={120}
