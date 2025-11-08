@@ -10,7 +10,7 @@ export default function PointsProgressBar({
   const progress = milestone > 0 ? Math.min((points / milestone) * 100, 100) : 0
 
   return (
-    <div className="w-full bg-gray-700 rounded-lg h-6 overflow-hidden relative">
+    <div className="w-full bg-gray-600 rounded-lg h-6 overflow-hidden relative">
       <div
         className="bg-white h-full transition-all duration-300 rounded-lg"
         style={{ width: `${progress}%` }}
