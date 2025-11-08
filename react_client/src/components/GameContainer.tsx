@@ -6,7 +6,7 @@ import PullOrbDisplay from './PullOrbDisplay'
 import BottomBarDisplay from './BottomBarDisplay'
 import { DonutChart } from './DonutChart'
 import { ChartLineDots } from './LineChart'
-import type { GameData } from './GameDataTypes'
+import type { GameData, LineDataPoint } from './GameDataTypes'
 import { OrbCategory } from './GameDataTypes'
 import type { ChartConfig } from './ui/chart'
 
@@ -14,6 +14,7 @@ interface GameContainerProps {
   gameData: GameData
   donutChartData?: Array<{ category: string; value: number; fill: string }>
   donutChartConfig?: ChartConfig
+  lineData?: LineDataPoint[]
   onCashOut?: () => void
   onPullOrb?: () => void
 }
@@ -22,6 +23,7 @@ export default function GameContainer({
   gameData,
   donutChartData,
   donutChartConfig,
+  lineData,
   onCashOut = () => console.log('Cash out clicked'),
   onPullOrb = () => console.log('Pull Orb clicked')
 }: GameContainerProps) {
@@ -54,7 +56,7 @@ export default function GameContainer({
         </div>
         <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-start md:justify-center gap-2 md:gap-3">
           <div className="flex-1 min-h-0 w-full flex items-center justify-center">
-            <ChartLineDots width={topRowWidth} />
+            <ChartLineDots width={topRowWidth} data={lineData} />
           </div>
           <div className="flex-1 min-h-0 w-full flex items-center justify-center">
             <DonutChart 

@@ -12,32 +12,22 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from "@/components/ui/chart"
-
-const chartData = [
-  { month: "January", desktop: 186, mobile: 80 },
-  { month: "February", desktop: 305, mobile: 200 },
-  { month: "March", desktop: 237, mobile: 120 },
-  { month: "April", desktop: 73, mobile: 190 },
-  { month: "May", desktop: 209, mobile: 130 },
-  { month: "June", desktop: 214, mobile: 140 },
-]
+import type { LineDataPoint } from "./GameDataTypes"
+import { PointType } from "./GameDataTypes"
 
 const chartConfig = {
-  desktop: {
-    label: "Desktop",
+  aggregate_score: {
+    label: "Aggregate Score",
     color: "var(--chart-1)",
-  },
-  mobile: {
-    label: "Mobile",
-    color: "var(--chart-2)",
   },
 } satisfies ChartConfig
 
 interface ChartLineDotsProps {
   width?: number
+  data?: LineDataPoint[]
 }
 
-export function ChartLineDots({ width }: ChartLineDotsProps) {
+export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
   return (
     <Card 
       className="w-full h-full bg-transparent border-0 shadow-none"
@@ -47,19 +37,23 @@ export function ChartLineDots({ width }: ChartLineDotsProps) {
         <ChartContainer config={chartConfig} className="aspect-auto h-full w-full">
           <LineChart
             accessibilityLayer
-            data={chartData}
+            data={data}
             margin={{
               left: 0,
               right: 0,
             }}
           >
-            <CartesianGrid vertical={false} strokeDasharray="3 3" />
+            <CartesianGrid 
+              vertical={true} 
+              horizontal={true}
+              strokeDasharray="3 3"
+              stroke="rgba(255, 255, 255, 0.1)"
+            />
             <XAxis
-              dataKey="month"
+              dataKey="pull_number"
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              tickFormatter={(value) => value.slice(0, 3)}
             />
             <YAxis
               tickLine={false}
@@ -72,15 +66,29 @@ export function ChartLineDots({ width }: ChartLineDotsProps) {
               content={<ChartTooltipContent hideLabel />}
             />
             <Line
-              dataKey="desktop"
+              dataKey="aggregate_score"
               type="natural"
-              stroke="var(--color-desktop)"
+              stroke="white"
               strokeWidth={2}
-              dot={{
-                fill: "var(--color-desktop)",
+              dot={(props: any) => {
+                const { cx, cy, payload } = props
+                const color = payload.point_type === PointType.Bomb ? "#ff3333" : "#33ff33"
+                return (
+                  <circle
+                    cx={cx}
+                    cy={cy}
+                    r={10}
+                    fill={color}
+                    stroke="white"
+                    strokeWidth={2}
+                  />
+                )
               }}
               activeDot={{
-                r: 6,
+                r: 8,
+                fill: "white",
+                stroke: "white",
+                strokeWidth: 2,
               }}
             />
           </LineChart>

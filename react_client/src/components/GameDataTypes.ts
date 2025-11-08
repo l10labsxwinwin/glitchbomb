@@ -32,9 +32,21 @@ export enum OrbCategory {
   Special = "Special",
 }
 
+export enum PointType {
+  Bomb = "Bomb",
+  NonBomb = "NonBomb",
+}
+
 export interface Orb {
   effect: OrbEffect
   category: OrbCategory
   value: number
+}
+
+export interface LineDataPoint {
+  pull_number: number
+  level: number
+  aggregate_score: number
+  point_type: PointType
 }
 

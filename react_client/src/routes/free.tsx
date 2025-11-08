@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import GameContainer from '../components/GameContainer'
-import { OrbCategory, OrbEffect, type GameData, type Orb } from '@/components/GameDataTypes'
+import { LineDataPoint, OrbCategory, OrbEffect, PointType, type GameData, type Orb } from '@/components/GameDataTypes'
 import type { ChartConfig } from '@/components/ui/chart'
 
 export const Route = createFileRoute('/free')({
@@ -40,6 +40,16 @@ const mockGameData: GameData = {
   pullable_orbs,
   consumed_orbs: [],
 }
+
+const mockLineData: LineDataPoint[] = [
+  { pull_number: 1, level: 1, aggregate_score: -10, point_type: PointType.NonBomb },
+  { pull_number: 2, level: 1, aggregate_score: -10, point_type: PointType.NonBomb },
+  { pull_number: 3, level: 1, aggregate_score: -5, point_type: PointType.NonBomb },
+  { pull_number: 4, level: 1, aggregate_score: 5, point_type: PointType.NonBomb },
+  { pull_number: 5, level: 1, aggregate_score: 5, point_type: PointType.Bomb },
+  { pull_number: 6, level: 1, aggregate_score: 8, point_type: PointType.NonBomb },
+  { pull_number: 7, level: 1, aggregate_score: 18, point_type: PointType.NonBomb },
+]
 
 // Group pullable orbs by category
 const groupOrbsByCategory = (orbs: Orb[]) => {
@@ -101,6 +111,7 @@ function FreePlay() {
       gameData={mockGameData}
       donutChartData={donutChartData}
       donutChartConfig={donutChartConfig}
+      lineData={mockLineData}
     />
   )
 }
