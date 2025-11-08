@@ -4,5 +4,7 @@ export interface GameData {
   glitchChips: number
   milestone: number
   multiplier: number
+  bombs: number
+  health: number
 }
 
