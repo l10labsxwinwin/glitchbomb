@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import GameContainer from '../components/GameContainer'
-import { LineDataPoint, OrbCategory, OrbEffect, PointType, type GameData, type Orb } from '@/components/GameDataTypes'
+import { LineDataPoint, OrbCategory, OrbEffect, PointType, type GameData, type Orb, orbCategoryColors } from '@/components/GameDataTypes'
 import type { ChartConfig } from '@/components/ui/chart'
 
 export const Route = createFileRoute('/free')({
@@ -52,15 +52,6 @@ const groupOrbsByCategory = (orbs: Orb[]) => {
   return grouped
 }
 
-// Map categories to colors and labels
-const categoryColors: Record<OrbCategory, string> = {
-  [OrbCategory.Point]: "var(--chart-1)",
-  [OrbCategory.Health]: "var(--chart-2)",
-  [OrbCategory.Bomb]: "var(--chart-3)",
-  [OrbCategory.Multiplier]: "var(--chart-4)",
-  [OrbCategory.Special]: "var(--chart-5)",
-}
-
 const categoryLabels: Record<OrbCategory, string> = {
   [OrbCategory.Point]: "Point",
   [OrbCategory.Health]: "Health",
@@ -89,7 +80,7 @@ function FreePlay() {
     .map(([category, count]) => ({
       category,
       value: count,
-      fill: categoryColors[category as OrbCategory],
+      fill: orbCategoryColors[category as OrbCategory],
     }))
 
   const donutChartConfig: ChartConfig = {
@@ -100,7 +91,7 @@ function FreePlay() {
       if (orbCategoryCounts[category as OrbCategory] > 0) {
         acc[category] = {
           label: categoryLabels[category as OrbCategory],
-          color: categoryColors[category as OrbCategory],
+          color: orbCategoryColors[category as OrbCategory],
         }
       }
       return acc

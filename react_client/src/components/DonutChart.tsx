@@ -80,7 +80,8 @@ export function DonutChart({
           <PieChart>
             <ChartTooltip
               cursor={false}
-              content={<ChartTooltipContent hideLabel />}
+              wrapperStyle={{ zIndex: 9999 }}
+              content={<ChartTooltipContent hideLabel className="z-[9999]" style={{ zIndex: 9999 }} />}
             />
             <Pie
               data={data}
@@ -126,7 +127,7 @@ export function DonutChart({
           </PieChart>
         </ChartContainer>
         {children && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10">
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-0">
             <div className="pointer-events-auto flex items-center justify-center">
               {children}
             </div>

@@ -9,11 +9,12 @@ interface PullOrbDisplayProps {
 
 export default function PullOrbDisplay({ onClick, disabled = false, orbs, health }: PullOrbDisplayProps) {
   return (
-    <div className="flex items-center justify-center">
+    <div className="flex items-center justify-center relative z-0">
       <button
         onClick={onClick}
         disabled={disabled}
-        className="flex flex-col items-center justify-center w-48 h-48 max-w-48 max-h-48 rounded-full border-2 border-white text-white hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-white gap-2"
+        className="flex flex-col items-center justify-center w-48 h-48 max-w-48 max-h-48 rounded-full border-2 hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#55DD63] gap-2 relative z-0"
+        style={{ background: 'linear-gradient(to bottom, #1C4E21, #000000)', borderColor: '#55DD63', color: '#55DD63', zIndex: 0 }}
       >
         <span className="text-xl font-bold">PULL</span>
         <span className="text-xl font-bold">ORB</span>
