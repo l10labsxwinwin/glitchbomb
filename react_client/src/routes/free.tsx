@@ -37,7 +37,6 @@ const mockGameData: GameData = {
   multiplier: 2.5,
   bombs: 5,
   health: 5,
-  orbs: 12,
   pullable_orbs,
   consumed_orbs: [],
 }

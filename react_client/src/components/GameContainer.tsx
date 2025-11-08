@@ -57,7 +57,7 @@ export default function GameContainer({
         >
           <PullOrbDisplay 
             onClick={onPullOrb} 
-            orbs={gameData.orbs}
+            orbs={gameData.pullable_orbs.length}
             health={gameData.health}
           />
         </DonutChart>

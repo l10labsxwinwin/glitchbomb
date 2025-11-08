@@ -6,7 +6,6 @@ export interface GameData {
   multiplier: number
   bombs: number
   health: number
-  orbs: number
   pullable_orbs: Orb[]
   consumed_orbs: Orb[]
 }
