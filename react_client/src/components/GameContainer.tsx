@@ -4,16 +4,22 @@ import Multiplier from './Multiplier'
 import CashOutButton from './CashOutButton'
 import PullOrbDisplay from './PullOrbDisplay'
 import BottomBarDisplay from './BottomBarDisplay'
+import { DonutChart } from './DonutChart'
 import type { GameData } from './GameDataTypes'
+import type { ChartConfig } from './ui/chart'
 
 interface GameContainerProps {
   gameData: GameData
+  donutChartData?: Array<{ category: string; value: number; fill: string }>
+  donutChartConfig?: ChartConfig
   onCashOut?: () => void
   onPullOrb?: () => void
 }
 
 export default function GameContainer({ 
-  gameData, 
+  gameData,
+  donutChartData,
+  donutChartConfig,
   onCashOut = () => console.log('Cash out clicked'),
   onPullOrb = () => console.log('Pull Orb clicked')
 }: GameContainerProps) {
@@ -42,11 +48,19 @@ export default function GameContainer({
             <Multiplier value={gameData.multiplier} />
           </div>
         </div>
-        <PullOrbDisplay 
-          onClick={onPullOrb} 
-          orbs={gameData.orbs}
-          health={gameData.health}
-        />
+        <DonutChart 
+          className="w-full max-w-md md:max-w-lg"
+          innerRadius={120}
+          outerRadius={150}
+          data={donutChartData}
+          config={donutChartConfig}
+        >
+          <PullOrbDisplay 
+            onClick={onPullOrb} 
+            orbs={gameData.orbs}
+            health={gameData.health}
+          />
+        </DonutChart>
         <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full">
           <BottomBarDisplay bombs={gameData.bombs} width={bottomBarWidth} />
         </div>
