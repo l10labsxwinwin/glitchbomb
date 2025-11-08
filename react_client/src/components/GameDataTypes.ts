@@ -3,5 +3,6 @@ export interface GameData {
   points: number
   glitchChips: number
   milestone: number
+  multiplier: number
 }
 
