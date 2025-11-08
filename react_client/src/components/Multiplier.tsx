@@ -4,7 +4,7 @@ interface MultiplierProps {
 
 export default function Multiplier({ value }: MultiplierProps) {
   return (
-    <div className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 border-2 border-white text-white">
+    <div className="flex items-center justify-center w-20 h-20 md:w-24 md:h-24 border-2 border-white text-white rounded-lg">
       <span className="text-2xl md:text-3xl font-bold">{value}X</span>
     </div>
   )
