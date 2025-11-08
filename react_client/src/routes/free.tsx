@@ -10,6 +10,7 @@ function FreePlay() {
     moonRocks: 80,
     points: 140,
     glitchChips: 36,
+    milestone: 200,
   }
 
   return (
