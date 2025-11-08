@@ -4,6 +4,7 @@ import Multiplier from './Multiplier'
 import CashOutButton from './CashOutButton'
 import PullOrbDisplay from './PullOrbDisplay'
 import BottomBarDisplay from './BottomBarDisplay'
+import RecentOrbsDisplay from './RecentOrbsDisplay'
 import { DonutChart } from './DonutChart'
 import { ChartLineDots } from './LineChart'
 import type { GameData, LineDataPoint } from './GameDataTypes'
@@ -53,6 +54,9 @@ export default function GameContainer({
             <StatsDisplay gameData={gameData} />
             <Multiplier value={gameData.multiplier} />
           </div>
+        </div>
+        <div className="w-full shrink-0">
+          <RecentOrbsDisplay consumedOrbs={gameData.consumed_orbs} />
         </div>
         <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-start md:justify-center gap-2 md:gap-3">
           <div className="flex-1 min-h-0 w-full flex items-center justify-center">

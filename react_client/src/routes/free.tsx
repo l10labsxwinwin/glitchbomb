@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import GameContainer from '../components/GameContainer'
 import { LineDataPoint, OrbCategory, OrbEffect, PointType, type GameData, type Orb } from '@/components/GameDataTypes'
@@ -7,7 +8,7 @@ export const Route = createFileRoute('/free')({
   component: FreePlay,
 })
 
-const pullable_orbs: Orb[] = [
+const initialPullableOrbs: Orb[] = [
   { effect: OrbEffect.Point, category: OrbCategory.Point, value: 1 },
   { effect: OrbEffect.Point, category: OrbCategory.Point, value: 1 },
   { effect: OrbEffect.Point, category: OrbCategory.Point, value: 1 },
@@ -28,18 +29,6 @@ const pullable_orbs: Orb[] = [
   { effect: OrbEffect.RewindPoint, category: OrbCategory.Special, value: 1 },
   { effect: OrbEffect.BombImmunity, category: OrbCategory.Special, value: 1 },
 ]
-
-const mockGameData: GameData = {
-  moonRocks: 80,
-  points: 15,
-  glitchChips: 36,
-  milestone: 30,
-  multiplier: 2.5,
-  bombs: 5,
-  health: 5,
-  pullable_orbs,
-  consumed_orbs: [],
-}
 
 const mockLineData: LineDataPoint[] = [
   { pull_number: 1, level: 1, aggregate_score: -10, point_type: PointType.NonBomb },
@@ -63,9 +52,6 @@ const groupOrbsByCategory = (orbs: Orb[]) => {
   return grouped
 }
 
-// Transform pullable orbs into donut chart format grouped by category
-const orbCategoryCounts = groupOrbsByCategory(pullable_orbs)
-
 // Map categories to colors and labels
 const categoryColors: Record<OrbCategory, string> = {
   [OrbCategory.Point]: "var(--chart-1)",
@@ -83,36 +69,63 @@ const categoryLabels: Record<OrbCategory, string> = {
   [OrbCategory.Special]: "Special",
 }
 
-const donutChartData = Object.entries(orbCategoryCounts)
-  .filter(([_, count]) => count > 0)
-  .map(([category, count]) => ({
-    category,
-    value: count,
-    fill: categoryColors[category as OrbCategory],
-  }))
-
-const donutChartConfig: ChartConfig = {
-  value: {
-    label: "Count",
-  },
-  ...Object.entries(orbCategoryCounts).reduce((acc, [category]) => {
-    if (orbCategoryCounts[category as OrbCategory] > 0) {
-      acc[category] = {
-        label: categoryLabels[category as OrbCategory],
-        color: categoryColors[category as OrbCategory],
-      }
-    }
-    return acc
-  }, {} as Record<string, { label: string; color: string }>),
-}
-
 function FreePlay() {
+  const [pullableOrbs, setPullableOrbs] = useState<Orb[]>([...initialPullableOrbs])
+  const [consumedOrbs, setConsumedOrbs] = useState<Orb[]>([])
+
+  // Function to pull an orb: removes one from pullable_orbs and adds to consumed_orbs
+  const pullOrb = () => {
+    if (pullableOrbs.length > 0) {
+      const pulledOrb = pullableOrbs[0] // Get first orb
+      setPullableOrbs((prev) => prev.slice(1)) // Remove first orb
+      setConsumedOrbs((prev) => [...prev, pulledOrb]) // Add to consumed
+    }
+  }
+
+  // Calculate donut chart data based on current pullable orbs
+  const orbCategoryCounts = groupOrbsByCategory(pullableOrbs)
+  const donutChartData = Object.entries(orbCategoryCounts)
+    .filter(([_, count]) => count > 0)
+    .map(([category, count]) => ({
+      category,
+      value: count,
+      fill: categoryColors[category as OrbCategory],
+    }))
+
+  const donutChartConfig: ChartConfig = {
+    value: {
+      label: "Count",
+    },
+    ...Object.entries(orbCategoryCounts).reduce((acc, [category]) => {
+      if (orbCategoryCounts[category as OrbCategory] > 0) {
+        acc[category] = {
+          label: categoryLabels[category as OrbCategory],
+          color: categoryColors[category as OrbCategory],
+        }
+      }
+      return acc
+    }, {} as Record<string, { label: string; color: string }>),
+  }
+
+  const gameData: GameData = {
+    moonRocks: 80,
+    points: 15,
+    glitchChips: 36,
+    milestone: 30,
+    multiplier: 2.5,
+    bombs: 5,
+    health: 5,
+    pullable_orbs: pullableOrbs,
+    consumed_orbs: consumedOrbs,
+  }
+
   return (
     <GameContainer 
-      gameData={mockGameData}
+      gameData={gameData}
       donutChartData={donutChartData}
       donutChartConfig={donutChartConfig}
       lineData={mockLineData}
+      onPullOrb={pullOrb}
     />
   )
 }

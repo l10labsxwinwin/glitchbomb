@@ -89,6 +89,7 @@ export function DonutChart({
               innerRadius={innerRadius}
               outerRadius={outerRadius}
               strokeWidth={5}
+              animationDuration={500}
             >
               {showText && (
                 <Label
