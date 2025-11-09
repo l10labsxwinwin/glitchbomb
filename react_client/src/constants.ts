@@ -1,0 +1,1 @@
+export const DEFAULT_ENTRY_PRICE: bigint = 1_000_000_000_000_000_000_000n;
