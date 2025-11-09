@@ -1,48 +1,48 @@
-"use client"
+'use client'
 
-import * as React from "react"
+import * as React from 'react'
 
-import { Label, Pie, PieChart } from "recharts"
+import { Label, Pie, PieChart } from 'recharts'
 
 import {
   type ChartConfig,
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
-} from "@/components/ui/chart"
-import { cn } from "@/lib/utils"
+} from '@/components/ui/chart'
+import { cn } from '@/lib/utils'
 
 const chartData = [
-  { browser: "chrome", visitors: 275, fill: "var(--chart-1)" },
-  { browser: "safari", visitors: 200, fill: "var(--chart-2)" },
-  { browser: "firefox", visitors: 287, fill: "var(--chart-3)" },
-  { browser: "edge", visitors: 173, fill: "var(--chart-4)" },
-  { browser: "other", visitors: 190, fill: "var(--chart-5)" },
+  { category: 'chrome', value: 275, fill: 'var(--chart-1)' },
+  { category: 'safari', value: 200, fill: 'var(--chart-2)' },
+  { category: 'firefox', value: 287, fill: 'var(--chart-3)' },
+  { category: 'edge', value: 173, fill: 'var(--chart-4)' },
+  { category: 'other', value: 190, fill: 'var(--chart-5)' },
 ]
 
 const chartConfig = {
   visitors: {
-    label: "Visitors",
+    label: 'Visitors',
   },
   chrome: {
-    label: "Chrome",
-    color: "var(--chart-1)",
+    label: 'Chrome',
+    color: 'var(--chart-1)',
   },
   safari: {
-    label: "Safari",
-    color: "var(--chart-2)",
+    label: 'Safari',
+    color: 'var(--chart-2)',
   },
   firefox: {
-    label: "Firefox",
-    color: "var(--chart-3)",
+    label: 'Firefox',
+    color: 'var(--chart-3)',
   },
   edge: {
-    label: "Edge",
-    color: "var(--chart-4)",
+    label: 'Edge',
+    color: 'var(--chart-4)',
   },
   other: {
-    label: "Other",
-    color: "var(--chart-5)",
+    label: 'Other',
+    color: 'var(--chart-5)',
   },
 } satisfies ChartConfig
 
@@ -52,7 +52,7 @@ interface DonutChartProps {
   innerRadius?: number
   outerRadius?: number
   showText?: boolean
-  data?: typeof chartData
+  data?: Array<{ category: string; value: number; fill: string }>
   config?: ChartConfig
 }
 
@@ -66,12 +66,16 @@ export function DonutChart({
   config = chartConfig,
 }: DonutChartProps) {
   const totalVisitors = React.useMemo(() => {
-    const valueKey = data?.[0]?.visitors !== undefined ? "visitors" : "value"
-    return data.reduce((acc, curr) => acc + (curr[valueKey as keyof typeof curr] as number), 0)
+    return data.reduce((acc, curr) => acc + curr.value, 0)
   }, [data])
 
   return (
-    <div className={cn("relative w-full h-full flex flex-col items-center justify-center", className)}>
+    <div
+      className={cn(
+        'relative w-full h-full flex flex-col items-center justify-center',
+        className,
+      )}
+    >
       <div className="relative w-full h-full aspect-square max-w-full max-h-full">
         <ChartContainer
           config={config}
@@ -81,12 +85,18 @@ export function DonutChart({
             <ChartTooltip
               cursor={false}
               wrapperStyle={{ zIndex: 9999 }}
-              content={<ChartTooltipContent hideLabel className="z-[9999]" style={{ zIndex: 9999 }} />}
+              content={
+                <ChartTooltipContent
+                  hideLabel
+                  className="z-[9999]"
+                  style={{ zIndex: 9999 }}
+                />
+              }
             />
             <Pie
               data={data}
-              dataKey={data?.[0]?.visitors !== undefined ? "visitors" : "value"}
-              nameKey={data?.[0]?.browser !== undefined ? "browser" : "category"}
+              dataKey="value"
+              nameKey="category"
               innerRadius={innerRadius}
               outerRadius={outerRadius}
               strokeWidth={5}
@@ -95,7 +105,7 @@ export function DonutChart({
               {showText && (
                 <Label
                   content={({ viewBox }) => {
-                    if (viewBox && "cx" in viewBox && "cy" in viewBox) {
+                    if (viewBox && 'cx' in viewBox && 'cy' in viewBox) {
                       return (
                         <text
                           x={viewBox.cx}
@@ -137,4 +147,3 @@ export function DonutChart({
     </div>
   )
 }
-

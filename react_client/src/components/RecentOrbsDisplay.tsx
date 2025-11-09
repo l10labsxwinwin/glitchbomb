@@ -1,28 +1,34 @@
 import type { Orb } from './GameDataTypes'
-import { OrbCategory, orbCategoryColors } from './GameDataTypes'
+import { orbCategoryColors } from './GameDataTypes'
 
 interface RecentOrbsDisplayProps {
   consumedOrbs: Orb[]
   width?: number
 }
 
-export default function RecentOrbsDisplay({ consumedOrbs, width }: RecentOrbsDisplayProps) {
+export default function RecentOrbsDisplay({
+  consumedOrbs,
+  width,
+}: RecentOrbsDisplayProps) {
   // Reverse the array so most recent (last pulled) is first (leftmost)
   const reversedOrbs = [...consumedOrbs].reverse()
 
   return (
     <div className="w-full flex items-center justify-center">
-      <div 
+      <div
         className="flex items-center justify-start px-3 md:px-4 py-1.5 md:py-2 bg-black rounded-full gap-3 md:gap-4"
         style={width ? { width: `${width}px` } : undefined}
       >
-        <span className="font-mono text-xs md:text-sm font-bold tracking-wider" style={{ color: '#55DD63' }}>
+        <span
+          className="font-mono text-xs md:text-sm font-bold tracking-wider"
+          style={{ color: '#55DD63' }}
+        >
           RECENT
         </span>
         <div className="flex items-center gap-1.5 md:gap-2">
           {reversedOrbs.map((orb, index) => {
             const colorVar = orbCategoryColors[orb.category]
-            
+
             return (
               <div
                 key={index}
@@ -39,4 +45,3 @@ export default function RecentOrbsDisplay({ consumedOrbs, width }: RecentOrbsDis
     </div>
   )
 }
-
