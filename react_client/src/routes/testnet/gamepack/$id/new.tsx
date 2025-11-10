@@ -1,7 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
-import SingleGamepack from '@/components/SingleGamepack'
-import { useGames } from '@/hooks/games'
-import { useEffect, useMemo } from 'react'
+import { useState } from 'react'
+import { useStart } from '@/hooks/start'
 
 export const Route = createFileRoute('/testnet/gamepack/$id/new')({
   component: NewStateRoute,
@@ -10,21 +9,34 @@ export const Route = createFileRoute('/testnet/gamepack/$id/new')({
 function NewStateRoute() {
   const { id } = Route.useParams()
   const gamepackId = Number(id)
-  const { games } = useGames(gamepackId)
+  const { start } = useStart()
+  const [isStarting, setIsStarting] = useState(false)
 
-  const latestGame = useMemo(() => {
-    if (games.length === 0) return null
-    return games.reduce((latest, current) => {
-      const currentId = Number(current.game_id)
-      const latestId = Number(latest.game_id)
-      return currentId > latestId ? current : latest
-    })
-  }, [games])
+  const handleStartGame = async () => {
+    setIsStarting(true)
+    try {
+      await start(gamepackId)
+    } catch (error) {
+      console.error('Failed to start game:', error)
+    } finally {
+      setIsStarting(false)
+    }
+  }
 
-  useEffect(() => {
-    console.log('New state - All games:', games)
-  }, [games])
-
-  return <SingleGamepack gamepackId={gamepackId} latestGame={latestGame} />
+  return (
+    <div className="flex justify-center items-center py-8">
+      <button
+        onClick={handleStartGame}
+        disabled={isStarting}
+        className="px-6 py-3 rounded-lg text-lg font-semibold transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+        style={{
+          backgroundColor: '#55DD63',
+          color: '#0C1806',
+        }}
+      >
+        {isStarting ? 'Starting...' : 'Start Game'}
+      </button>
+    </div>
+  )
 }
 

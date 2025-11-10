@@ -1,6 +1,7 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router'
 import { useGames } from '@/hooks/games'
 import { useEffect, useMemo } from 'react'
+import SingleGamepack from '@/components/SingleGamepack'
 
 export const Route = createFileRoute('/testnet/gamepack/$id')({
   component: GamepackRoute,
@@ -62,6 +63,9 @@ function GamepackRoute() {
     }
   }, [latestGame, gamepackId, navigate])
 
-  // Show loading or nothing while redirecting
-  return null
+  return (
+    <SingleGamepack gamepackId={gamepackId} latestGame={latestGame}>
+      <Outlet />
+    </SingleGamepack>
+  )
 }

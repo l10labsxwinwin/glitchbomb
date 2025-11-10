@@ -1,30 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
-import SingleGamepack from '@/components/SingleGamepack'
-import { useGames } from '@/hooks/games'
-import { useEffect, useMemo } from 'react'
 
 export const Route = createFileRoute('/testnet/gamepack/$id/empty')({
   component: EmptyStateRoute,
 })
 
 function EmptyStateRoute() {
-  const { id } = Route.useParams()
-  const gamepackId = Number(id)
-  const { games } = useGames(gamepackId)
-
-  const latestGame = useMemo(() => {
-    if (games.length === 0) return null
-    return games.reduce((latest, current) => {
-      const currentId = Number(current.game_id)
-      const latestId = Number(latest.game_id)
-      return currentId > latestId ? current : latest
-    })
-  }, [games])
-
-  useEffect(() => {
-    console.log('Empty state - All games:', games)
-  }, [games])
-
-  return <SingleGamepack gamepackId={gamepackId} latestGame={latestGame} />
+  return (
+    <div className="flex justify-center items-center py-8">
+      <div className="text-white text-lg">No game found. Create a new game to start.</div>
+    </div>
+  )
 }
 

@@ -1,9 +1,11 @@
 import type { Game } from '@/bindings/typescript/models.gen'
 import { useNavigate } from '@tanstack/react-router'
+import type { ReactNode } from 'react'
 
 interface SingleGamepackProps {
   gamepackId: number
   latestGame: Game | null
+  children?: ReactNode
 }
 
 // Helper function to convert state name to URL-friendly format
@@ -22,6 +24,7 @@ function stateToRoute(state: string): string {
 export default function SingleGamepack({
   gamepackId,
   latestGame,
+  children,
 }: SingleGamepackProps) {
   const navigate = useNavigate()
   
@@ -62,7 +65,7 @@ export default function SingleGamepack({
             Current State: {gameState}
           </div>
         )}
-        <div className="flex flex-wrap gap-2 justify-center">
+        <div className="flex flex-wrap gap-2 justify-center mb-4">
           {['Empty', 'New', 'Level', 'LevelComplete', 'Shop', 'GameOver'].map(
             (state) => (
               <button
@@ -79,6 +82,7 @@ export default function SingleGamepack({
             ),
           )}
         </div>
+        {children}
       </div>
     </div>
   )
