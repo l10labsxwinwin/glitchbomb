@@ -1,8 +1,14 @@
+import type { Game } from '@/bindings/typescript/models.gen'
+
 interface SingleGamepackProps {
   gamepackId: number
+  latestGame: Game | null
 }
 
-export default function SingleGamepack({ gamepackId }: SingleGamepackProps) {
+export default function SingleGamepack({
+  gamepackId,
+  latestGame,
+}: SingleGamepackProps) {
   return (
     <div
       className="relative min-h-screen flex flex-col text-white"
