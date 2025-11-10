@@ -9,7 +9,7 @@ export const Route = createFileRoute('/testnet')({
 function TestnetRoute() {
   return (
     <div
-      className="relative min-h-screen flex flex-col gap-4 md:gap-8 lg:gap-16 text-white"
+      className="relative min-h-screen flex flex-col text-white"
       style={{
         background: 'linear-gradient(to bottom, #0C1806, #000000)',
       }}
@@ -22,7 +22,7 @@ function TestnetRoute() {
 
 const Main = () => {
   return (
-    <div className="flex-1">
+    <div className="flex-1 flex items-center justify-center">
       <GamepackDisplay />
     </div>
   )
@@ -37,11 +37,11 @@ export const Header = () => {
 
   return (
     <div
-      className="w-full min-h-12 sm:min-h-14 md:min-h-16 px-2 sm:px-4 md:px-6 lg:px-8 py-1 sm:py-2 md:py-3 flex flex-row items-center justify-between gap-1 sm:gap-2 border-b"
+      className="w-full min-h-12 sm:min-h-14 md:min-h-16 flex flex-row items-center justify-between border-b px-4 md:px-6"
       style={{ borderColor: '#55DD63' }}
     >
       <div
-        className="flex items-center justify-start gap-1 cursor-pointer select-none"
+        className="flex items-center justify-start cursor-pointer select-none"
         onClick={handleClick}
       >
         <h1

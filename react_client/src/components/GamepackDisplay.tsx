@@ -45,14 +45,14 @@ export default function GamepackDisplay() {
 
   if (gamepacks.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="flex flex-col items-center">
         <p className="text-white text-lg">No gamepacks found</p>
       </div>
     )
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen p-4">
+    <div className="flex flex-col items-center p-4">
       <div className="w-full max-w-7xl">
         <div className="overflow-x-auto pb-4">
           <div className="flex gap-4 md:gap-6">

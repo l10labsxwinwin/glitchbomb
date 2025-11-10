@@ -23,35 +23,35 @@ export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
   const accumulatedMoonrocks = Number(data.accumulated_moonrocks)
 
   return (
-    <div className="shrink-0 w-full max-w-sm aspect-[2/1] rounded-2xl border-2 border-[#55DD63] bg-gradient-to-br from-[#0C1806]/40 to-black text-white p-3 sm:p-4 md:p-6 flex flex-col justify-between shadow-lg hover:shadow-[0_0_20px_rgba(85,221,99,0.3)] transition-shadow">
+    <div className="shrink-0 w-full max-w-sm aspect-[2/1] rounded-2xl border-2 border-[#55DD63] bg-gradient-to-br from-[#0C1806]/40 to-black text-white p-4 md:p-6 flex flex-col justify-between shadow-lg hover:shadow-[0_0_20px_rgba(85,221,99,0.3)] transition-shadow">
       {/* Header */}
-      <div className="space-y-1 sm:space-y-2 md:space-y-3 shrink-0">
+      <div className="space-y-2 md:space-y-3 shrink-0">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm sm:text-base md:text-xl font-bold">#{gamepackId}</h2>
+          <h2 className="text-base md:text-xl font-bold">#{gamepackId}</h2>
           <StatusBadge state={state} />
         </div>
 
         {/* Center Content */}
-        <div className="space-y-2 sm:space-y-3 md:space-y-4 py-2 sm:py-4 md:py-6 grow flex flex-col justify-center">
+        <div className="space-y-3 md:space-y-4 py-4 md:py-6 grow flex flex-col justify-center">
           {/* Moonrocks Display */}
-          <div className="text-center border-t border-[#55DD63]/30 pt-2 sm:pt-3">
-            <p className="text-gray-400 text-[10px] sm:text-xs">Accumulated</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-amber-400">
+          <div className="text-center border-t border-[#55DD63]/30 pt-3">
+            <p className="text-gray-400 text-xs">Accumulated</p>
+            <p className="text-2xl md:text-3xl font-bold text-amber-400">
               {accumulatedMoonrocks}
             </p>
-            <p className="text-gray-400 text-[10px] sm:text-xs">Moonrocks</p>
+            <p className="text-gray-400 text-xs">Moonrocks</p>
           </div>
 
           {/* Game ID */}
-          <div className="border-t border-[#55DD63]/30 pt-2 sm:pt-3 text-center">
-            <p className="text-gray-400 text-[10px] sm:text-xs">Game ID</p>
-            <p className="text-sm sm:text-base md:text-lg font-mono">{currentGameId}</p>
+          <div className="border-t border-[#55DD63]/30 pt-3 text-center">
+            <p className="text-gray-400 text-xs">Game ID</p>
+            <p className="text-base md:text-lg font-mono">{currentGameId}</p>
           </div>
         </div>
       </div>
 
       {/* Footer Button */}
-      <div className="pt-2 sm:pt-3 md:pt-4 border-t border-[#55DD63]/30 shrink-0 flex justify-center">
+      <div className="pt-3 md:pt-4 border-t border-[#55DD63]/30 shrink-0 flex justify-center">
         {isUnopened && onOpen && (
           <Button onClick={() => onOpen(gamepackId)}>Open</Button>
         )}
@@ -79,7 +79,7 @@ function StatusBadge({ state }: { state: string }) {
 
   return (
     <div
-      className={`${config.bg} px-1.5 sm:px-2 py-0.5 sm:py-1 rounded-full text-[10px] sm:text-xs font-semibold ${config.text}`}
+      className={`${config.bg} px-2 py-1 rounded-full text-xs font-semibold ${config.text}`}
     >
       {state}
     </div>
