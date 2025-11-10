@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router'
+import { createFileRoute, useNavigate, Outlet, useRouterState } from '@tanstack/react-router'
 import ControllerMenuBar from '../components/ControllerMenuBar'
 import GamepackDisplay from '../components/GamepackDisplay'
 
@@ -7,6 +7,9 @@ export const Route = createFileRoute('/testnet')({
 })
 
 function TestnetRoute() {
+  const router = useRouterState()
+  const isExactMatch = router.location.pathname === '/testnet'
+
   return (
     <div
       className="relative min-h-screen flex flex-col text-white"
@@ -15,7 +18,7 @@ function TestnetRoute() {
       }}
     >
       <Header />
-      <Main />
+      {isExactMatch ? <Main /> : <Outlet />}
     </div>
   )
 }

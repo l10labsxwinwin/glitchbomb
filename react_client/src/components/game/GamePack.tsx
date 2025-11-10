@@ -1,3 +1,4 @@
+import { useNavigate } from '@tanstack/react-router'
 import { GamePack as GamePackType } from '@/bindings/typescript/models.gen'
 
 interface GamePackProps {
@@ -7,15 +8,21 @@ interface GamePackProps {
 }
 
 export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
+  const navigate = useNavigate()
   const gamepackId = Number(gamepack.gamepack_id)
 
   // Extract state from CairoCustomEnum - cast to string like in real.tsx
   const state = (gamepack.state as unknown as string) || 'Unknown'
 
+  const isEmpty = state === 'Empty'
   const isUnopened = state === 'Unopened'
   const isInProgress = state === 'InProgress'
   const isCompleted = state === 'Completed'
   const isEndedEarly = state === 'EndedEarly'
+
+  const handleContinue = () => {
+    navigate({ to: '/testnet/gamepack/$id', params: { id: gamepackId.toString() } })
+  }
 
   const data = gamepack.data
   const currentGameId = Number(data.current_game_id)
@@ -65,6 +72,14 @@ export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
 
       {/* Bottom Section - Action Button */}
       <div className="shrink-0 flex justify-center mb-1">
+        {isEmpty && (
+          <button
+            disabled
+            className="px-3 py-1 text-[10px] font-sans uppercase bg-[#0C1806]/10 text-[#0C1806]/50 border border-[#0C1806]/20 rounded cursor-not-allowed"
+          >
+            Empty
+          </button>
+        )}
         {isUnopened && onOpen && (
           <button
             onClick={() => onOpen(gamepackId)}
@@ -73,9 +88,9 @@ export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
             Open
           </button>
         )}
-        {isInProgress && onStart && (
+        {isInProgress && (
           <button
-            onClick={() => onStart(gamepackId)}
+            onClick={handleContinue}
             className="px-3 py-1 text-[10px] font-sans uppercase bg-[#0C1806]/20 text-[#0C1806] border border-[#0C1806]/30 rounded hover:bg-[#0C1806]/30 transition-colors"
           >
             Continue
@@ -86,7 +101,7 @@ export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
             disabled
             className="px-3 py-1 text-[10px] font-sans uppercase bg-[#0C1806]/10 text-[#0C1806]/50 border border-[#0C1806]/20 rounded cursor-not-allowed"
           >
-            {isCompleted ? 'Completed' : 'Ended'}
+            {state}
           </button>
         )}
       </div>

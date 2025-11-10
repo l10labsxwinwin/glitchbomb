@@ -13,6 +13,7 @@ import { Route as TestnetRouteImport } from './routes/testnet'
 import { Route as RealRouteImport } from './routes/real'
 import { Route as FreeRouteImport } from './routes/free'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TestnetGamepackIdRouteImport } from './routes/testnet/gamepack/$id'
 
 const TestnetRoute = TestnetRouteImport.update({
   id: '/testnet',
@@ -34,39 +35,53 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestnetGamepackIdRoute = TestnetGamepackIdRouteImport.update({
+  id: '/gamepack/$id',
+  path: '/gamepack/$id',
+  getParentRoute: () => TestnetRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
-  '/testnet': typeof TestnetRoute
+  '/testnet': typeof TestnetRouteWithChildren
+  '/testnet/gamepack/$id': typeof TestnetGamepackIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
-  '/testnet': typeof TestnetRoute
+  '/testnet': typeof TestnetRouteWithChildren
+  '/testnet/gamepack/$id': typeof TestnetGamepackIdRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
-  '/testnet': typeof TestnetRoute
+  '/testnet': typeof TestnetRouteWithChildren
+  '/testnet/gamepack/$id': typeof TestnetGamepackIdRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/free' | '/real' | '/testnet'
+  fullPaths: '/' | '/free' | '/real' | '/testnet' | '/testnet/gamepack/$id'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/free' | '/real' | '/testnet'
-  id: '__root__' | '/' | '/free' | '/real' | '/testnet'
+  to: '/' | '/free' | '/real' | '/testnet' | '/testnet/gamepack/$id'
+  id:
+    | '__root__'
+    | '/'
+    | '/free'
+    | '/real'
+    | '/testnet'
+    | '/testnet/gamepack/$id'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FreeRoute: typeof FreeRoute
   RealRoute: typeof RealRoute
-  TestnetRoute: typeof TestnetRoute
+  TestnetRoute: typeof TestnetRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
@@ -99,14 +114,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/testnet/gamepack/$id': {
+      id: '/testnet/gamepack/$id'
+      path: '/gamepack/$id'
+      fullPath: '/testnet/gamepack/$id'
+      preLoaderRoute: typeof TestnetGamepackIdRouteImport
+      parentRoute: typeof TestnetRoute
+    }
   }
 }
+
+interface TestnetRouteChildren {
+  TestnetGamepackIdRoute: typeof TestnetGamepackIdRoute
+}
+
+const TestnetRouteChildren: TestnetRouteChildren = {
+  TestnetGamepackIdRoute: TestnetGamepackIdRoute,
+}
+
+const TestnetRouteWithChildren =
+  TestnetRoute._addFileChildren(TestnetRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FreeRoute: FreeRoute,
   RealRoute: RealRoute,
-  TestnetRoute: TestnetRoute,
+  TestnetRoute: TestnetRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
