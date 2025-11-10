@@ -136,13 +136,13 @@ export const Header = () => {
         onClick={handleClick}
       >
         <h1
-          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[64px] leading-tight sm:leading-[36px] md:leading-[42px] lg:leading-[48px] uppercase translate-y-0 sm:translate-y-0.5 md:translate-y-1"
+          className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-[64px] leading-tight sm:leading-[36px] md:leading-[42px] lg:leading-[48px] lowercase translate-y-0 sm:translate-y-0.5 md:translate-y-1"
           style={{
             color: '#55DD63',
             textShadow: '2px 2px 0px rgba(0, 0, 0, 0.25)',
           }}
         >
-          GLITCH BOMB
+          glitchbomb
         </h1>
       </div>
       <div className="flex flex-wrap items-center justify-end gap-2 sm:gap-3 md:gap-4">
