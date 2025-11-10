@@ -2,10 +2,9 @@ import { useRef, useEffect, useState } from 'react'
 import StatsDisplay from './StatsDisplay'
 import Multiplier from './Multiplier'
 import CashOutButton from './CashOutButton'
-import PullOrbDisplay from './PullOrbDisplay'
 import BottomBarDisplay from './BottomBarDisplay'
 import RecentOrbsDisplay from './RecentOrbsDisplay'
-import { DonutChart } from './DonutChart'
+import { FusedPullOrb } from './FusedPullOrb'
 import { ChartLineDots } from './LineChart'
 import type { GameData, LineDataPoint } from './GameDataTypes'
 import { OrbCategory } from './GameDataTypes'
@@ -28,65 +27,62 @@ export default function GameContainer({
   onCashOut = () => console.log('Cash out clicked'),
   onPullOrb = () => console.log('Pull Orb clicked')
 }: GameContainerProps) {
-  const topRowRef = useRef<HTMLDivElement>(null)
-  const [bottomBarWidth, setBottomBarWidth] = useState<number | undefined>(undefined)
-  const [topRowWidth, setTopRowWidth] = useState<number | undefined>(undefined)
+  const donutContainerRef = useRef<HTMLDivElement>(null)
+  const [donutRadii, setDonutRadii] = useState<{ inner: number; outer: number } | undefined>(undefined)
 
   useEffect(() => {
-    const updateWidth = () => {
-      if (topRowRef.current) {
-        setBottomBarWidth(topRowRef.current.offsetWidth)
-        setTopRowWidth(topRowRef.current.offsetWidth)
+    const updateRadii = () => {
+      if (donutContainerRef.current) {
+        const size = Math.min(donutContainerRef.current.offsetWidth, donutContainerRef.current.offsetHeight)
+        // Calculate radii as percentages of container size for scalability
+        const innerRadius = size * 0.4 // 40% of container size
+        const outerRadius = size * 0.5 // 50% of container size
+        setDonutRadii({ inner: innerRadius, outer: outerRadius })
       }
     }
 
-    updateWidth()
-    window.addEventListener('resize', updateWidth)
-    return () => window.removeEventListener('resize', updateWidth)
+    updateRadii()
+    window.addEventListener('resize', updateRadii)
+    return () => window.removeEventListener('resize', updateRadii)
   }, [gameData])
 
   return (
     <div 
-      className="h-full overflow-hidden flex flex-col items-center justify-center text-white px-4 md:px-6 py-6 md:py-8"
+      className="h-full overflow-hidden flex flex-col items-center justify-center text-white px-4 py-6"
       style={{
         background: 'linear-gradient(to bottom, #0C1806, #000000)'
       }}
     >
-      <div className="flex flex-col items-center w-full max-w-7xl h-full gap-2 md:gap-4">
-        <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full shrink-0">
-          <div ref={topRowRef} className="flex flex-row items-center gap-4 md:gap-8">
-            <CashOutButton onClick={onCashOut} />
-            <StatsDisplay gameData={gameData} />
-            <Multiplier value={gameData.multiplier} />
-          </div>
+      <div className="flex flex-col items-center w-full h-full gap-2">
+        <div className="flex flex-row items-center gap-4 w-full shrink-0">
+          <CashOutButton onClick={onCashOut} />
+          <StatsDisplay gameData={gameData} />
+          <Multiplier value={gameData.multiplier} />
         </div>
-        <div className="w-full shrink-0 mt-4 md:mt-6">
-          <RecentOrbsDisplay consumedOrbs={gameData.consumed_orbs} width={topRowWidth} />
+        <div className="w-full shrink-0 mt-4">
+          <RecentOrbsDisplay consumedOrbs={gameData.consumed_orbs} />
         </div>
-        <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-start md:justify-center gap-2 md:gap-4">
+        <div className="flex-1 min-h-0 w-full flex flex-col items-center justify-start gap-2">
           <div className="flex-1 min-h-0 w-full flex items-center justify-center">
-            <ChartLineDots width={topRowWidth} data={lineData} />
+            <ChartLineDots data={lineData} />
           </div>
-          <div className="flex-1 min-h-0 w-full flex items-center justify-center">
-        <DonutChart 
+          <div ref={donutContainerRef} className="flex-1 min-h-0 w-full flex items-center justify-center">
+            <FusedPullOrb 
               className="w-full h-full"
-          innerRadius={120}
-          outerRadius={150}
-          data={donutChartData}
-          config={donutChartConfig}
-        >
-          <PullOrbDisplay 
-            onClick={onPullOrb} 
-                orbs={gameData.pullable_orbs.length}
-            health={gameData.health}
-          />
-        </DonutChart>
+              innerRadius={donutRadii?.inner}
+              outerRadius={donutRadii?.outer}
+              data={donutChartData}
+              config={donutChartConfig}
+              pullableOrbs={gameData.pullable_orbs}
+              onClick={onPullOrb}
+              orbs={gameData.pullable_orbs.length}
+              health={gameData.health}
+            />
           </div>
         </div>
-        <div className="flex flex-row items-center gap-4 md:gap-8 justify-center w-full shrink-0">
+        <div className="flex flex-row items-center gap-4 w-full shrink-0">
           <BottomBarDisplay 
             bombOrbs={gameData.pullable_orbs.filter(orb => orb.category === OrbCategory.Bomb)} 
-            width={bottomBarWidth} 
           />
         </div>
       </div>

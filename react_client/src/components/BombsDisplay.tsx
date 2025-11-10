@@ -7,13 +7,13 @@ interface BombsDisplayProps {
 
 export default function BombsDisplay({ bombOrbs }: BombsDisplayProps) {
   return (
-    <div className="flex items-center justify-center gap-2">
+    <div className="flex items-center justify-center gap-2 flex-1 min-w-0">
       {bombOrbs.map((orb, index) => (
-        <div key={index} className="relative">
-          <BombIcon className="w-12 h-12 md:w-20 md:h-20" />
+        <div key={index} className="relative shrink-0">
+          <BombIcon className="w-10 h-10" />
           {orb.value !== 1 && (
             <span 
-              className="absolute left-1/2 flex items-center justify-center text-xs font-bold leading-none" 
+              className="absolute left-1/2 flex items-center justify-center text-[10px] font-bold leading-none" 
               style={{ 
                 color: '#14240C',
                 bottom: '8%',

@@ -1,5 +1,6 @@
 "use client"
 
+import { useRef, useEffect, useState } from "react"
 import { CartesianGrid, Line, LineChart, XAxis, YAxis } from "recharts"
 
 import {
@@ -22,11 +23,37 @@ const chartConfig = {
 } satisfies ChartConfig
 
 interface ChartLineDotsProps {
-  width?: number
   data?: LineDataPoint[]
 }
 
-export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
+export function ChartLineDots({ data = [] }: ChartLineDotsProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const [yAxisWidth, setYAxisWidth] = useState(40)
+  const [dotRadius, setDotRadius] = useState(10)
+  const [activeDotRadius, setActiveDotRadius] = useState(8)
+
+  useEffect(() => {
+    const updateSizes = () => {
+      if (containerRef.current) {
+        const containerWidth = containerRef.current.offsetWidth
+        // Calculate responsive sizes based on container width
+        // Y-axis width: 5% of container width, min 30px, max 60px
+        const calculatedYAxisWidth = Math.max(30, Math.min(60, containerWidth * 0.05))
+        // Dot radius: 1.5% of container width, min 6px, max 12px
+        const calculatedDotRadius = Math.max(6, Math.min(12, containerWidth * 0.015))
+        // Active dot radius: 80% of dot radius
+        const calculatedActiveDotRadius = calculatedDotRadius * 0.8
+        
+        setYAxisWidth(calculatedYAxisWidth)
+        setDotRadius(calculatedDotRadius)
+        setActiveDotRadius(calculatedActiveDotRadius)
+      }
+    }
+
+    updateSizes()
+    window.addEventListener('resize', updateSizes)
+    return () => window.removeEventListener('resize', updateSizes)
+  }, [])
   // Calculate domain with lowest value as minimum aggregate_score
   const calculateDomain = () => {
     if (data.length === 0) return [0, 0]
@@ -90,8 +117,8 @@ export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
 
   return (
     <Card 
+      ref={containerRef}
       className="w-full h-full bg-transparent border-0 shadow-none"
-      style={width ? { width: `${width}px` } : undefined}
     >
       <CardContent className="p-0 h-full">
         <ChartContainer config={chartConfig} className="aspect-auto h-full w-full">
@@ -120,7 +147,7 @@ export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
               tickLine={false}
               axisLine={false}
               tickMargin={8}
-              width={40}
+              width={yAxisWidth}
               domain={domain}
               ticks={ticks}
               allowDecimals={false}
@@ -144,13 +171,13 @@ export function ChartLineDots({ width, data = [] }: ChartLineDotsProps) {
                   <circle
                     cx={cx}
                     cy={cy}
-                    r={10}
+                    r={dotRadius}
                     fill={color}
                   />
                 )
               }}
               activeDot={{
-                r: 8,
+                r: activeDotRadius,
                 fill: "white",
                 stroke: "white",
                 strokeWidth: 2,
