@@ -2,11 +2,11 @@ import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import GamepackDisplay from '../components/GamepackDisplay'
 import ControllerMenuBar from '../components/ControllerMenuBar'
 
-export const Route = createFileRoute('/sepolia')({
-  component: SepoliaRoute,
+export const Route = createFileRoute('/testnet')({
+  component: TestnetRoute,
 })
 
-function SepoliaRoute() {
+function TestnetRoute() {
   return (
     <div
       className="relative min-h-screen flex flex-col gap-4 md:gap-8 lg:gap-16 text-white"

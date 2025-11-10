@@ -27,8 +27,8 @@ function TitleScreen() {
       <div className="flex gap-4">
         <Button onClick={() => navigate({ to: '/free' })}>Free Play</Button>
         <Button onClick={() => navigate({ to: '/real' })}>Real Play</Button>
-        <Button onClick={() => navigate({ to: '/sepolia' })}>
-          Sepolia Play
+        <Button onClick={() => navigate({ to: '/testnet' })}>
+          Testnet Play
         </Button>
       </div>
     </div>

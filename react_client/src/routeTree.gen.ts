@@ -9,14 +9,14 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SepoliaRouteImport } from './routes/sepolia'
+import { Route as TestnetRouteImport } from './routes/testnet'
 import { Route as RealRouteImport } from './routes/real'
 import { Route as FreeRouteImport } from './routes/free'
 import { Route as IndexRouteImport } from './routes/index'
 
-const SepoliaRoute = SepoliaRouteImport.update({
-  id: '/sepolia',
-  path: '/sepolia',
+const TestnetRoute = TestnetRouteImport.update({
+  id: '/testnet',
+  path: '/testnet',
   getParentRoute: () => rootRouteImport,
 } as any)
 const RealRoute = RealRouteImport.update({
@@ -39,43 +39,43 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
-  '/sepolia': typeof SepoliaRoute
+  '/testnet': typeof TestnetRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
-  '/sepolia': typeof SepoliaRoute
+  '/testnet': typeof TestnetRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
-  '/sepolia': typeof SepoliaRoute
+  '/testnet': typeof TestnetRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/free' | '/real' | '/sepolia'
+  fullPaths: '/' | '/free' | '/real' | '/testnet'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/free' | '/real' | '/sepolia'
-  id: '__root__' | '/' | '/free' | '/real' | '/sepolia'
+  to: '/' | '/free' | '/real' | '/testnet'
+  id: '__root__' | '/' | '/free' | '/real' | '/testnet'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FreeRoute: typeof FreeRoute
   RealRoute: typeof RealRoute
-  SepoliaRoute: typeof SepoliaRoute
+  TestnetRoute: typeof TestnetRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/sepolia': {
-      id: '/sepolia'
-      path: '/sepolia'
-      fullPath: '/sepolia'
-      preLoaderRoute: typeof SepoliaRouteImport
+    '/testnet': {
+      id: '/testnet'
+      path: '/testnet'
+      fullPath: '/testnet'
+      preLoaderRoute: typeof TestnetRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/real': {
@@ -106,7 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FreeRoute: FreeRoute,
   RealRoute: RealRoute,
-  SepoliaRoute: SepoliaRoute,
+  TestnetRoute: TestnetRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
