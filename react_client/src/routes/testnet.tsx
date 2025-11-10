@@ -1,6 +1,8 @@
 import { createFileRoute, useNavigate, Outlet, useRouterState } from '@tanstack/react-router'
 import ControllerMenuBar from '../components/ControllerMenuBar'
 import GamepackDisplay from '../components/GamepackDisplay'
+import Button from '../components/Button'
+import { useBuy } from '../hooks/buy'
 
 export const Route = createFileRoute('/testnet')({
   component: TestnetRoute,
@@ -37,9 +39,15 @@ const Main = () => {
       >
         MY GAMEPACKS
       </h2>
+      <Buy />
       <GamepackDisplay />
     </div>
   )
+}
+
+const Buy = () => {
+  const { buy } = useBuy()
+  return <Button onClick={() => buy()}>Buy Gamepack</Button>
 }
 
 export const Header = () => {
