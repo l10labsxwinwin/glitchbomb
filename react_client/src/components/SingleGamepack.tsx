@@ -7,12 +7,7 @@ interface SingleGamepackProps {
   children?: ReactNode
 }
 
-export default function SingleGamepack({
-  gamepackId,
-  latestGame,
-  children,
-}: SingleGamepackProps) {
-
+export default function SingleGamepack({ children }: SingleGamepackProps) {
   return (
     <div
       className="relative flex flex-col text-white w-full h-full"
@@ -20,10 +15,7 @@ export default function SingleGamepack({
         background: 'linear-gradient(to bottom, #0C1806, #000000)',
       }}
     >
-      <div className="flex-1 min-h-0 w-full">
-        {children}
-      </div>
+      <div className="flex-1 min-h-0 w-full">{children}</div>
     </div>
   )
 }
-

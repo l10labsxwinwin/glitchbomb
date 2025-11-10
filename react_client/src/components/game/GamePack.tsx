@@ -7,7 +7,7 @@ interface GamePackProps {
   onStart?: (gamepackId: number) => void
 }
 
-export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
+export default function GamePack({ gamepack, onOpen }: GamePackProps) {
   const navigate = useNavigate()
   const gamepackId = Number(gamepack.gamepack_id)
 
@@ -21,7 +21,10 @@ export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
   const isEndedEarly = state === 'EndedEarly'
 
   const handleContinue = () => {
-    navigate({ to: '/testnet/gamepack/$id', params: { id: gamepackId.toString() } })
+    navigate({
+      to: '/testnet/gamepack/$id',
+      params: { id: gamepackId.toString() },
+    })
   }
 
   const data = gamepack.data
@@ -58,7 +61,9 @@ export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
       <div className="grow my-2 bg-[#2d7a3d] rounded border border-[#0C1806]/20 p-3 flex flex-col justify-center space-y-2">
         {/* Moonrocks Display */}
         <div className="text-center">
-          <div className="text-[8px] text-[#0C1806]/70 uppercase mb-1">Moonrocks</div>
+          <div className="text-[8px] text-[#0C1806]/70 uppercase mb-1">
+            Moonrocks
+          </div>
           <div className="text-xl font-bold text-[#0C1806] leading-none">
             {accumulatedMoonrocks}
           </div>
@@ -66,7 +71,9 @@ export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
 
         {/* Currently Playing Game */}
         <div className="text-center border-t border-[#0C1806]/20 pt-2">
-          <div className="text-[8px] text-[#0C1806]/70 uppercase mb-1">Game: {currentGameId}</div>
+          <div className="text-[8px] text-[#0C1806]/70 uppercase mb-1">
+            Game: {currentGameId}
+          </div>
         </div>
       </div>
 
@@ -108,4 +115,3 @@ export default function GamePack({ gamepack, onOpen, onStart }: GamePackProps) {
     </div>
   )
 }
-
