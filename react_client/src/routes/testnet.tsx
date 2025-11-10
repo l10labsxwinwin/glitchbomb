@@ -1,6 +1,12 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
-import GamepackDisplay from '../components/GamepackDisplay'
 import ControllerMenuBar from '../components/ControllerMenuBar'
+import GamepackCarousel from '../components/GamepackCarousel'
+import { useAccount, useNetwork } from '@starknet-react/core'
+import { useMemo } from 'react'
+import { useTokens } from '@/hooks/tokens'
+import { useGamepacks } from '@/hooks/gamepacks'
+import { addAddressPadding } from 'starknet'
+import { getCollectionAddress } from '../../config'
 
 export const Route = createFileRoute('/testnet')({
   component: TestnetRoute,
@@ -15,7 +21,38 @@ function TestnetRoute() {
       }}
     >
       <Header />
-      <GamepackDisplay />
+      <Main />
+    </div>
+  )
+}
+
+const Main = () => {
+  const { chain } = useNetwork()
+  const { account } = useAccount()
+  const { balances } = useTokens({
+    contractAddresses: [addAddressPadding(getCollectionAddress(chain.id))],
+    accountAddresses: !account ? [] : [addAddressPadding(account.address)],
+    contractType: 'ERC721',
+  })
+
+  const gamepackIds = useMemo(() => {
+    return balances
+      .filter((balance) => {
+        const balanceValue = BigInt(balance.balance || '0x0')
+        return balanceValue > 0n
+      })
+      .map((balance) => {
+        const tokenId = balance.token_id || '0x0'
+        return parseInt(tokenId, 16)
+      })
+      .filter((id) => id > 0)
+  }, [balances])
+
+  const { gamepacks } = useGamepacks(gamepackIds)
+
+  return (
+    <div className="flex flex-col items-center gap-4 md:gap-6 lg:gap-8 px-2 sm:px-4">
+      <GamepackCarousel gamepacks={gamepacks} />
     </div>
   )
 }
