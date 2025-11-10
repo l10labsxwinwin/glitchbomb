@@ -51,12 +51,12 @@ export default function SingleGamepack({
 
   return (
     <div
-      className="relative min-h-screen flex flex-col text-white"
+      className="relative flex flex-col text-white w-full h-full"
       style={{
         background: 'linear-gradient(to bottom, #0C1806, #000000)',
       }}
     >
-      <div className="flex flex-col items-center justify-center flex-1 p-4">
+      <div className="flex flex-col items-center shrink-0 p-4">
         <div className="text-white text-lg mb-4">
           Gamepack #{gamepackId}
         </div>
@@ -82,6 +82,8 @@ export default function SingleGamepack({
             ),
           )}
         </div>
+      </div>
+      <div className="flex-1 min-h-0 w-full">
         {children}
       </div>
     </div>

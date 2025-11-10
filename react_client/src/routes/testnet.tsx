@@ -12,20 +12,22 @@ function TestnetRoute() {
 
   return (
     <div
-      className="relative min-h-screen flex flex-col text-white"
+      className="relative h-dvh overflow-hidden flex flex-col text-white"
       style={{
         background: 'linear-gradient(to bottom, #0C1806, #000000)',
       }}
     >
       <Header />
-      {isExactMatch ? <Main /> : <Outlet />}
+      <div className="flex-1 min-h-0">
+        {isExactMatch ? <Main /> : <Outlet />}
+      </div>
     </div>
   )
 }
 
 const Main = () => {
   return (
-    <div className="flex-1 flex flex-col items-center justify-center">
+    <div className="flex flex-col items-center justify-center h-full">
       <h2
         className="text-2xl font-bold tracking-wider uppercase mb-4"
         style={{

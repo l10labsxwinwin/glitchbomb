@@ -47,7 +47,7 @@ export default function GameContainer({
 
   return (
     <div 
-      className="h-screen overflow-hidden flex flex-col items-center justify-center text-white px-4 md:px-6 py-6 md:py-8"
+      className="h-full overflow-hidden flex flex-col items-center justify-center text-white px-4 md:px-6 py-6 md:py-8"
       style={{
         background: 'linear-gradient(to bottom, #0C1806, #000000)'
       }}
