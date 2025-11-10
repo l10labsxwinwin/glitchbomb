@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SepoliaRouteImport } from './routes/sepolia'
 import { Route as RealRouteImport } from './routes/real'
 import { Route as FreeRouteImport } from './routes/free'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SepoliaRoute = SepoliaRouteImport.update({
+  id: '/sepolia',
+  path: '/sepolia',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RealRoute = RealRouteImport.update({
   id: '/real',
   path: '/real',
@@ -33,34 +39,45 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
+  '/sepolia': typeof SepoliaRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
+  '/sepolia': typeof SepoliaRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
+  '/sepolia': typeof SepoliaRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/free' | '/real'
+  fullPaths: '/' | '/free' | '/real' | '/sepolia'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/free' | '/real'
-  id: '__root__' | '/' | '/free' | '/real'
+  to: '/' | '/free' | '/real' | '/sepolia'
+  id: '__root__' | '/' | '/free' | '/real' | '/sepolia'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FreeRoute: typeof FreeRoute
   RealRoute: typeof RealRoute
+  SepoliaRoute: typeof SepoliaRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/sepolia': {
+      id: '/sepolia'
+      path: '/sepolia'
+      fullPath: '/sepolia'
+      preLoaderRoute: typeof SepoliaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/real': {
       id: '/real'
       path: '/real'
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FreeRoute: FreeRoute,
   RealRoute: RealRoute,
+  SepoliaRoute: SepoliaRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
