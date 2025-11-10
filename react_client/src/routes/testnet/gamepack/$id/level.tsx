@@ -4,6 +4,7 @@ import GameContainer from '@/components/GameContainer'
 import { LineDataPoint, OrbCategory, OrbEffect, PointType, type GameData, type Orb, orbCategoryColors } from '@/components/GameDataTypes'
 import type { ChartConfig } from '@/components/ui/chart'
 import { useGames } from '@/hooks/games'
+import { usePullOrb } from '@/hooks/pullOrb'
 
 export const Route = createFileRoute('/testnet/gamepack/$id/level')({
   component: LevelStateRoute,
@@ -65,6 +66,7 @@ function LevelStateRoute() {
   const { id } = Route.useParams()
   const gamepackId = Number(id)
   const { games } = useGames(gamepackId)
+  const { pullOrb: pullOrbContract } = usePullOrb()
 
   const latestGame = useMemo(() => {
     if (games.length === 0) return null
@@ -105,13 +107,9 @@ function LevelStateRoute() {
     }
   }, [latestGame])
 
-  // Function to pull an orb: removes one from pullable_orbs and adds to consumed_orbs
-  const pullOrb = () => {
-    if (pullableOrbs.length > 0) {
-      const pulledOrb = pullableOrbs[0] // Get first orb
-      setPullableOrbs((prev) => prev.slice(1)) // Remove first orb
-      setConsumedOrbs((prev) => [...prev, pulledOrb]) // Add to consumed
-    }
+  // Function to pull an orb: calls the contract function
+  const pullOrb = async () => {
+    await pullOrbContract(gamepackId)
   }
 
   // Calculate donut chart data based on current pullable orbs
