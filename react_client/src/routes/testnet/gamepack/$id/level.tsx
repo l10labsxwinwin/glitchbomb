@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import GameContainer from '@/components/GameContainer'
 import { LineDataPoint, OrbCategory, OrbEffect, PointType, type GameData, type Orb, orbCategoryColors } from '@/components/GameDataTypes'
 import type { ChartConfig } from '@/components/ui/chart'
+import { useGames } from '@/hooks/games'
 
 export const Route = createFileRoute('/testnet/gamepack/$id/level')({
   component: LevelStateRoute,
@@ -61,8 +62,48 @@ const categoryLabels: Record<OrbCategory, string> = {
 }
 
 function LevelStateRoute() {
+  const { id } = Route.useParams()
+  const gamepackId = Number(id)
+  const { games } = useGames(gamepackId)
+
+  const latestGame = useMemo(() => {
+    if (games.length === 0) return null
+    return games.reduce((latest, current) => {
+      const currentId = Number(current.game_id)
+      const latestId = Number(latest.game_id)
+      return currentId > latestId ? current : latest
+    })
+  }, [games])
+
+  // Use actual counts from Game data but keep mock structure for now (until we convert OrbEffectEnum to Orb)
   const [pullableOrbs, setPullableOrbs] = useState<Orb[]>([...initialPullableOrbs])
   const [consumedOrbs, setConsumedOrbs] = useState<Orb[]>([])
+
+  // Update pullable orbs count when game data changes
+  useEffect(() => {
+    if (latestGame) {
+      const count = latestGame.data.pullable_orbs.length
+      setPullableOrbs(prev => {
+        if (prev.length !== count) {
+          // Create array with actual count, using mock orbs as template
+          return Array(count).fill(null).map((_, i) => 
+            prev[i] || prev[0] || initialPullableOrbs[0]
+          )
+        }
+        return prev
+      })
+      // Update consumed orbs count
+      const consumedCount = latestGame.data.consumed_orbs.length
+      setConsumedOrbs(prev => {
+        if (prev.length !== consumedCount) {
+          return Array(consumedCount).fill(null).map((_, i) => 
+            prev[i] || prev[0] || initialPullableOrbs[0]
+          )
+        }
+        return prev
+      })
+    }
+  }, [latestGame])
 
   // Function to pull an orb: removes one from pullable_orbs and adds to consumed_orbs
   const pullOrb = () => {
@@ -98,16 +139,19 @@ function LevelStateRoute() {
     }, {} as Record<string, { label: string; color: string }>),
   }
 
+  // Convert Game type to GameData, using direct matches from actual Game data
   const gameData: GameData = {
-    moonRocks: 80,
-    points: 15,
-    glitchChips: 36,
-    milestone: 30,
-    multiplier: 2.5,
-    bombs: 5,
-    health: 5,
-    pullable_orbs: pullableOrbs,
-    consumed_orbs: consumedOrbs,
+    moonRocks: latestGame 
+      ? Number(latestGame.data.temp_moonrocks) + Number(latestGame.data.moonrocks_earned) - Number(latestGame.data.moonrocks_spent)
+      : 80,
+    points: latestGame ? Number(latestGame.data.points) : 15,
+    glitchChips: latestGame ? Number(latestGame.data.glitch_chips) : 36,
+    milestone: latestGame ? Number(latestGame.data.milestone) : 30,
+    multiplier: latestGame ? Number(latestGame.data.multiplier) : 2.5,
+    bombs: 5, // Keep as mock for now
+    health: latestGame ? Number(latestGame.data.hp) : 5,
+    pullable_orbs: pullableOrbs, // Using arrays with actual counts from latestGame.data.pullable_orbs.length
+    consumed_orbs: consumedOrbs, // Using arrays with actual counts from latestGame.data.consumed_orbs.length
   }
 
   return (
