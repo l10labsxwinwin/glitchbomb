@@ -35,6 +35,14 @@ export default function GamepackDisplay() {
 
   const { gamepacks } = useGamepacks(gamepackIds)
 
+  const sortedGamepacks = useMemo(() => {
+    return [...gamepacks].sort((a, b) => {
+      const idA = Number(a.gamepack_id)
+      const idB = Number(b.gamepack_id)
+      return idB - idA // Sort descending (highest first)
+    })
+  }, [gamepacks])
+
   const handleOpen = (gamepackId: number) => {
     open(gamepackId)
   }
@@ -43,7 +51,7 @@ export default function GamepackDisplay() {
     start(gamepackId)
   }
 
-  if (gamepacks.length === 0) {
+  if (sortedGamepacks.length === 0) {
     return (
       <div className="flex flex-col items-center">
         <p className="text-white text-lg">No gamepacks found</p>
@@ -52,20 +60,16 @@ export default function GamepackDisplay() {
   }
 
   return (
-    <div className="flex flex-col items-center p-4">
-      <div className="w-full max-w-7xl">
-        <div className="overflow-x-auto pb-4">
-          <div className="flex gap-4 md:gap-6">
-            {gamepacks.map((gamepack) => (
-              <GamePack
-                key={gamepack.gamepack_id}
-                gamepack={gamepack}
-                onOpen={handleOpen}
-                onStart={handleStart}
-              />
-            ))}
-          </div>
-        </div>
+    <div className="flex flex-col items-center p-4 w-full max-w-4xl">
+      <div className="flex flex-row gap-3 w-full overflow-x-auto pb-2">
+        {sortedGamepacks.map((gamepack) => (
+          <GamePack
+            key={gamepack.gamepack_id}
+            gamepack={gamepack}
+            onOpen={handleOpen}
+            onStart={handleStart}
+          />
+        ))}
       </div>
     </div>
   )

@@ -22,7 +22,16 @@ function TestnetRoute() {
 
 const Main = () => {
   return (
-    <div className="flex-1 flex items-center justify-center">
+    <div className="flex-1 flex flex-col items-center justify-center">
+      <h2
+        className="text-2xl font-bold tracking-wider uppercase mb-4"
+        style={{
+          color: '#55DD63',
+          textShadow: '2px 2px 0px rgba(0, 0, 0, 0.25)',
+        }}
+      >
+        MY GAMEPACKS
+      </h2>
       <GamepackDisplay />
     </div>
   )
