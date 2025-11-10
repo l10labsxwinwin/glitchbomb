@@ -1,5 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import SingleGamepack from '@/components/SingleGamepack'
+import { useGames } from '@/hooks/games'
+import { useEffect } from 'react'
 
 export const Route = createFileRoute('/testnet/gamepack/$id')({
   component: GamepackRoute,
@@ -7,5 +9,12 @@ export const Route = createFileRoute('/testnet/gamepack/$id')({
 
 function GamepackRoute() {
   const { id } = Route.useParams()
-  return <SingleGamepack gamepackId={Number(id)} />
+  const gamepackId = Number(id)
+  const { games } = useGames(gamepackId)
+
+  useEffect(() => {
+    console.log('All games:', games)
+  }, [games])
+
+  return <SingleGamepack gamepackId={gamepackId} />
 }
