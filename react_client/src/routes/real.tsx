@@ -19,7 +19,12 @@ export const Route = createFileRoute('/real')({
 
 function RealPlay() {
   return (
-    <div className="relative min-h-screen flex flex-col gap-16 bg-black text-white">
+    <div 
+      className="relative min-h-screen flex flex-col gap-16 text-white"
+      style={{
+        background: 'linear-gradient(to bottom, #0C1806, #000000)'
+      }}
+    >
       <Header />
       <Main />
     </div>
@@ -28,7 +33,7 @@ function RealPlay() {
 
 export const Main = () => {
   return (
-    <div className="flex flex-col items-center gap-8">
+    <div className="flex flex-col items-center gap-8 px-4">
       <Buy />
       <Gamepacks />
     </div>
@@ -69,7 +74,7 @@ export const Gamepacks = () => {
   const { gamepacks } = useGamepacks(gamepackIds);
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 w-full max-w-4xl">
       {gamepacks.map((gamepack) => (
         <Game key={gamepack.gamepack_id} gamepack={gamepack} />
       ))}
@@ -83,8 +88,15 @@ export const Game = ({ gamepack }: { gamepack: GamePack }) => {
   }, [gamepack]);
 
   return (
-    <div className="flex gap-4">
-      <p>{`Gamepack #${gamepack.gamepack_id}`}</p>
+    <div 
+      className="flex gap-4 items-center p-4 rounded-lg"
+      style={{ 
+        backgroundColor: '#14240C',
+        color: '#55DD63',
+        border: '2px solid #55DD63'
+      }}
+    >
+      <p className="font-semibold">{`Gamepack #${gamepack.gamepack_id}`}</p>
       {unopened && <Open gamepackId={Number(gamepack.gamepack_id)} />}
       {!unopened && <Start gamepackId={Number(gamepack.gamepack_id)} />}
     </div>
@@ -114,14 +126,17 @@ export const Header = () => {
   };
 
   return (
-    <div className="w-full min-h-24 max-h-24 px-8 flex items-center justify-between border-b border-[rgba(0,0,0,0.24)] bg-[linear-gradient(0deg,rgba(0,0,0,0.24)_0%,rgba(0,0,0,0.16)_100%)]">
+    <div className="w-full min-h-24 max-h-24 px-8 flex items-center justify-between border-b" style={{ borderColor: '#55DD63' }}>
       <div
         className="flex items-center justify-start gap-2 cursor-pointer select-none"
         onClick={handleClick}
       >
         <h1
-          className="text-[64px] leading-[48px] uppercase text-white translate-y-1"
-          style={{ textShadow: "3px 3px 0px rgba(0, 0, 0, 0.25)" }}
+          className="text-[64px] leading-[48px] uppercase translate-y-1"
+          style={{ 
+            color: '#55DD63',
+            textShadow: "3px 3px 0px rgba(0, 0, 0, 0.25)" 
+          }}
         >
           GLITCH BOMB
         </h1>
