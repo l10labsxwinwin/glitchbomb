@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useGamepackContext } from '@/context/gamepack'
 import GameOverDisplay from '@/components/GameOverDisplay'
 import { useNextGame } from '@/hooks/nextGame'
@@ -11,6 +11,7 @@ export const Route = createFileRoute('/testnet/gamepack/$id/game-over')({
 function GameOverStateRoute() {
   const { gamepackId, latestGame, orbsInGame } = useGamepackContext()
   const { nextGame } = useNextGame()
+  const navigate = useNavigate()
   const [isStarting, setIsStarting] = useState(false)
 
   console.log('Game Over Route Data:', {
@@ -30,11 +31,16 @@ function GameOverStateRoute() {
     }
   }
 
+  const handleBackToGamepacks = () => {
+    navigate({ to: '/testnet' })
+  }
+
   return (
     <GameOverDisplay 
       latestGame={latestGame}
       gamepackId={gamepackId}
       onNewGame={handleNextGame}
+      onBackToGamepacks={handleBackToGamepacks}
       isStarting={isStarting}
     />
   )

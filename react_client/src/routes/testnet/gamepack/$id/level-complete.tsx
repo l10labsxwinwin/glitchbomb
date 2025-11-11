@@ -1,4 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useGamepackContext } from '@/context/gamepack'
 import LevelCompleteDisplay from '@/components/LevelCompleteDisplay'
 import { useEnterShop } from '@/hooks/enterShop'
@@ -13,6 +13,7 @@ function LevelCompleteStateRoute() {
   const { gamepackId, latestGame, orbsInGame } = useGamepackContext()
   const { enterShop } = useEnterShop()
   const { cashOut } = useCashOut()
+  const navigate = useNavigate()
   const [isEnteringShop, setIsEnteringShop] = useState(false)
   const [isCashingOut, setIsCashingOut] = useState(false)
 
@@ -44,12 +45,17 @@ function LevelCompleteStateRoute() {
     }
   }
 
+  const handleBackToGamepacks = () => {
+    navigate({ to: '/testnet' })
+  }
+
   return (
     <LevelCompleteDisplay 
       latestGame={latestGame}
       gamepackId={gamepackId}
       onEnterShop={handleEnterShop}
       onCashOut={handleCashOut}
+      onBackToGamepacks={handleBackToGamepacks}
       isEnteringShop={isEnteringShop}
       isCashingOut={isCashingOut}
     />
