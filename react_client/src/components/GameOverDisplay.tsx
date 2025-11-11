@@ -126,7 +126,7 @@ export default function GameOverDisplay({ latestGame, onNewGame, isStarting = fa
             color: '#0C1806',
           }}
         >
-          {isStarting ? 'Starting...' : 'Start New Game'}
+          {isStarting ? 'Starting...' : 'Start Next Game'}
         </button>
       )}
     </div>

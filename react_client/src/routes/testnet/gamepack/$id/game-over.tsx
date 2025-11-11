@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useGamepackContext } from '@/context/gamepack'
 import GameOverDisplay from '@/components/GameOverDisplay'
-import { useStart } from '@/hooks/start'
+import { useNextGame } from '@/hooks/nextGame'
 import { useState } from 'react'
 
 export const Route = createFileRoute('/testnet/gamepack/$id/game-over')({
@@ -10,7 +10,7 @@ export const Route = createFileRoute('/testnet/gamepack/$id/game-over')({
 
 function GameOverStateRoute() {
   const { gamepackId, latestGame, orbsInGame } = useGamepackContext()
-  const { start } = useStart()
+  const { nextGame } = useNextGame()
   const [isStarting, setIsStarting] = useState(false)
 
   console.log('Game Over Route Data:', {
@@ -19,12 +19,12 @@ function GameOverStateRoute() {
     orbsInGame,
   })
 
-  const handleNewGame = async () => {
+  const handleNextGame = async () => {
     setIsStarting(true)
     try {
-      await start(gamepackId)
+      await nextGame(gamepackId)
     } catch (error) {
-      console.error('Failed to start new game:', error)
+      console.error('Failed to start next game:', error)
     } finally {
       setIsStarting(false)
     }
@@ -33,7 +33,7 @@ function GameOverStateRoute() {
   return (
     <GameOverDisplay 
       latestGame={latestGame}
-      onNewGame={handleNewGame}
+      onNewGame={handleNextGame}
       isStarting={isStarting}
     />
   )
