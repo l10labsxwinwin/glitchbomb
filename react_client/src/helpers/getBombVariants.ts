@@ -1,4 +1,4 @@
-import type { Game } from '../src/bindings/typescript/models.gen'
+import type { Game } from '@/bindings/typescript/models.gen'
 
 /**
  * Extracts all bomb variant values from a game's pullable_orbs array.

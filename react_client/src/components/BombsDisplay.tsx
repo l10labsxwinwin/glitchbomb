@@ -1,17 +1,16 @@
 import BombIcon from './BombIcon'
-import type { Orb } from './GameDataTypes'
 
 interface BombsDisplayProps {
-  bombOrbs: Orb[]
+  bombValues: number[]
 }
 
-export default function BombsDisplay({ bombOrbs }: BombsDisplayProps) {
+export default function BombsDisplay({ bombValues }: BombsDisplayProps) {
   return (
     <div className="flex items-center justify-center gap-2 flex-1 min-w-0">
-      {bombOrbs.map((orb, index) => (
+      {bombValues.map((value, index) => (
         <div key={index} className="relative shrink-0">
           <BombIcon className="w-10 h-10" />
-          {orb.value !== 1 && (
+          {value !== 1 && (
             <span 
               className="absolute left-1/2 flex items-center justify-center text-[10px] font-bold leading-none" 
               style={{ 
@@ -20,7 +19,7 @@ export default function BombsDisplay({ bombOrbs }: BombsDisplayProps) {
                 transform: 'translateX(-5%)'
               }}
             >
-              {orb.value}x
+              {value}x
             </span>
           )}
         </div>

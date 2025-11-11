@@ -5,6 +5,7 @@ import { LineDataPoint, OrbCategory, OrbEffect, PointType, type GameData, type O
 import type { ChartConfig } from '@/components/ui/chart'
 import { useGames } from '@/hooks/games'
 import { usePullOrb } from '@/hooks/pullOrb'
+import { getBombVariants } from '@/helpers/getBombVariants'
 
 export const Route = createFileRoute('/testnet/gamepack/$id/level')({
   component: LevelStateRoute,
@@ -112,6 +113,11 @@ function LevelStateRoute() {
     await pullOrbContract(gamepackId)
   }
 
+  // Get bomb values from latest game
+  const bombValues = useMemo(() => {
+    return latestGame ? getBombVariants(latestGame) : []
+  }, [latestGame])
+
   // Calculate donut chart data based on current pullable orbs
   const orbCategoryCounts = groupOrbsByCategory(pullableOrbs)
   const donutChartData = Object.entries(orbCategoryCounts)
@@ -146,7 +152,7 @@ function LevelStateRoute() {
     glitchChips: latestGame ? Number(latestGame.data.glitch_chips) : 36,
     milestone: latestGame ? Number(latestGame.data.milestone) : 30,
     multiplier: latestGame ? Number(latestGame.data.multiplier) : 2.5,
-    bombs: 5, // Keep as mock for now
+    bombs: bombValues.length,
     health: latestGame ? Number(latestGame.data.hp) : 5,
     pullable_orbs: pullableOrbs, // Using arrays with actual counts from latestGame.data.pullable_orbs.length
     consumed_orbs: consumedOrbs, // Using arrays with actual counts from latestGame.data.consumed_orbs.length
@@ -155,6 +161,7 @@ function LevelStateRoute() {
   return (
     <GameContainer 
       gameData={gameData}
+      bombValues={bombValues}
       donutChartData={donutChartData}
       donutChartConfig={donutChartConfig}
       lineData={mockLineData}

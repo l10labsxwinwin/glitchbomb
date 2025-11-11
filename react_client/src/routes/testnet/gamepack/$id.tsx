@@ -3,7 +3,6 @@ import { useGames } from '@/hooks/games'
 import { useOrbsInGame } from '@/hooks/orbsInGame'
 import { useEffect, useMemo } from 'react'
 import SingleGamepack from '@/components/SingleGamepack'
-import { getBombVariants } from '../../../../helpers/getBombVariants'
 
 export const Route = createFileRoute('/testnet/gamepack/$id')({
   component: GamepackRoute,
@@ -42,13 +41,6 @@ function GamepackRoute() {
     latestGame ? Number(latestGame.game_id) : 0,
   )
 
-  useEffect(() => {
-    if (latestGame) {
-      console.log('Latest Game:', latestGame)
-      const bombVariants = getBombVariants(latestGame)
-      console.log('Bomb Variants:', bombVariants)
-    }
-  }, [latestGame])
 
   useEffect(() => {
     if (orbsInGame) {

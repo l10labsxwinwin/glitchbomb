@@ -7,11 +7,11 @@ import RecentOrbsDisplay from './RecentOrbsDisplay'
 import { FusedPullOrb } from './FusedPullOrb'
 import { ChartLineDots } from './LineChart'
 import type { GameData, LineDataPoint } from './GameDataTypes'
-import { OrbCategory } from './GameDataTypes'
 import type { ChartConfig } from './ui/chart'
 
 interface GameContainerProps {
   gameData: GameData
+  bombValues?: number[]
   donutChartData?: Array<{ category: string; value: number; fill: string }>
   donutChartConfig?: ChartConfig
   lineData?: LineDataPoint[]
@@ -21,6 +21,7 @@ interface GameContainerProps {
 
 export default function GameContainer({ 
   gameData,
+  bombValues = [],
   donutChartData,
   donutChartConfig,
   lineData,
@@ -82,7 +83,7 @@ export default function GameContainer({
         </div>
         <div className="flex flex-row items-center gap-4 w-full shrink-0">
           <BottomBarDisplay 
-            bombOrbs={gameData.pullable_orbs.filter(orb => orb.category === OrbCategory.Bomb)} 
+            bombValues={bombValues}
           />
         </div>
       </div>
