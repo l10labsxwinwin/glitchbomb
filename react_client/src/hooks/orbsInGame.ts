@@ -5,7 +5,7 @@ import type {
 } from '@dojoengine/sdk'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { NAMESPACE } from '../../config'
-import { OrbsInGame } from '../bindings/typescript/models.gen'
+import { OrbsInGame } from '@/bindings/typescript/models.gen'
 import { useDojoSdk } from '@/hooks/dojo'
 
 const MODEL_NAME = 'OrbsInGame'

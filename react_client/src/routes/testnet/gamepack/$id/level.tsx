@@ -6,6 +6,7 @@ import type { ChartConfig } from '@/components/ui/chart'
 import { useGames } from '@/hooks/games'
 import { usePullOrb } from '@/hooks/pullOrb'
 import { getBombVariants } from '@/helpers/getBombVariants'
+import { to_orbcategory } from '@/lib/frontenddatatypes'
 
 export const Route = createFileRoute('/testnet/gamepack/$id/level')({
   component: LevelStateRoute,
@@ -116,6 +117,14 @@ function LevelStateRoute() {
   // Get bomb values from latest game
   const bombValues = useMemo(() => {
     return latestGame ? getBombVariants(latestGame) : []
+  }, [latestGame])
+
+  // Convert pullable orbs to orb categories and log
+  useEffect(() => {
+    if (latestGame && latestGame.data.pullable_orbs) {
+      const orbCategories = to_orbcategory(latestGame.data.pullable_orbs)
+      console.log('Orb Categories:', orbCategories)
+    }
   }, [latestGame])
 
   // Calculate donut chart data based on current pullable orbs
