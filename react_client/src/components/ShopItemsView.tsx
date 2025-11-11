@@ -124,11 +124,8 @@ export default function ShopItemsView({
 
   return (
     <div className="w-full">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold" style={{ color: '#55DD63' }}>
-          Shop Items
-        </h2>
-        {totalPages > 1 && (
+      {totalPages > 1 && (
+        <div className="flex items-center justify-center mb-4">
           <div className="flex items-center gap-2">
             <button
               onClick={prevPage}
@@ -158,8 +155,8 @@ export default function ShopItemsView({
               &gt;
             </button>
           </div>
-        )}
-      </div>
+        </div>
+      )}
       <div className="bg-black/30 border border-white/10 p-4 rounded-lg">
         <div className="grid grid-cols-3 gap-4 justify-items-center">
           {currentOrbs.map((orb, idx) => {
