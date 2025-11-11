@@ -2,10 +2,10 @@ import { useState, useMemo, useEffect } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import GameContainer from '@/components/GameContainer'
 import { LineDataPoint, PointType, type GameData, type Orb } from '@/components/GameDataTypes'
-import { useGames } from '@/hooks/games'
 import { usePullOrb } from '@/hooks/pullOrb'
 import { getBombVariants } from '@/helpers/getBombVariants'
 import { to_orbcategory } from '@/lib/frontenddatatypes'
+import { useGamepackContext } from '@/context/gamepack'
 
 export const Route = createFileRoute('/testnet/gamepack/$id/level')({
   component: LevelStateRoute,
@@ -23,19 +23,8 @@ const mockLineData: LineDataPoint[] = [
 ]
 
 function LevelStateRoute() {
-  const { id } = Route.useParams()
-  const gamepackId = Number(id)
-  const { games } = useGames(gamepackId)
+  const { gamepackId, latestGame } = useGamepackContext()
   const { pullOrb: pullOrbContract } = usePullOrb()
-
-  const latestGame = useMemo(() => {
-    if (games.length === 0) return null
-    return games.reduce((latest, current) => {
-      const currentId = Number(current.game_id)
-      const latestId = Number(latest.game_id)
-      return currentId > latestId ? current : latest
-    })
-  }, [games])
 
   // Use actual counts from Game data but keep mock structure for now (until we convert OrbEffectEnum to Orb)
   const [pullableOrbs, setPullableOrbs] = useState<Orb[]>([])

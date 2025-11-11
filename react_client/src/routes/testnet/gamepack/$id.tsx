@@ -77,7 +77,11 @@ function GamepackRoute() {
   }, [latestGame, gamepackId, navigate])
 
   return (
-    <SingleGamepack gamepackId={gamepackId} latestGame={latestGame}>
+    <SingleGamepack
+      gamepackId={gamepackId}
+      latestGame={latestGame}
+      orbsInGame={orbsInGame}
+    >
       <Outlet />
     </SingleGamepack>
   )
