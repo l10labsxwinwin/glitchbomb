@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useRef, useEffect } from 'react'
 import type { Orb } from '@/bindings/typescript/models.gen'
 
 interface ShopItemsViewProps {
@@ -90,29 +90,93 @@ export default function ShopItemsView({
   const orbsPerPage = 9
   const totalPages = 3 // Always 3 pages: common, rare, cosmic
 
+  // Store the sorted order for each rarity (maps original index to sorted position)
+  const sortedOrderRef = useRef<{
+    common: number[] | null
+    rare: number[] | null
+    cosmic: number[] | null
+  }>({
+    common: null,
+    rare: null,
+    cosmic: null,
+  })
+
+  // Initialize sorted order when first entering the shop
+  useEffect(() => {
+    if (!orbsInBag) {
+      // Reset order when shop is empty
+      sortedOrderRef.current = { common: null, rare: null, cosmic: null }
+      return
+    }
+
+    // Sort each rarity by price and store the order of original indices
+    // Only do this if we haven't established an order yet for that rarity
+    const sortAndStoreOrder = (orbs: Array<Orb>, currentOrder: number[] | null): number[] | null => {
+      if (!orbs || orbs.length === 0) return null
+      
+      // If order already exists and the number of orbs with effects matches, keep existing order
+      const indexedOrbs = orbs.map((orb, idx) => ({ orb, originalIndex: idx }))
+      const filtered = indexedOrbs.filter(({ orb }) => getOrbEffect(orb) !== null)
+      
+      // If we already have an order and the count matches, don't re-sort
+      if (currentOrder && currentOrder.length === filtered.length) {
+        return currentOrder
+      }
+      
+      // Otherwise, sort by price (first time entering shop)
+      const sorted = filtered.sort(
+        (a, b) => Number(a.orb.current_price) - Number(b.orb.current_price)
+      )
+      return sorted.map(({ originalIndex }) => originalIndex)
+    }
+
+    sortedOrderRef.current = {
+      common: sortAndStoreOrder(orbsInBag.common || [], sortedOrderRef.current.common),
+      rare: sortAndStoreOrder(orbsInBag.rare || [], sortedOrderRef.current.rare),
+      cosmic: sortAndStoreOrder(orbsInBag.cosmic || [], sortedOrderRef.current.cosmic),
+    }
+  }, [orbsInBag])
+
   // Get orbs for the current page based on rarity
   const currentOrbs = useMemo(() => {
     if (!orbsInBag) return Array(orbsPerPage).fill(null)
     
     let orbsForPage: Array<Orb & { rarity: 'common' | 'rare' | 'cosmic'; index: number }> = []
+    let sortedOrder: number[] | null = null
     
     // Page 0: Common, Page 1: Rare, Page 2: Cosmic
     if (currentPage === 0) {
       orbsForPage = (orbsInBag.common || []).map((orb, idx) => ({ ...orb, rarity: 'common' as const, index: idx }))
+      sortedOrder = sortedOrderRef.current.common
     } else if (currentPage === 1) {
       orbsForPage = (orbsInBag.rare || []).map((orb, idx) => ({ ...orb, rarity: 'rare' as const, index: idx }))
+      sortedOrder = sortedOrderRef.current.rare
     } else if (currentPage === 2) {
       orbsForPage = (orbsInBag.cosmic || []).map((orb, idx) => ({ ...orb, rarity: 'cosmic' as const, index: idx }))
+      sortedOrder = sortedOrderRef.current.cosmic
     }
     
-    // Filter out orbs with no effect and sort by price
-    const filteredOrbs = orbsForPage
-      .filter(orb => getOrbEffect(orb) !== null)
-      .sort((a, b) => Number(a.current_price) - Number(b.current_price))
+    // Filter out orbs with no effect
+    const filteredOrbs = orbsForPage.filter(orb => getOrbEffect(orb) !== null)
+    
+    // If we have a stored order, use it to maintain the order
+    // Otherwise, sort by price (fallback for edge cases)
+    let orderedOrbs: Array<Orb & { rarity: 'common' | 'rare' | 'cosmic'; index: number }>
+    if (sortedOrder && sortedOrder.length === filteredOrbs.length) {
+      // Create a map from original index to orb
+      const orbMap = new Map(filteredOrbs.map(orb => [orb.index, orb]))
+      // Order by the stored sorted order
+      orderedOrbs = sortedOrder
+        .map(originalIndex => orbMap.get(originalIndex))
+        .filter((orb): orb is typeof filteredOrbs[0] => orb !== undefined)
+    } else {
+      // Fallback: sort by price if order not yet established
+      orderedOrbs = filteredOrbs.sort((a, b) => Number(a.current_price) - Number(b.current_price))
+    }
     
     // Fill remaining slots with null placeholders
-    const placeholders = Array(Math.max(0, orbsPerPage - filteredOrbs.length)).fill(null)
-    return [...filteredOrbs, ...placeholders]
+    const placeholders = Array(Math.max(0, orbsPerPage - orderedOrbs.length)).fill(null)
+    return [...orderedOrbs, ...placeholders]
   }, [orbsInBag, currentPage, orbsPerPage])
 
   const nextPage = () => {
