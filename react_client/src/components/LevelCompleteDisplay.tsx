@@ -5,16 +5,20 @@ import type { GameData } from './GameDataTypes'
 
 interface LevelCompleteDisplayProps {
   latestGame: Game | null
+  gamepackId?: number
   onEnterShop?: () => void
   onCashOut?: () => void
+  onBackToGamepacks?: () => void
   isEnteringShop?: boolean
   isCashingOut?: boolean
 }
 
 export default function LevelCompleteDisplay({ 
-  latestGame, 
+  latestGame,
+  gamepackId,
   onEnterShop, 
   onCashOut,
+  onBackToGamepacks,
   isEnteringShop = false,
   isCashingOut = false,
 }: LevelCompleteDisplayProps) {
@@ -85,6 +89,8 @@ export default function LevelCompleteDisplay({
 
   const level = latestGame ? Number(latestGame.data.level) : 0
   const pullNumber = latestGame ? Number(latestGame.data.pull_number) : 0
+  const gameId = latestGame ? Number(latestGame.game_id) : 0
+  const displayGamepackId = gamepackId ?? (latestGame ? Number(latestGame.gamepack_id) : 0)
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full px-4 py-8 gap-8">
@@ -95,7 +101,7 @@ export default function LevelCompleteDisplay({
         </h1>
         {latestGame && (
           <p className="text-lg opacity-80" style={{ color: '#55DD63' }}>
-            Level {level} • Pull {pullNumber}
+            Gamepack #{displayGamepackId} • Game #{gameId} • Level {level} • Pull {pullNumber}
           </p>
         )}
       </div>
@@ -124,32 +130,48 @@ export default function LevelCompleteDisplay({
       </div>
 
       {/* Action Buttons */}
-      <div className="flex flex-row gap-4 w-full max-w-md justify-center">
-        {onEnterShop && (
+      <div className="flex flex-col gap-4 w-full max-w-md">
+        <div className="flex flex-row gap-4 w-full justify-center">
+          {onEnterShop && (
+            <button
+              onClick={onEnterShop}
+              disabled={isEnteringShop || isCashingOut}
+              className="flex-1 px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: '#55DD63',
+                color: '#0C1806',
+              }}
+            >
+              {isEnteringShop ? 'Entering...' : 'Enter Shop'}
+            </button>
+          )}
+          {onCashOut && (
+            <button
+              onClick={onCashOut}
+              disabled={isCashingOut || isEnteringShop}
+              className="flex-1 px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: '#14240C',
+                color: '#55DD63',
+                border: '2px solid #55DD63',
+              }}
+            >
+              {isCashingOut ? 'Cashing Out...' : 'Cash Out'}
+            </button>
+          )}
+        </div>
+        {onBackToGamepacks && (
           <button
-            onClick={onEnterShop}
+            onClick={onBackToGamepacks}
             disabled={isEnteringShop || isCashingOut}
-            className="flex-1 px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-            style={{
-              backgroundColor: '#55DD63',
-              color: '#0C1806',
-            }}
-          >
-            {isEnteringShop ? 'Entering...' : 'Enter Shop'}
-          </button>
-        )}
-        {onCashOut && (
-          <button
-            onClick={onCashOut}
-            disabled={isCashingOut || isEnteringShop}
-            className="flex-1 px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             style={{
               backgroundColor: '#14240C',
               color: '#55DD63',
               border: '2px solid #55DD63',
             }}
           >
-            {isCashingOut ? 'Cashing Out...' : 'Cash Out'}
+            Back to Gamepacks
           </button>
         )}
       </div>

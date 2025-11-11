@@ -5,11 +5,13 @@ import type { GameData } from './GameDataTypes'
 
 interface GameOverDisplayProps {
   latestGame: Game | null
+  gamepackId?: number
   onNewGame?: () => void
+  onBackToGamepacks?: () => void
   isStarting?: boolean
 }
 
-export default function GameOverDisplay({ latestGame, onNewGame, isStarting = false }: GameOverDisplayProps) {
+export default function GameOverDisplay({ latestGame, gamepackId, onNewGame, onBackToGamepacks, isStarting = false }: GameOverDisplayProps) {
   // Count total bombs pulled from consumed_orbs array
   const totalBombsPulled = useMemo(() => {
     if (!latestGame || !latestGame.data.consumed_orbs) {
@@ -78,6 +80,7 @@ export default function GameOverDisplay({ latestGame, onNewGame, isStarting = fa
   const level = latestGame ? Number(latestGame.data.level) : 0
   const pullNumber = latestGame ? Number(latestGame.data.pull_number) : 0
   const gameId = latestGame ? Number(latestGame.game_id) : 0
+  const displayGamepackId = gamepackId ?? (latestGame ? Number(latestGame.gamepack_id) : 0)
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full px-4 py-8 gap-8">
@@ -88,7 +91,7 @@ export default function GameOverDisplay({ latestGame, onNewGame, isStarting = fa
         </h1>
         {latestGame && (
           <p className="text-lg opacity-80" style={{ color: '#55DD63' }}>
-            Game #{gameId} • Level {level} • Pull {pullNumber}
+            Gamepack #{displayGamepackId} • Game #{gameId} • Level {level} • Pull {pullNumber}
           </p>
         )}
       </div>
@@ -141,19 +144,35 @@ export default function GameOverDisplay({ latestGame, onNewGame, isStarting = fa
       </div>
 
       {/* Action Button */}
-      {onNewGame && (
-        <button
-          onClick={onNewGame}
-          disabled={isStarting}
-          className="px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: '#55DD63',
-            color: '#0C1806',
-          }}
-        >
-          {isStarting ? 'Starting...' : 'Start Next Game'}
-        </button>
-      )}
+      <div className="flex flex-col gap-4 w-full max-w-md items-center">
+        {onNewGame && (
+          <button
+            onClick={onNewGame}
+            disabled={isStarting}
+            className="w-full px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: '#55DD63',
+              color: '#0C1806',
+            }}
+          >
+            {isStarting ? 'Starting...' : 'Start Next Game'}
+          </button>
+        )}
+        {onBackToGamepacks && (
+          <button
+            onClick={onBackToGamepacks}
+            disabled={isStarting}
+            className="w-full px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: '#14240C',
+              color: '#55DD63',
+              border: '2px solid #55DD63',
+            }}
+          >
+            Back to Gamepacks
+          </button>
+        )}
+      </div>
     </div>
   )
 }

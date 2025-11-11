@@ -33,6 +33,7 @@ function GameOverStateRoute() {
   return (
     <GameOverDisplay 
       latestGame={latestGame}
+      gamepackId={gamepackId}
       onNewGame={handleNextGame}
       isStarting={isStarting}
     />

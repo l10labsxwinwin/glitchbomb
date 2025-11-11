@@ -47,6 +47,7 @@ function LevelCompleteStateRoute() {
   return (
     <LevelCompleteDisplay 
       latestGame={latestGame}
+      gamepackId={gamepackId}
       onEnterShop={handleEnterShop}
       onCashOut={handleCashOut}
       isEnteringShop={isEnteringShop}

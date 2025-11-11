@@ -3,6 +3,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import GameContainer from '@/components/GameContainer'
 import { LineDataPoint, PointType, type GameData, type Orb } from '@/components/GameDataTypes'
 import { usePullOrb } from '@/hooks/pullOrb'
+import { useCashOut } from '@/hooks/cashOut'
 import { getBombVariants } from '@/helpers/getBombVariants'
 import { to_orbcategory } from '@/lib/frontenddatatypes'
 import { useGamepackContext } from '@/context/gamepack'
@@ -25,6 +26,8 @@ const mockLineData: LineDataPoint[] = [
 function LevelStateRoute() {
   const { gamepackId, latestGame } = useGamepackContext()
   const { pullOrb: pullOrbContract } = usePullOrb()
+  const { cashOut } = useCashOut()
+  const [isCashingOut, setIsCashingOut] = useState(false)
 
   // Use actual counts from Game data but keep mock structure for now (until we convert OrbEffectEnum to Orb)
   const [pullableOrbs, setPullableOrbs] = useState<Orb[]>([])
@@ -55,6 +58,18 @@ function LevelStateRoute() {
   // Function to pull an orb: calls the contract function
   const pullOrb = async () => {
     await pullOrbContract(gamepackId)
+  }
+
+  // Function to cash out: calls the contract function
+  const handleCashOut = async () => {
+    setIsCashingOut(true)
+    try {
+      await cashOut(gamepackId)
+    } catch (error) {
+      console.error('Failed to cash out:', error)
+    } finally {
+      setIsCashingOut(false)
+    }
   }
 
   // Get bomb values from latest game
@@ -99,6 +114,7 @@ function LevelStateRoute() {
       orbCategories={orbCategories}
       lineData={mockLineData}
       onPullOrb={pullOrb}
+      onCashOut={handleCashOut}
     />
   )
 }
