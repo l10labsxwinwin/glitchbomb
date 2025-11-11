@@ -1,5 +1,6 @@
 import { createFileRoute, Outlet, useNavigate } from '@tanstack/react-router'
 import { useGames } from '@/hooks/games'
+import { useOrbsInGame } from '@/hooks/orbsInGame'
 import { useEffect, useMemo } from 'react'
 import SingleGamepack from '@/components/SingleGamepack'
 
@@ -34,6 +35,23 @@ function GamepackRoute() {
       return currentId > latestId ? current : latest
     })
   }, [games])
+
+  const { orbsInGame } = useOrbsInGame(
+    gamepackId,
+    latestGame ? Number(latestGame.game_id) : 0,
+  )
+
+  useEffect(() => {
+    if (latestGame) {
+      console.log('Latest Game:', latestGame)
+    }
+  }, [latestGame])
+
+  useEffect(() => {
+    if (orbsInGame) {
+      console.log('OrbsInGame:', orbsInGame)
+    }
+  }, [orbsInGame])
 
   useEffect(() => {
     if (latestGame) {
