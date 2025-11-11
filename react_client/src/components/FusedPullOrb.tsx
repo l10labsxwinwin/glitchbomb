@@ -10,110 +10,85 @@ import {
   ChartTooltipContent,
 } from '@/components/ui/chart'
 import { cn } from '@/lib/utils'
-import type { Orb } from './GameDataTypes'
 import { OrbCategory, orbCategoryColors } from './GameDataTypes'
+import type { OrbCategories } from '@/lib/frontenddatatypes'
 
-const categoryLabels: Record<OrbCategory, string> = {
-  [OrbCategory.Point]: 'Point',
-  [OrbCategory.Health]: 'Health',
-  [OrbCategory.Bomb]: 'Bomb',
-  [OrbCategory.Multiplier]: 'Multiplier',
-  [OrbCategory.Special]: 'Special',
+// Map OrbCategories field names to colors
+const orbCategoryFieldColors: Record<keyof OrbCategories, string> = {
+  health: orbCategoryColors[OrbCategory.Health],    // #00FF88 - Bright green
+  bomb: orbCategoryColors[OrbCategory.Bomb],        // #FF4444 - Bright red
+  multiplier: orbCategoryColors[OrbCategory.Multiplier], // #A855F7 - Bright purple
+  point: orbCategoryColors[OrbCategory.Point],     // #00D9FF - Bright cyan
+  special: orbCategoryColors[OrbCategory.Special], // #FFD700 - Gold
+}
+
+// Map OrbCategories field names to display labels
+const orbCategoryFieldLabels: Record<keyof OrbCategories, string> = {
+  health: 'Health',
+  bomb: 'Bomb',
+  multiplier: 'Multiplier',
+  point: 'Point',
+  special: 'Special',
 }
 
 interface FusedPullOrbProps {
   onClick?: () => void
   disabled?: boolean
-  orbs: number
   health: number
   className?: string
   innerRadius?: number
   outerRadius?: number
-  data?: Array<{ category: string; value: number; fill: string }>
-  config?: ChartConfig
-  pullableOrbs?: Orb[]
-}
-
-// Group pullable orbs by category
-const groupOrbsByCategory = (orbs: Orb[]) => {
-  const grouped = orbs.reduce(
-    (acc, orb) => {
-      const category = orb.category
-      acc[category] = (acc[category] || 0) + 1
-      return acc
-    },
-    {} as Record<OrbCategory, number>,
-  )
-
-  return grouped
+  orbCategories: OrbCategories
 }
 
 export function FusedPullOrb({
   onClick,
   disabled = false,
-  orbs,
   health,
   className,
   innerRadius = 60,
   outerRadius,
-  data,
-  config,
-  pullableOrbs,
+  orbCategories,
 }: FusedPullOrbProps) {
-  // Generate data from pullableOrbs if data is not provided
+  // Calculate total orb count from all categories
+  const totalOrbs = React.useMemo(() => {
+    return Object.values(orbCategories).reduce(
+      (sum, effects) => sum + effects.length,
+      0,
+    )
+  }, [orbCategories])
+
+  // Generate chart data from orbCategories
   const chartData = React.useMemo(() => {
-    if (data && data.length > 0) {
-      return data
-    }
+    return Object.entries(orbCategories)
+      .filter(([_, effects]) => effects.length > 0)
+      .map(([fieldName, effects]) => ({
+        category: fieldName,
+        value: effects.length,
+        fill: orbCategoryFieldColors[fieldName as keyof OrbCategories],
+      }))
+  }, [orbCategories])
 
-    if (pullableOrbs && pullableOrbs.length > 0) {
-      const orbCategoryCounts = groupOrbsByCategory(pullableOrbs)
-      return Object.entries(orbCategoryCounts)
-        .filter(([_, count]) => count > 0)
-        .map(([category, count]) => ({
-          category,
-          value: count,
-          fill: orbCategoryColors[category as OrbCategory],
-        }))
-    }
-
-    return []
-  }, [data, pullableOrbs])
-
-  // Generate config if not provided
+  // Generate chart config from orbCategories
   const chartConfig = React.useMemo(() => {
-    if (config) {
-      return config
-    }
-
-    if (pullableOrbs && pullableOrbs.length > 0) {
-      const orbCategoryCounts = groupOrbsByCategory(pullableOrbs)
-      return {
-        value: {
-          label: 'Count',
-        },
-        ...Object.entries(orbCategoryCounts).reduce(
-          (acc, [category]) => {
-            if (orbCategoryCounts[category as OrbCategory] > 0) {
-              acc[category] = {
-                label: categoryLabels[category as OrbCategory],
-                color: orbCategoryColors[category as OrbCategory],
-              }
-            }
-            return acc
-          },
-          {} as Record<string, { label: string; color: string }>,
-        ),
-      } satisfies ChartConfig
-    }
-
-    // Default empty config
     return {
       value: {
         label: 'Count',
       },
+      ...Object.entries(orbCategories).reduce(
+        (acc, [fieldName, effects]) => {
+          if (effects.length > 0) {
+            acc[fieldName] = {
+              label: orbCategoryFieldLabels[fieldName as keyof OrbCategories],
+              color: orbCategoryFieldColors[fieldName as keyof OrbCategories],
+            }
+          }
+          return acc
+        },
+        {} as Record<string, { label: string; color: string }>,
+      ),
     } satisfies ChartConfig
-  }, [config, pullableOrbs])
+  }, [orbCategories])
 
   // Calculate responsive stroke width based on outerRadius
   const strokeWidth = outerRadius
@@ -194,7 +169,7 @@ export function FusedPullOrb({
                               <div className="flex items-center gap-1">
                                 <Diameter className="w-3 h-3" />
                                 <span className="text-xs font-mono">
-                                  x{orbs}
+                                  x{totalOrbs}
                                 </span>
                               </div>
                               <span className="w-0.5 h-0.5 rounded-full bg-gray-400"></span>

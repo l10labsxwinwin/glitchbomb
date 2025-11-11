@@ -7,13 +7,12 @@ import RecentOrbsDisplay from './RecentOrbsDisplay'
 import { FusedPullOrb } from './FusedPullOrb'
 import { ChartLineDots } from './LineChart'
 import type { GameData, LineDataPoint } from './GameDataTypes'
-import type { ChartConfig } from './ui/chart'
+import type { OrbCategories } from '@/lib/frontenddatatypes'
 
 interface GameContainerProps {
   gameData: GameData
   bombValues?: number[]
-  donutChartData?: Array<{ category: string; value: number; fill: string }>
-  donutChartConfig?: ChartConfig
+  orbCategories?: OrbCategories
   lineData?: LineDataPoint[]
   onCashOut?: () => void
   onPullOrb?: () => void
@@ -22,8 +21,7 @@ interface GameContainerProps {
 export default function GameContainer({ 
   gameData,
   bombValues = [],
-  donutChartData,
-  donutChartConfig,
+  orbCategories,
   lineData,
   onCashOut = () => console.log('Cash out clicked'),
   onPullOrb = () => console.log('Pull Orb clicked')
@@ -68,17 +66,16 @@ export default function GameContainer({
             <ChartLineDots data={lineData} />
           </div>
           <div ref={donutContainerRef} className="flex-1 min-h-0 w-full flex items-center justify-center">
-            <FusedPullOrb 
-              className="w-full h-full"
-              innerRadius={donutRadii?.inner}
-              outerRadius={donutRadii?.outer}
-              data={donutChartData}
-              config={donutChartConfig}
-              pullableOrbs={gameData.pullable_orbs}
-              onClick={onPullOrb}
-              orbs={gameData.pullable_orbs.length}
-              health={gameData.health}
-            />
+            {orbCategories && (
+              <FusedPullOrb 
+                className="w-full h-full"
+                innerRadius={donutRadii?.inner}
+                outerRadius={donutRadii?.outer}
+                orbCategories={orbCategories}
+                onClick={onPullOrb}
+                health={gameData.health}
+              />
+            )}
           </div>
         </div>
         <div className="flex flex-row items-center gap-4 w-full shrink-0">
