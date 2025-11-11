@@ -27,7 +27,6 @@ function LevelStateRoute() {
   const { gamepackId, latestGame } = useGamepackContext()
   const { pullOrb: pullOrbContract } = usePullOrb()
   const { cashOut } = useCashOut()
-  const [isCashingOut, setIsCashingOut] = useState(false)
 
   // Use actual counts from Game data but keep mock structure for now (until we convert OrbEffectEnum to Orb)
   const [pullableOrbs, setPullableOrbs] = useState<Orb[]>([])
@@ -62,13 +61,10 @@ function LevelStateRoute() {
 
   // Function to cash out: calls the contract function
   const handleCashOut = async () => {
-    setIsCashingOut(true)
     try {
       await cashOut(gamepackId)
     } catch (error) {
       console.error('Failed to cash out:', error)
-    } finally {
-      setIsCashingOut(false)
     }
   }
 
