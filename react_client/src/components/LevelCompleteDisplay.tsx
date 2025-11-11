@@ -3,13 +3,21 @@ import StatsDisplay from './StatsDisplay'
 import { useMemo } from 'react'
 import type { GameData } from './GameDataTypes'
 
-interface GameOverDisplayProps {
+interface LevelCompleteDisplayProps {
   latestGame: Game | null
-  onNewGame?: () => void
-  isStarting?: boolean
+  onEnterShop?: () => void
+  onCashOut?: () => void
+  isEnteringShop?: boolean
+  isCashingOut?: boolean
 }
 
-export default function GameOverDisplay({ latestGame, onNewGame, isStarting = false }: GameOverDisplayProps) {
+export default function LevelCompleteDisplay({ 
+  latestGame, 
+  onEnterShop, 
+  onCashOut,
+  isEnteringShop = false,
+  isCashingOut = false,
+}: LevelCompleteDisplayProps) {
   // Count total bombs pulled from consumed_orbs array
   const totalBombsPulled = useMemo(() => {
     if (!latestGame || !latestGame.data.consumed_orbs) {
@@ -77,26 +85,25 @@ export default function GameOverDisplay({ latestGame, onNewGame, isStarting = fa
 
   const level = latestGame ? Number(latestGame.data.level) : 0
   const pullNumber = latestGame ? Number(latestGame.data.pull_number) : 0
-  const gameId = latestGame ? Number(latestGame.game_id) : 0
 
   return (
     <div className="flex flex-col items-center justify-center h-full w-full px-4 py-8 gap-8">
-      {/* Game Over Title */}
+      {/* Level Complete Title */}
       <div className="flex flex-col items-center gap-2">
         <h1 className="text-5xl font-bold" style={{ color: '#55DD63' }}>
-          GAME OVER
+          LEVEL COMPLETE!
         </h1>
         {latestGame && (
           <p className="text-lg opacity-80" style={{ color: '#55DD63' }}>
-            Game #{gameId} • Level {level} • Pull {pullNumber}
+            Level {level} • Pull {pullNumber}
           </p>
         )}
       </div>
 
-      {/* Final Stats */}
+      {/* Current Stats */}
       <div className="flex flex-col items-center gap-6 w-full max-w-md">
         <div className="text-xl font-semibold" style={{ color: '#55DD63' }}>
-          Final Stats
+          Current Stats
         </div>
         
         <div className="w-full">
@@ -104,19 +111,7 @@ export default function GameOverDisplay({ latestGame, onNewGame, isStarting = fa
         </div>
 
         {/* Additional Stats */}
-        <div className="flex flex-row gap-6 w-full justify-center flex-wrap">
-          {latestGame && (
-            <>
-              <div className="flex flex-col items-center gap-2">
-                <div className="text-sm opacity-70" style={{ color: '#55DD63' }}>
-                  Moonrocks Spent
-                </div>
-                <div className="text-2xl font-bold" style={{ color: '#55DD63' }}>
-                  {Number(latestGame.data.moonrocks_spent)}
-                </div>
-              </div>
-            </>
-          )}
+        <div className="flex flex-row gap-6 w-full justify-center">
           <div className="flex flex-col items-center gap-2">
             <div className="text-sm opacity-70" style={{ color: '#55DD63' }}>
               Bombs Pulled
@@ -125,35 +120,39 @@ export default function GameOverDisplay({ latestGame, onNewGame, isStarting = fa
               {gameData.bombs}
             </div>
           </div>
-          {latestGame && (
-            <>
-              <div className="flex flex-col items-center gap-2">
-                <div className="text-sm opacity-70" style={{ color: '#55DD63' }}>
-                  Moonrocks Earned
-                </div>
-                <div className="text-2xl font-bold" style={{ color: '#55DD63' }}>
-                  {Number(latestGame.data.moonrocks_earned)}
-                </div>
-              </div>
-            </>
-          )}
         </div>
       </div>
 
-      {/* Action Button */}
-      {onNewGame && (
-        <button
-          onClick={onNewGame}
-          disabled={isStarting}
-          className="px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
-          style={{
-            backgroundColor: '#55DD63',
-            color: '#0C1806',
-          }}
-        >
-          {isStarting ? 'Starting...' : 'Start Next Game'}
-        </button>
-      )}
+      {/* Action Buttons */}
+      <div className="flex flex-row gap-4 w-full max-w-md justify-center">
+        {onEnterShop && (
+          <button
+            onClick={onEnterShop}
+            disabled={isEnteringShop || isCashingOut}
+            className="flex-1 px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: '#55DD63',
+              color: '#0C1806',
+            }}
+          >
+            {isEnteringShop ? 'Entering...' : 'Enter Shop'}
+          </button>
+        )}
+        {onCashOut && (
+          <button
+            onClick={onCashOut}
+            disabled={isCashingOut || isEnteringShop}
+            className="flex-1 px-8 py-4 rounded-lg text-lg font-semibold transition-colors hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+            style={{
+              backgroundColor: '#14240C',
+              color: '#55DD63',
+              border: '2px solid #55DD63',
+            }}
+          >
+            {isCashingOut ? 'Cashing Out...' : 'Cash Out'}
+          </button>
+        )}
+      </div>
     </div>
   )
 }
