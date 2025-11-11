@@ -88,27 +88,32 @@ export default function ShopItemsView({
 }: ShopItemsViewProps) {
   const [currentPage, setCurrentPage] = useState(0)
   const orbsPerPage = 9
+  const totalPages = 3 // Always 3 pages: common, rare, cosmic
 
-  const allOrbs = useMemo(() => {
-    if (!orbsInBag) return []
-    const common = (orbsInBag.common || []).map((orb, idx) => ({ ...orb, rarity: 'common' as const, index: idx }))
-    const rare = (orbsInBag.rare || []).map((orb, idx) => ({ ...orb, rarity: 'rare' as const, index: idx }))
-    const cosmic = (orbsInBag.cosmic || []).map((orb, idx) => ({ ...orb, rarity: 'cosmic' as const, index: idx }))
+  // Get orbs for the current page based on rarity
+  const currentOrbs = useMemo(() => {
+    if (!orbsInBag) return Array(orbsPerPage).fill(null)
     
-    return [...common, ...rare, ...cosmic]
+    let orbsForPage: Array<Orb & { rarity: 'common' | 'rare' | 'cosmic'; index: number }> = []
+    
+    // Page 0: Common, Page 1: Rare, Page 2: Cosmic
+    if (currentPage === 0) {
+      orbsForPage = (orbsInBag.common || []).map((orb, idx) => ({ ...orb, rarity: 'common' as const, index: idx }))
+    } else if (currentPage === 1) {
+      orbsForPage = (orbsInBag.rare || []).map((orb, idx) => ({ ...orb, rarity: 'rare' as const, index: idx }))
+    } else if (currentPage === 2) {
+      orbsForPage = (orbsInBag.cosmic || []).map((orb, idx) => ({ ...orb, rarity: 'cosmic' as const, index: idx }))
+    }
+    
+    // Filter out orbs with no effect and sort by price
+    const filteredOrbs = orbsForPage
       .filter(orb => getOrbEffect(orb) !== null)
       .sort((a, b) => Number(a.current_price) - Number(b.current_price))
-  }, [orbsInBag])
-
-  const totalPages = Math.max(1, Math.ceil(allOrbs.length / orbsPerPage))
-
-  const currentOrbs = useMemo(() => {
-    const start = currentPage * orbsPerPage
-    const end = start + orbsPerPage
-    const pageOrbs = allOrbs.slice(start, end)
-    const placeholders = Array(orbsPerPage - pageOrbs.length).fill(null)
-    return [...pageOrbs, ...placeholders]
-  }, [allOrbs, currentPage, orbsPerPage])
+    
+    // Fill remaining slots with null placeholders
+    const placeholders = Array(Math.max(0, orbsPerPage - filteredOrbs.length)).fill(null)
+    return [...filteredOrbs, ...placeholders]
+  }, [orbsInBag, currentPage, orbsPerPage])
 
   const nextPage = () => {
     if (currentPage < totalPages - 1) {
