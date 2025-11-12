@@ -39,7 +39,10 @@ const Main = () => {
       >
         MY GAMEPACKS
       </h2>
-      <Buy />
+      <div className="flex gap-3 mb-4">
+        <Buy />
+        <ViewLeaderboard />
+      </div>
       <GamepackDisplay />
     </div>
   )
@@ -48,6 +51,15 @@ const Main = () => {
 const Buy = () => {
   const { buy } = useBuy()
   return <Button onClick={() => buy()}>Buy Gamepack</Button>
+}
+
+const ViewLeaderboard = () => {
+  const navigate = useNavigate()
+  return (
+    <Button onClick={() => navigate({ to: '/testnet/leaderboard' })}>
+      View Leaderboard
+    </Button>
+  )
 }
 
 export const Header = () => {

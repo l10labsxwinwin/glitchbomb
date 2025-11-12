@@ -13,6 +13,7 @@ import { Route as TestnetRouteImport } from './routes/testnet'
 import { Route as RealRouteImport } from './routes/real'
 import { Route as FreeRouteImport } from './routes/free'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TestnetLeaderboardRouteImport } from './routes/testnet/leaderboard'
 import { Route as TestnetGamepackIdRouteImport } from './routes/testnet/gamepack/$id'
 import { Route as TestnetGamepackIdShopRouteImport } from './routes/testnet/gamepack/$id/shop'
 import { Route as TestnetGamepackIdNewRouteImport } from './routes/testnet/gamepack/$id/new'
@@ -40,6 +41,11 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const TestnetLeaderboardRoute = TestnetLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => TestnetRoute,
 } as any)
 const TestnetGamepackIdRoute = TestnetGamepackIdRouteImport.update({
   id: '/gamepack/$id',
@@ -84,6 +90,7 @@ export interface FileRoutesByFullPath {
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
   '/testnet': typeof TestnetRouteWithChildren
+  '/testnet/leaderboard': typeof TestnetLeaderboardRoute
   '/testnet/gamepack/$id': typeof TestnetGamepackIdRouteWithChildren
   '/testnet/gamepack/$id/empty': typeof TestnetGamepackIdEmptyRoute
   '/testnet/gamepack/$id/game-over': typeof TestnetGamepackIdGameOverRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
   '/testnet': typeof TestnetRouteWithChildren
+  '/testnet/leaderboard': typeof TestnetLeaderboardRoute
   '/testnet/gamepack/$id': typeof TestnetGamepackIdRouteWithChildren
   '/testnet/gamepack/$id/empty': typeof TestnetGamepackIdEmptyRoute
   '/testnet/gamepack/$id/game-over': typeof TestnetGamepackIdGameOverRoute
@@ -111,6 +119,7 @@ export interface FileRoutesById {
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
   '/testnet': typeof TestnetRouteWithChildren
+  '/testnet/leaderboard': typeof TestnetLeaderboardRoute
   '/testnet/gamepack/$id': typeof TestnetGamepackIdRouteWithChildren
   '/testnet/gamepack/$id/empty': typeof TestnetGamepackIdEmptyRoute
   '/testnet/gamepack/$id/game-over': typeof TestnetGamepackIdGameOverRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/free'
     | '/real'
     | '/testnet'
+    | '/testnet/leaderboard'
     | '/testnet/gamepack/$id'
     | '/testnet/gamepack/$id/empty'
     | '/testnet/gamepack/$id/game-over'
@@ -139,6 +149,7 @@ export interface FileRouteTypes {
     | '/free'
     | '/real'
     | '/testnet'
+    | '/testnet/leaderboard'
     | '/testnet/gamepack/$id'
     | '/testnet/gamepack/$id/empty'
     | '/testnet/gamepack/$id/game-over'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/free'
     | '/real'
     | '/testnet'
+    | '/testnet/leaderboard'
     | '/testnet/gamepack/$id'
     | '/testnet/gamepack/$id/empty'
     | '/testnet/gamepack/$id/game-over'
@@ -197,6 +209,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/testnet/leaderboard': {
+      id: '/testnet/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/testnet/leaderboard'
+      preLoaderRoute: typeof TestnetLeaderboardRouteImport
+      parentRoute: typeof TestnetRoute
     }
     '/testnet/gamepack/$id': {
       id: '/testnet/gamepack/$id'
@@ -272,10 +291,12 @@ const TestnetGamepackIdRouteWithChildren =
   TestnetGamepackIdRoute._addFileChildren(TestnetGamepackIdRouteChildren)
 
 interface TestnetRouteChildren {
+  TestnetLeaderboardRoute: typeof TestnetLeaderboardRoute
   TestnetGamepackIdRoute: typeof TestnetGamepackIdRouteWithChildren
 }
 
 const TestnetRouteChildren: TestnetRouteChildren = {
+  TestnetLeaderboardRoute: TestnetLeaderboardRoute,
   TestnetGamepackIdRoute: TestnetGamepackIdRouteWithChildren,
 }
 
