@@ -1,7 +1,7 @@
 import { useAccount, useNetwork } from "@starknet-react/core";
 import { useCallback } from "react";
 import { CallData } from "starknet";
-import { getGameAddress } from "../../config";
+import { getGameAddress, getVrfAddress } from "../../config";
 
 export const usePullOrb = () => {
   const { account } = useAccount();
@@ -10,8 +10,17 @@ export const usePullOrb = () => {
   const pullOrb = useCallback(async (gamepackId: number) => {
     try {
       if (!account?.address) return false;
+      const vrfAddress = getVrfAddress(chain.id);
       const gameAddress = getGameAddress(chain.id);
       await account.execute([
+        {
+          contractAddress: vrfAddress,
+          entrypoint: "request_random",
+          calldata: CallData.compile({
+            caller: gameAddress,
+            source: { type: 0, address: gameAddress },
+          }),
+        },
         {
           contractAddress: gameAddress,
           entrypoint: "pull_orb",

@@ -33,13 +33,14 @@ pub mod gb_contract_v2 {
         GamePack, GamePackAction, GamePackState, GamePackTrait, new_gamepack_data, update_gamepack,
     };
     use crate::glitchbombv2::orbs::{update_common_orbs, update_cosmic_orbs, update_rare_orbs};
-    use crate::glitchbombv2::shared::shuffle;
+    use crate::interfaces::vrf::IVrfProviderDispatcher;
     use crate::models::config::{Config, ConfigTrait};
     use crate::systems::collection::{
         ICollectionDispatcher, ICollectionDispatcherTrait, NAME as COLLECTION_NAME,
     };
     use crate::systems::token::NAME as TOKEN_NAME;
     use crate::systems::vrf::NAME as VRF_NAME;
+    use crate::types::random::RandomTrait;
     use super::PlayerActionsV2;
 
     // Constructor
@@ -135,9 +136,10 @@ pub mod gb_contract_v2 {
             let gamepack: GamePack = world.read_model(gamepack_id);
             let mut game: Game = world.read_model((gamepack_id, gamepack.data.current_game_id));
 
+            let mut random = RandomTrait::new();
             let game_action = GameAction::StartGame;
             let (new_game_state, mut new_game_data) =
-                match update_game(game.state, game.data, game_action) {
+                match update_game(game.state, game.data, game_action, ref random) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -162,13 +164,20 @@ pub mod gb_contract_v2 {
             // [Check] Caller is the token owner
             self.assert_token_owner(ref world, gamepack_id);
 
+            // [Effect] Load Randomness
+            let config: Config = world.read_model(CONFIG_ID);
+            let mut random = RandomTrait::new_vrf(
+                IVrfProviderDispatcher { contract_address: config.vrf },
+            );
+
             // [Effect] Pull orb
             let mut gamepack: GamePack = world.read_model(gamepack_id);
             let mut game: Game = world.read_model((gamepack_id, gamepack.data.current_game_id));
 
             let action = GameAction::PullOrb;
 
-            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+            let (new_game_state, new_game_data) =
+                match update_game(game.state, game.data, action, ref random) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -200,7 +209,9 @@ pub mod gb_contract_v2 {
 
             let action = GameAction::CashOut;
 
-            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+            let mut random = RandomTrait::new();
+            let (new_game_state, new_game_data) =
+                match update_game(game.state, game.data, action, ref random) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -228,17 +239,15 @@ pub mod gb_contract_v2 {
 
             let action = GameAction::EnterShop;
 
-            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+            let mut random = RandomTrait::new();
+            let (new_game_state, new_game_data) =
+                match update_game(game.state, game.data, action, ref random) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
 
             game.state = new_game_state;
             game.data = new_game_data;
-
-            orbs_in_game.common = shuffle(orbs_in_game.common);
-            orbs_in_game.rare = shuffle(orbs_in_game.rare);
-            orbs_in_game.cosmic = shuffle(orbs_in_game.cosmic);
 
             world.write_model(@game);
             world.write_model(@orbs_in_game);
@@ -261,7 +270,9 @@ pub mod gb_contract_v2 {
 
             let action = GameAction::BuyOrb(orb_price);
 
-            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+            let mut random = RandomTrait::new();
+            let (new_game_state, new_game_data) =
+                match update_game(game.state, game.data, action, ref random) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -297,7 +308,9 @@ pub mod gb_contract_v2 {
 
             let action = GameAction::BuyOrb(orb_price);
 
-            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+            let mut random = RandomTrait::new();
+            let (new_game_state, new_game_data) =
+                match update_game(game.state, game.data, action, ref random) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -333,7 +346,9 @@ pub mod gb_contract_v2 {
 
             let action = GameAction::BuyOrb(orb_price);
 
-            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+            let mut random = RandomTrait::new();
+            let (new_game_state, new_game_data) =
+                match update_game(game.state, game.data, action, ref random) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
@@ -367,7 +382,9 @@ pub mod gb_contract_v2 {
 
             let action = GameAction::GoToNextLevel;
 
-            let (new_game_state, new_game_data) = match update_game(game.state, game.data, action) {
+            let mut random = RandomTrait::new();
+            let (new_game_state, new_game_data) =
+                match update_game(game.state, game.data, action, ref random) {
                 Result::Ok(result) => result,
                 Result::Err(err) => panic!("{:?}", err),
             };
