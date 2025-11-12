@@ -2,11 +2,11 @@ import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import ControllerConnector from "@cartridge/connector/controller";
-import type { ControllerOptions } from "@cartridge/controller";
+import type { ControllerOptions, SessionPolicies } from "@cartridge/controller";
 
 import * as TanStackQueryProvider from './integrations/tanstack-query/root-provider.tsx'
 import { DojoSdkProviderInitialized } from "./context/dojo";
-import { chains, DEFAULT_CHAIN_ID } from "../config";
+import { chains, DEFAULT_CHAIN_ID, getGameAddress, getTokenAddress } from "../config";
 import { type Chain, mainnet, sepolia } from "@starknet-react/chains";
 import {
   type Connector,
@@ -53,6 +53,60 @@ const buildChains = () => {
   }
 };
 
+const buildPolicies = (): SessionPolicies => {
+  // Get contract addresses for both chains
+  const sepoliaChainId = BigInt(sepolia.id);
+  const mainnetChainId = BigInt(mainnet.id);
+  
+  const sepoliaGameAddress = getGameAddress(sepoliaChainId);
+  const mainnetGameAddress = getGameAddress(mainnetChainId);
+  const sepoliaTokenAddress = getTokenAddress(sepoliaChainId);
+  const mainnetTokenAddress = getTokenAddress(mainnetChainId);
+
+  // Define game contract methods
+  const gameContractMethods = [
+    { name: "buy_gamepack", entrypoint: "buy_gamepack" },
+    { name: "open_gamepack", entrypoint: "open_gamepack" },
+    { name: "start_game", entrypoint: "start_game" },
+    { name: "pull_orb", entrypoint: "pull_orb" },
+    { name: "cash_out", entrypoint: "cash_out" },
+    { name: "enter_shop", entrypoint: "enter_shop" },
+    { name: "next_level", entrypoint: "next_level" },
+    { name: "next_game", entrypoint: "next_game" },
+    { name: "buy_common", entrypoint: "buy_common" },
+    { name: "buy_rare", entrypoint: "buy_rare" },
+    { name: "buy_cosmic", entrypoint: "buy_cosmic" },
+  ];
+
+  // Define token contract methods
+  const tokenContractMethods = [
+    { name: "approve", entrypoint: "approve" },
+  ];
+
+  return {
+    contracts: {
+      // Sepolia contracts
+      [sepoliaGameAddress]: {
+        name: "Glitch Bomb Game Contract (Sepolia)",
+        methods: gameContractMethods,
+      },
+      [sepoliaTokenAddress]: {
+        name: "Glitch Bomb Token (Sepolia)",
+        methods: tokenContractMethods,
+      },
+      // Mainnet contracts
+      [mainnetGameAddress]: {
+        name: "Glitch Bomb Game Contract (Mainnet)",
+        methods: gameContractMethods,
+      },
+      [mainnetTokenAddress]: {
+        name: "Glitch Bomb Token (Mainnet)",
+        methods: tokenContractMethods,
+      },
+    },
+  };
+};
+
 const provider = jsonRpcProvider({
   rpc: (chain: Chain) => {
     switch (chain) {
@@ -69,7 +123,7 @@ const provider = jsonRpcProvider({
 const options: ControllerOptions = {
   defaultChainId: DEFAULT_CHAIN_ID,
   chains: buildChains(),
-  // policies: buildPolicies(),
+  policies: buildPolicies(),
   preset: "glitch-bomb",
   namespace: "GLITCHBOMB",
   // slot: "glitchbomb-bal",
