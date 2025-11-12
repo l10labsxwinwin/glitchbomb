@@ -87,20 +87,20 @@ const buildPolicies = (): SessionPolicies => {
     contracts: {
       // Sepolia contracts
       [sepoliaGameAddress]: {
-        name: "Glitch Bomb Game Contract (Sepolia)",
+        description: "Glitch Bomb Game Contract (Sepolia)",
         methods: gameContractMethods,
       },
       [sepoliaTokenAddress]: {
-        name: "Glitch Bomb Token (Sepolia)",
+        description: "Glitch Bomb Token (Sepolia)",
         methods: tokenContractMethods,
       },
       // Mainnet contracts
       [mainnetGameAddress]: {
-        name: "Glitch Bomb Game Contract (Mainnet)",
+        description: "Glitch Bomb Game Contract (Mainnet)",
         methods: gameContractMethods,
       },
       [mainnetTokenAddress]: {
-        name: "Glitch Bomb Token (Mainnet)",
+        description: "Glitch Bomb Token (Mainnet)",
         methods: tokenContractMethods,
       },
     },
