@@ -161,28 +161,27 @@ export function FusedPullOrb({
                           <button
                             onClick={onClick}
                             disabled={disabled}
-                            className="flex flex-col items-center justify-center w-full h-full rounded-full border-2 hover:bg-white hover:text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#55DD63] gap-2 relative z-20"
+                            className="flex flex-col items-center justify-center w-full h-full rounded-full hover:bg-white hover:text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#55DD63] gap-2 relative z-20"
                             style={{
-                              background: 'transparent',
-                              borderColor: '#55DD63',
+                              background: 'rgba(85, 221, 99, 0.1)',
                               color: '#55DD63',
                             }}
                           >
                             <div className="flex flex-col items-center gap-0 leading-none">
-                              <span className="text-4xl font-extrabold">PULL</span>
-                              <span className="text-4xl font-extrabold">ORB</span>
+                              <span className="text-5xl font-extrabold" style={{ fontFamily: '"Rubik One", sans-serif' }}>PULL</span>
+                              <span className="text-5xl font-extrabold" style={{ fontFamily: '"Rubik One", sans-serif' }}>ORB</span>
                             </div>
                             <div className="flex items-center gap-2 mt-2">
                               <div className="flex items-center gap-1">
                                 <Diameter className="w-3 h-3" />
-                                <span className="text-xs font-mono">
+                                <span className="text-lg font-mono" style={{ fontFamily: '"VCR OSD Mono", monospace' }}>
                                   x{totalOrbs}
                                 </span>
                               </div>
                               <span className="w-0.5 h-0.5 rounded-full bg-gray-400"></span>
                               <div className="flex items-center gap-1">
                                 <Heart className="w-3 h-3" />
-                                <span className="text-xs font-mono">
+                                <span className="text-lg font-mono" style={{ fontFamily: '"VCR OSD Mono", monospace' }}>
                                   x{health}
                                 </span>
                               </div>
