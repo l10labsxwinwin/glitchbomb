@@ -1,7 +1,10 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMemo } from 'react'
+import { useNetwork } from '@starknet-react/core'
+import { addAddressPadding } from 'starknet'
 import { useAllGamepacks } from '@/hooks/allGamepacks'
-import { useGamepackOwners } from '@/hooks/gamepackOwners'
+import { useAllTokenBalances } from '@/hooks/allTokenBalances'
+import { getCollectionAddress } from '../../../config'
 import { GamePack } from '@/bindings/typescript/models.gen'
 
 export const Route = createFileRoute('/testnet/leaderboard')({
@@ -9,7 +12,15 @@ export const Route = createFileRoute('/testnet/leaderboard')({
 })
 
 function LeaderboardRoute() {
+  const { chain } = useNetwork()
   const { gamepacks } = useAllGamepacks()
+  
+  // Get all ERC721 token balances (token_id -> owner mapping) in a single query
+  const collectionAddress = useMemo(() => {
+    return getCollectionAddress(chain.id)
+  }, [chain.id])
+  
+  const { owners } = useAllTokenBalances(addAddressPadding(collectionAddress))
 
   const sortedGamepacks = useMemo(() => {
     return [...gamepacks].sort((a, b) => {
@@ -18,12 +29,6 @@ function LeaderboardRoute() {
       return moonrocksB - moonrocksA // Sort descending (largest first)
     })
   }, [gamepacks])
-
-  const gamepackIds = useMemo(() => {
-    return sortedGamepacks.map((gp) => Number(gp.gamepack_id))
-  }, [sortedGamepacks])
-
-  const { owners } = useGamepackOwners(gamepackIds)
 
   return (
     <div className="flex flex-col items-center h-full overflow-y-auto p-4 md:p-6">
