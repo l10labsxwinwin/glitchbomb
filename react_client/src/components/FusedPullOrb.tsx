@@ -151,20 +151,27 @@ export function FusedPullOrb({
                         width={buttonSize}
                         height={buttonSize}
                       >
-                        <div className="w-full h-full flex items-center justify-center">
+                        <div className="w-full h-full flex items-center justify-center relative">
+                          <img
+                            src="/glass_pullorb_idle.svg"
+                            alt=""
+                            className="absolute inset-0 w-full h-full pointer-events-none z-10"
+                            style={{ objectFit: 'contain' }}
+                          />
                           <button
                             onClick={onClick}
                             disabled={disabled}
-                            className="flex flex-col items-center justify-center w-full h-full rounded-full border-2 hover:bg-white hover:text-black transition-colors disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#55DD63] gap-2"
+                            className="flex flex-col items-center justify-center w-full h-full rounded-full border-2 hover:bg-white hover:text-black transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#55DD63] gap-2 relative z-20"
                             style={{
-                              background:
-                                'linear-gradient(to bottom, #1C4E21, #000000)',
+                              background: 'transparent',
                               borderColor: '#55DD63',
                               color: '#55DD63',
                             }}
                           >
-                            <span className="text-lg font-bold">PULL</span>
-                            <span className="text-lg font-bold">ORB</span>
+                            <div className="flex flex-col items-center gap-0 leading-none">
+                              <span className="text-4xl font-extrabold">PULL</span>
+                              <span className="text-4xl font-extrabold">ORB</span>
+                            </div>
                             <div className="flex items-center gap-2 mt-2">
                               <div className="flex items-center gap-1">
                                 <Diameter className="w-3 h-3" />
