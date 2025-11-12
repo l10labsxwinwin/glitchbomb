@@ -35,7 +35,6 @@ export const useGameEvents = (packId: number, gameId: number) => {
       StandardizedQueryResult<SchemaType>,
       Error
     >) => {
-      console.log({ data })
       if (
         error ||
         !data ||
@@ -60,7 +59,6 @@ export const useGameEvents = (packId: number, gameId: number) => {
                 e.gamepack_id === event.gamepack_id && e.game_id === event.game_id && e.tick === event.tick,
             ),
         )
-        console.log({ deduped })
         return [...events, ...deduped]
       })
     },
@@ -73,7 +71,6 @@ export const useGameEvents = (packId: number, gameId: number) => {
     }
 
     const query = await getGameEventsQuery(packId, gameId)
-    console.log({ query })
     const [result, subscription] = await sdk.subscribeEventQuery({
       query,
       callback: onUpdate,
