@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useMemo } from 'react'
 import { useAllGamepacks } from '@/hooks/allGamepacks'
+import { useGamepackOwners } from '@/hooks/gamepackOwners'
 import { GamePack } from '@/bindings/typescript/models.gen'
 
 export const Route = createFileRoute('/testnet/leaderboard')({
@@ -17,6 +18,12 @@ function LeaderboardRoute() {
       return moonrocksB - moonrocksA // Sort descending (largest first)
     })
   }, [gamepacks])
+
+  const gamepackIds = useMemo(() => {
+    return sortedGamepacks.map((gp) => Number(gp.gamepack_id))
+  }, [sortedGamepacks])
+
+  const { owners } = useGamepackOwners(gamepackIds)
 
   return (
     <div className="flex flex-col items-center h-full overflow-y-auto p-4 md:p-6">
@@ -40,8 +47,8 @@ function LeaderboardRoute() {
               <thead>
                 <tr className="bg-[#55DD63] text-[#0C1806]">
                   <th className="px-4 py-3 text-left font-bold uppercase text-sm tracking-wider">Rank</th>
-                  <th className="px-4 py-3 text-left font-bold uppercase text-sm tracking-wider">Gamepack ID</th>
-                  <th className="px-4 py-3 text-left font-bold uppercase text-sm tracking-wider">State</th>
+                  <th className="px-4 py-3 text-left font-bold uppercase text-sm tracking-wider">Owner</th>
+                  <th className="px-4 py-3 text-left font-bold uppercase text-sm tracking-wider">ID</th>
                   <th className="px-4 py-3 text-right font-bold uppercase text-sm tracking-wider">Moonrocks</th>
                 </tr>
               </thead>
@@ -51,6 +58,7 @@ function LeaderboardRoute() {
                     key={gamepack.gamepack_id}
                     gamepack={gamepack}
                     rank={index + 1}
+                    owner={owners[Number(gamepack.gamepack_id)]}
                   />
                 ))}
               </tbody>
@@ -65,13 +73,13 @@ function LeaderboardRoute() {
 interface LeaderboardRowProps {
   gamepack: GamePack
   rank: number
+  owner?: string
 }
 
-function LeaderboardRow({ gamepack, rank }: LeaderboardRowProps) {
+function LeaderboardRow({ gamepack, rank, owner }: LeaderboardRowProps) {
   const navigate = useNavigate()
   const gamepackId = Number(gamepack.gamepack_id)
   const accumulatedMoonrocks = Number(gamepack.data.accumulated_moonrocks)
-  const state = (gamepack.state as unknown as string) || 'Unknown'
 
   const handleClick = () => {
     navigate({
@@ -82,6 +90,32 @@ function LeaderboardRow({ gamepack, rank }: LeaderboardRowProps) {
 
   const rankColor =
     rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : '#55DD63'
+
+  const formatAddress = (address?: string) => {
+    if (!address) return 'Loading...'
+    // Convert from felt252 to hex if needed, then format
+    try {
+      let hexAddress = address.startsWith('0x') 
+        ? address 
+        : `0x${BigInt(address).toString(16)}`
+      // Remove 0x prefix to get the address part, then format with 0x
+      const addressWithoutPrefix = hexAddress.slice(2)
+      if (addressWithoutPrefix.length < 8) {
+        // If address is too short, pad it
+        const padded = addressWithoutPrefix.padStart(8, '0')
+        return `0x${padded.slice(0, 4)}...${padded.slice(-4)}`
+      }
+      return `0x${addressWithoutPrefix.slice(0, 4)}...${addressWithoutPrefix.slice(-4)}`
+    } catch {
+      // Fallback: try to format without conversion
+      const cleanAddress = address.replace('0x', '')
+      if (cleanAddress.length < 8) {
+        const padded = cleanAddress.padStart(8, '0')
+        return `0x${padded.slice(0, 4)}...${padded.slice(-4)}`
+      }
+      return `0x${cleanAddress.slice(0, 4)}...${cleanAddress.slice(-4)}`
+    }
+  }
 
   return (
     <tr
@@ -99,10 +133,10 @@ function LeaderboardRow({ gamepack, rank }: LeaderboardRowProps) {
           #{rank}
         </span>
       </td>
-      <td className="px-4 py-3 text-white font-semibold">#{gamepackId}</td>
-      <td className="px-4 py-3 text-white text-sm uppercase tracking-wider opacity-70">
-        {state}
+      <td className="px-4 py-3 text-white text-sm font-mono">
+        {formatAddress(owner)}
       </td>
+      <td className="px-4 py-3 text-white font-semibold">#{gamepackId}</td>
       <td className="px-4 py-3 text-right">
         <span className="text-white font-bold text-lg">
           {accumulatedMoonrocks.toLocaleString()}
