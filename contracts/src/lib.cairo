@@ -12,6 +12,10 @@ pub mod models {
     pub mod config;
 }
 
+pub mod events {
+    pub mod index;
+}
+
 pub mod systems {
     pub mod collection;
     pub mod token;

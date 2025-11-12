@@ -1,8 +1,8 @@
-use crate::types::random::{Random, RandomTrait};
+use crate::types::random::Random;
 use super::constants::{MAX_HP, level_cost_in_moonrocks, milestones};
 use super::gamepack::GamePack;
 use super::orbs::{get_common_orbs, get_cosmic_orbs, get_non_buyable_orbs, get_rare_orbs};
-use super::shared::UpdateError;
+use super::shared::{UpdateError, shuffle};
 
 #[derive(Drop, Serde, Debug, Copy, PartialEq, Introspect, DojoStore, Default)]
 pub enum GameState {
@@ -356,20 +356,17 @@ fn handle_pull_orb(
 ) -> Result<(GameState, GameData), UpdateError> {
     let mut new_data = data.clone();
 
-    let len = new_data.pullable_orbs.len();
-    if len == 0 {
-        return Ok((GameState::GameOver, data));
-    }
+    new_data.pullable_orbs = shuffle(new_data.pullable_orbs, ref random);
 
-    let rng: u256 = random.seed.into();
-    let index: u32 = (rng % len.into()).try_into().unwrap();
-    let pulled_orb = new_data.pullable_orbs.at(index);
-    random.next_seed();
+    let pulled_orb = match new_data.pullable_orbs.pop_front() {
+        Option::Some(orb) => orb,
+        Option::None => { return Ok((GameState::GameOver, data)); },
+    };
 
     new_data.pull_number += 1;
 
-    new_data = apply_orb_effect_to_data(pulled_orb, new_data)?;
-    let new_state = apply_data_for_state(pulled_orb, @new_data);
+    new_data = apply_orb_effect_to_data(@pulled_orb, new_data)?;
+    let new_state = apply_data_for_state(@pulled_orb, @new_data);
 
     Ok((new_state, new_data))
 }

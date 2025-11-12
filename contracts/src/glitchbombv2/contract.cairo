@@ -19,12 +19,14 @@ pub fn NAME() -> ByteArray {
 
 #[dojo::contract]
 pub mod gb_contract_v2 {
+    use dojo::event::EventStorage;
     use dojo::model::ModelStorage;
     use dojo::world::{IWorldDispatcherTrait, WorldStorage, WorldStorageTrait};
     use openzeppelin::token::erc20::interface::{IERC20Dispatcher, IERC20DispatcherTrait};
     use openzeppelin::token::erc721::interface::{IERC721Dispatcher, IERC721DispatcherTrait};
     use starknet::{ContractAddress, get_caller_address};
     use crate::constants::{CONFIG_ID, DEFAULT_ENTRY_PRICE, NAMESPACE};
+    use crate::events::index::GameEvent;
     use crate::glitchbombv2::game::{
         Game, GameAction, GameState, GameTrait, OrbsInGame, OrbsInGameTrait, new_game_data,
         orbs_to_effects, update_game,
@@ -33,6 +35,7 @@ pub mod gb_contract_v2 {
         GamePack, GamePackAction, GamePackState, GamePackTrait, new_gamepack_data, update_gamepack,
     };
     use crate::glitchbombv2::orbs::{update_common_orbs, update_cosmic_orbs, update_rare_orbs};
+    use crate::glitchbombv2::shared::shuffle;
     use crate::interfaces::vrf::IVrfProviderDispatcher;
     use crate::models::config::{Config, ConfigTrait};
     use crate::systems::collection::{
@@ -193,6 +196,16 @@ pub mod gb_contract_v2 {
             }
 
             world.write_model(@game);
+
+            // [Event] Emit game event
+            let event = GameEvent {
+                gamepack_id,
+                game_id: gamepack.data.current_game_id,
+                tick: game.data.pull_number,
+                state: new_game_state,
+                data: game.data,
+            };
+            world.emit_event(@event);
         }
 
 
@@ -239,7 +252,10 @@ pub mod gb_contract_v2 {
 
             let action = GameAction::EnterShop;
 
-            let mut random = RandomTrait::new();
+            let config: Config = world.read_model(CONFIG_ID);
+            let mut random = RandomTrait::new_vrf(
+                IVrfProviderDispatcher { contract_address: config.vrf },
+            );
             let (new_game_state, new_game_data) =
                 match update_game(game.state, game.data, action, ref random) {
                 Result::Ok(result) => result,
@@ -248,6 +264,10 @@ pub mod gb_contract_v2 {
 
             game.state = new_game_state;
             game.data = new_game_data;
+
+            orbs_in_game.common = shuffle(orbs_in_game.common, ref random);
+            orbs_in_game.rare = shuffle(orbs_in_game.rare, ref random);
+            orbs_in_game.cosmic = shuffle(orbs_in_game.cosmic, ref random);
 
             world.write_model(@game);
             world.write_model(@orbs_in_game);

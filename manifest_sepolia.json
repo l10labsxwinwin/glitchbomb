@@ -2862,7 +2862,7 @@
     },
     {
       "address": "0x63c38eb06b1e64df9cec2c8b6c6f4cfa6fe666108bf4f43a09f2aa3823a5318",
-      "class_hash": "0x72b1498aa8130006523a96290e3796ab33b67852dc3fabc2834ceefe0888357",
+      "class_hash": "0x2f3e982e6cc29a5c11fb7775817c08a233d7b03c26212a5d3f290233013e6f7",
       "abi": [
         {
           "type": "impl",
@@ -3258,6 +3258,13 @@
       "selector": "0x27ca987ea702e46490472a6815c43f5cb08a0317b42c00a5097cbe0bc59fa91"
     }
   ],
-  "events": [],
+  "events": [
+    {
+      "members": [],
+      "class_hash": "0x4b14128abedfe3ce4499d4bcac9571030845b1d54198145ea00105e34e7f511",
+      "tag": "GLITCHBOMB-GameEvent",
+      "selector": "0xd290fd15fe8d57b249490bd452a71434fdde8dd26f1dae9c96349423c597bb"
+    }
+  ],
   "external_contracts": []
 }
