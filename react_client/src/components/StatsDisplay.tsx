@@ -10,7 +10,7 @@ interface StatsDisplayProps {
 
 export default function StatsDisplay({ gameData }: StatsDisplayProps) {
   return (
-    <div className="flex flex-col items-center gap-3 flex-1" style={{ color: '#55DD63' }}>
+    <div className="flex flex-col items-center gap-3 flex-1 h-[88px]" style={{ color: '#55DD63' }}>
       <div className="flex flex-row gap-4 items-center w-full justify-center">
         <StatColumn value={gameData.moonRocks} icon={<MoonrocksIcon className="w-5 h-5" />} />
         <div className="flex-1 flex items-center justify-center min-w-0">
