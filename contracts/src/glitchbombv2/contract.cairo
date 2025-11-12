@@ -201,7 +201,7 @@ pub mod gb_contract_v2 {
             let event = GameEvent {
                 gamepack_id,
                 game_id: gamepack.data.current_game_id,
-                tick: game.data.pull_number,
+                tick: game.data.level * 100 + game.data.pull_number,
                 state: new_game_state,
                 data: game.data,
             };

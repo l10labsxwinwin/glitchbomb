@@ -67,6 +67,15 @@ export interface Config {
 	vrf: string;
 }
 
+// Type definition for `glitchbomb::events::index::GameEvent` struct
+export interface GameEvent {
+	gamepack_id: BigNumberish;
+	game_id: BigNumberish;
+	tick: BigNumberish;
+	state: GameStateEnum;
+	data: GameData;
+}
+
 // Type definition for `openzeppelin_access::accesscontrol::accesscontrol::AccessControlComponent::RoleAdminChanged` struct
 export interface RoleAdminChanged {
 	role: BigNumberish;
@@ -186,6 +195,7 @@ export interface SchemaType extends ISchemaType {
 		GamePack: GamePack,
 		GamePackData: GamePackData,
 		Config: Config,
+		GameEvent: GameEvent,
 		RoleAdminChanged: RoleAdminChanged,
 		RoleGranted: RoleGranted,
 		RoleGrantedWithDelay: RoleGrantedWithDelay,
@@ -344,10 +354,10 @@ export const schema: SchemaType = {
 			gamepack_id: 0,
 		state: new CairoCustomEnum({ 
 					Empty: "",
-				Unopened: "Unopened",
-				InProgress: "InProgress",
-				EndedEarly: "EndedEarly",
-				Completed: "Completed", }),
+				Unopened: undefined,
+				InProgress: undefined,
+				EndedEarly: undefined,
+				Completed: undefined, }),
 		data: { current_game_id: 0, accumulated_moonrocks: 0, },
 		},
 		GamePackData: {
@@ -359,6 +369,41 @@ export const schema: SchemaType = {
 			collection: "",
 			token: "",
 			vrf: "",
+		},
+		GameEvent: {
+			gamepack_id: 0,
+			game_id: 0,
+			tick: 0,
+		state: new CairoCustomEnum({ 
+					Empty: "",
+				New: undefined,
+				Level: undefined,
+				LevelComplete: undefined,
+				Shop: undefined,
+				GameOver: undefined, }),
+		data: { level: 0, pull_number: 0, points: 0, milestone: 0, hp: 0, multiplier: 0, glitch_chips: 0, moonrocks_spent: 0, moonrocks_earned: 0, temp_moonrocks: 0, bomb_immunity_turns: 0, bombs_pulled_in_level: 0, pullable_orbs: [new CairoCustomEnum({ 
+					Empty: "",
+				PointRewind: undefined,
+				Point: undefined,
+				PointPerOrbRemaining: undefined,
+				PointPerBombPulled: undefined,
+				GlitchChips: undefined,
+				Moonrocks: undefined,
+				Health: undefined,
+				Bomb: undefined,
+				Multiplier: undefined,
+				BombImmunity: undefined, })], consumed_orbs: [new CairoCustomEnum({ 
+					Empty: "",
+				PointRewind: undefined,
+				Point: undefined,
+				PointPerOrbRemaining: undefined,
+				PointPerBombPulled: undefined,
+				GlitchChips: undefined,
+				Moonrocks: undefined,
+				Health: undefined,
+				Bomb: undefined,
+				Multiplier: undefined,
+				BombImmunity: undefined, })], },
 		},
 		RoleAdminChanged: {
 			role: 0,
@@ -417,6 +462,7 @@ export enum ModelsMapping {
 	GamePackData = 'glitchbomb-GamePackData',
 	GamePackState = 'glitchbomb-GamePackState',
 	Config = 'glitchbomb-Config',
+	GameEvent = 'glitchbomb-GameEvent',
 	Source = 'glitchbomb-Source',
 	RoleAdminChanged = 'openzeppelin_access-RoleAdminChanged',
 	RoleGranted = 'openzeppelin_access-RoleGranted',

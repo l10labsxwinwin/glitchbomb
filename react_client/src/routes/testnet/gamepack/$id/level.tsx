@@ -7,6 +7,7 @@ import { useCashOut } from '@/hooks/cashOut'
 import { getBombVariants } from '@/helpers/getBombVariants'
 import { to_orbcategory } from '@/lib/frontenddatatypes'
 import { useGamepackContext } from '@/context/gamepack'
+import { useGameEvents } from '@/hooks/game-events'
 
 export const Route = createFileRoute('/testnet/gamepack/$id/level')({
   component: LevelStateRoute,
@@ -25,6 +26,7 @@ const mockLineData: LineDataPoint[] = [
 
 function LevelStateRoute() {
   const { gamepackId, latestGame } = useGamepackContext()
+  const { events: _events } = useGameEvents(Number(gamepackId), Number(latestGame?.game_id || 0))
   const { pullOrb: pullOrbContract } = usePullOrb()
   const { cashOut } = useCashOut()
 

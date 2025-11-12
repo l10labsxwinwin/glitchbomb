@@ -2862,7 +2862,7 @@
     },
     {
       "address": "0x63c38eb06b1e64df9cec2c8b6c6f4cfa6fe666108bf4f43a09f2aa3823a5318",
-      "class_hash": "0x2f3e982e6cc29a5c11fb7775817c08a233d7b03c26212a5d3f290233013e6f7",
+      "class_hash": "0x47d03de8d7c59cabc2785a8cff9802e71c92d1b073155927237683e6671726a",
       "abi": [
         {
           "type": "impl",
