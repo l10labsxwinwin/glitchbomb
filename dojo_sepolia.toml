@@ -39,5 +39,5 @@ disable_multicall = true
     "0x1",                                                                # Collection: Option None
     "0x1",                                                                # Token: Option None
     "0x0",                                                                # VRF: Option Some
-    "0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f", # Owner
+    "0x051fea4450da9d6aee758bdeba88b2f665bcbf549d2c61421aa724e9ac0ced8f", # VRF Address
 ]

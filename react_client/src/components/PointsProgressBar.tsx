@@ -15,9 +15,9 @@ export default function PointsProgressBar({
         className="h-full transition-all duration-300 rounded-lg"
         style={{ width: `${progress}%`, backgroundColor: '#55DD63' }}
       ></div>
-      <div className="absolute inset-0 flex items-center justify-between px-2 sm:px-4 md:px-8 text-sm font-bold uppercase whitespace-nowrap" style={{ color: '#14240C' }}>
+      <div className="absolute inset-0 flex items-center justify-between px-2 text-xs font-bold uppercase whitespace-nowrap" style={{ color: '#14240C' }}>
         <span className="whitespace-nowrap">GOAL:</span>
-        <span className="whitespace-nowrap">{points} PTS</span>
+        <span className="whitespace-nowrap">{milestone} PTS</span>
       </div>
     </div>
   )

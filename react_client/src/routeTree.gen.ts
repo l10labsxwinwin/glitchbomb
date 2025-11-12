@@ -9,10 +9,24 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TestnetRouteImport } from './routes/testnet'
 import { Route as RealRouteImport } from './routes/real'
 import { Route as FreeRouteImport } from './routes/free'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as TestnetLeaderboardRouteImport } from './routes/testnet/leaderboard'
+import { Route as TestnetGamepackIdRouteImport } from './routes/testnet/gamepack/$id'
+import { Route as TestnetGamepackIdShopRouteImport } from './routes/testnet/gamepack/$id/shop'
+import { Route as TestnetGamepackIdNewRouteImport } from './routes/testnet/gamepack/$id/new'
+import { Route as TestnetGamepackIdLevelCompleteRouteImport } from './routes/testnet/gamepack/$id/level-complete'
+import { Route as TestnetGamepackIdLevelRouteImport } from './routes/testnet/gamepack/$id/level'
+import { Route as TestnetGamepackIdGameOverRouteImport } from './routes/testnet/gamepack/$id/game-over'
+import { Route as TestnetGamepackIdEmptyRouteImport } from './routes/testnet/gamepack/$id/empty'
 
+const TestnetRoute = TestnetRouteImport.update({
+  id: '/testnet',
+  path: '/testnet',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RealRoute = RealRouteImport.update({
   id: '/real',
   path: '/real',
@@ -28,39 +42,153 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TestnetLeaderboardRoute = TestnetLeaderboardRouteImport.update({
+  id: '/leaderboard',
+  path: '/leaderboard',
+  getParentRoute: () => TestnetRoute,
+} as any)
+const TestnetGamepackIdRoute = TestnetGamepackIdRouteImport.update({
+  id: '/gamepack/$id',
+  path: '/gamepack/$id',
+  getParentRoute: () => TestnetRoute,
+} as any)
+const TestnetGamepackIdShopRoute = TestnetGamepackIdShopRouteImport.update({
+  id: '/shop',
+  path: '/shop',
+  getParentRoute: () => TestnetGamepackIdRoute,
+} as any)
+const TestnetGamepackIdNewRoute = TestnetGamepackIdNewRouteImport.update({
+  id: '/new',
+  path: '/new',
+  getParentRoute: () => TestnetGamepackIdRoute,
+} as any)
+const TestnetGamepackIdLevelCompleteRoute =
+  TestnetGamepackIdLevelCompleteRouteImport.update({
+    id: '/level-complete',
+    path: '/level-complete',
+    getParentRoute: () => TestnetGamepackIdRoute,
+  } as any)
+const TestnetGamepackIdLevelRoute = TestnetGamepackIdLevelRouteImport.update({
+  id: '/level',
+  path: '/level',
+  getParentRoute: () => TestnetGamepackIdRoute,
+} as any)
+const TestnetGamepackIdGameOverRoute =
+  TestnetGamepackIdGameOverRouteImport.update({
+    id: '/game-over',
+    path: '/game-over',
+    getParentRoute: () => TestnetGamepackIdRoute,
+  } as any)
+const TestnetGamepackIdEmptyRoute = TestnetGamepackIdEmptyRouteImport.update({
+  id: '/empty',
+  path: '/empty',
+  getParentRoute: () => TestnetGamepackIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
+  '/testnet': typeof TestnetRouteWithChildren
+  '/testnet/leaderboard': typeof TestnetLeaderboardRoute
+  '/testnet/gamepack/$id': typeof TestnetGamepackIdRouteWithChildren
+  '/testnet/gamepack/$id/empty': typeof TestnetGamepackIdEmptyRoute
+  '/testnet/gamepack/$id/game-over': typeof TestnetGamepackIdGameOverRoute
+  '/testnet/gamepack/$id/level': typeof TestnetGamepackIdLevelRoute
+  '/testnet/gamepack/$id/level-complete': typeof TestnetGamepackIdLevelCompleteRoute
+  '/testnet/gamepack/$id/new': typeof TestnetGamepackIdNewRoute
+  '/testnet/gamepack/$id/shop': typeof TestnetGamepackIdShopRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
+  '/testnet': typeof TestnetRouteWithChildren
+  '/testnet/leaderboard': typeof TestnetLeaderboardRoute
+  '/testnet/gamepack/$id': typeof TestnetGamepackIdRouteWithChildren
+  '/testnet/gamepack/$id/empty': typeof TestnetGamepackIdEmptyRoute
+  '/testnet/gamepack/$id/game-over': typeof TestnetGamepackIdGameOverRoute
+  '/testnet/gamepack/$id/level': typeof TestnetGamepackIdLevelRoute
+  '/testnet/gamepack/$id/level-complete': typeof TestnetGamepackIdLevelCompleteRoute
+  '/testnet/gamepack/$id/new': typeof TestnetGamepackIdNewRoute
+  '/testnet/gamepack/$id/shop': typeof TestnetGamepackIdShopRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/free': typeof FreeRoute
   '/real': typeof RealRoute
+  '/testnet': typeof TestnetRouteWithChildren
+  '/testnet/leaderboard': typeof TestnetLeaderboardRoute
+  '/testnet/gamepack/$id': typeof TestnetGamepackIdRouteWithChildren
+  '/testnet/gamepack/$id/empty': typeof TestnetGamepackIdEmptyRoute
+  '/testnet/gamepack/$id/game-over': typeof TestnetGamepackIdGameOverRoute
+  '/testnet/gamepack/$id/level': typeof TestnetGamepackIdLevelRoute
+  '/testnet/gamepack/$id/level-complete': typeof TestnetGamepackIdLevelCompleteRoute
+  '/testnet/gamepack/$id/new': typeof TestnetGamepackIdNewRoute
+  '/testnet/gamepack/$id/shop': typeof TestnetGamepackIdShopRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/free' | '/real'
+  fullPaths:
+    | '/'
+    | '/free'
+    | '/real'
+    | '/testnet'
+    | '/testnet/leaderboard'
+    | '/testnet/gamepack/$id'
+    | '/testnet/gamepack/$id/empty'
+    | '/testnet/gamepack/$id/game-over'
+    | '/testnet/gamepack/$id/level'
+    | '/testnet/gamepack/$id/level-complete'
+    | '/testnet/gamepack/$id/new'
+    | '/testnet/gamepack/$id/shop'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/free' | '/real'
-  id: '__root__' | '/' | '/free' | '/real'
+  to:
+    | '/'
+    | '/free'
+    | '/real'
+    | '/testnet'
+    | '/testnet/leaderboard'
+    | '/testnet/gamepack/$id'
+    | '/testnet/gamepack/$id/empty'
+    | '/testnet/gamepack/$id/game-over'
+    | '/testnet/gamepack/$id/level'
+    | '/testnet/gamepack/$id/level-complete'
+    | '/testnet/gamepack/$id/new'
+    | '/testnet/gamepack/$id/shop'
+  id:
+    | '__root__'
+    | '/'
+    | '/free'
+    | '/real'
+    | '/testnet'
+    | '/testnet/leaderboard'
+    | '/testnet/gamepack/$id'
+    | '/testnet/gamepack/$id/empty'
+    | '/testnet/gamepack/$id/game-over'
+    | '/testnet/gamepack/$id/level'
+    | '/testnet/gamepack/$id/level-complete'
+    | '/testnet/gamepack/$id/new'
+    | '/testnet/gamepack/$id/shop'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   FreeRoute: typeof FreeRoute
   RealRoute: typeof RealRoute
+  TestnetRoute: typeof TestnetRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/testnet': {
+      id: '/testnet'
+      path: '/testnet'
+      fullPath: '/testnet'
+      preLoaderRoute: typeof TestnetRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/real': {
       id: '/real'
       path: '/real'
@@ -82,13 +210,104 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/testnet/leaderboard': {
+      id: '/testnet/leaderboard'
+      path: '/leaderboard'
+      fullPath: '/testnet/leaderboard'
+      preLoaderRoute: typeof TestnetLeaderboardRouteImport
+      parentRoute: typeof TestnetRoute
+    }
+    '/testnet/gamepack/$id': {
+      id: '/testnet/gamepack/$id'
+      path: '/gamepack/$id'
+      fullPath: '/testnet/gamepack/$id'
+      preLoaderRoute: typeof TestnetGamepackIdRouteImport
+      parentRoute: typeof TestnetRoute
+    }
+    '/testnet/gamepack/$id/shop': {
+      id: '/testnet/gamepack/$id/shop'
+      path: '/shop'
+      fullPath: '/testnet/gamepack/$id/shop'
+      preLoaderRoute: typeof TestnetGamepackIdShopRouteImport
+      parentRoute: typeof TestnetGamepackIdRoute
+    }
+    '/testnet/gamepack/$id/new': {
+      id: '/testnet/gamepack/$id/new'
+      path: '/new'
+      fullPath: '/testnet/gamepack/$id/new'
+      preLoaderRoute: typeof TestnetGamepackIdNewRouteImport
+      parentRoute: typeof TestnetGamepackIdRoute
+    }
+    '/testnet/gamepack/$id/level-complete': {
+      id: '/testnet/gamepack/$id/level-complete'
+      path: '/level-complete'
+      fullPath: '/testnet/gamepack/$id/level-complete'
+      preLoaderRoute: typeof TestnetGamepackIdLevelCompleteRouteImport
+      parentRoute: typeof TestnetGamepackIdRoute
+    }
+    '/testnet/gamepack/$id/level': {
+      id: '/testnet/gamepack/$id/level'
+      path: '/level'
+      fullPath: '/testnet/gamepack/$id/level'
+      preLoaderRoute: typeof TestnetGamepackIdLevelRouteImport
+      parentRoute: typeof TestnetGamepackIdRoute
+    }
+    '/testnet/gamepack/$id/game-over': {
+      id: '/testnet/gamepack/$id/game-over'
+      path: '/game-over'
+      fullPath: '/testnet/gamepack/$id/game-over'
+      preLoaderRoute: typeof TestnetGamepackIdGameOverRouteImport
+      parentRoute: typeof TestnetGamepackIdRoute
+    }
+    '/testnet/gamepack/$id/empty': {
+      id: '/testnet/gamepack/$id/empty'
+      path: '/empty'
+      fullPath: '/testnet/gamepack/$id/empty'
+      preLoaderRoute: typeof TestnetGamepackIdEmptyRouteImport
+      parentRoute: typeof TestnetGamepackIdRoute
+    }
   }
 }
+
+interface TestnetGamepackIdRouteChildren {
+  TestnetGamepackIdEmptyRoute: typeof TestnetGamepackIdEmptyRoute
+  TestnetGamepackIdGameOverRoute: typeof TestnetGamepackIdGameOverRoute
+  TestnetGamepackIdLevelRoute: typeof TestnetGamepackIdLevelRoute
+  TestnetGamepackIdLevelCompleteRoute: typeof TestnetGamepackIdLevelCompleteRoute
+  TestnetGamepackIdNewRoute: typeof TestnetGamepackIdNewRoute
+  TestnetGamepackIdShopRoute: typeof TestnetGamepackIdShopRoute
+}
+
+const TestnetGamepackIdRouteChildren: TestnetGamepackIdRouteChildren = {
+  TestnetGamepackIdEmptyRoute: TestnetGamepackIdEmptyRoute,
+  TestnetGamepackIdGameOverRoute: TestnetGamepackIdGameOverRoute,
+  TestnetGamepackIdLevelRoute: TestnetGamepackIdLevelRoute,
+  TestnetGamepackIdLevelCompleteRoute: TestnetGamepackIdLevelCompleteRoute,
+  TestnetGamepackIdNewRoute: TestnetGamepackIdNewRoute,
+  TestnetGamepackIdShopRoute: TestnetGamepackIdShopRoute,
+}
+
+const TestnetGamepackIdRouteWithChildren =
+  TestnetGamepackIdRoute._addFileChildren(TestnetGamepackIdRouteChildren)
+
+interface TestnetRouteChildren {
+  TestnetLeaderboardRoute: typeof TestnetLeaderboardRoute
+  TestnetGamepackIdRoute: typeof TestnetGamepackIdRouteWithChildren
+}
+
+const TestnetRouteChildren: TestnetRouteChildren = {
+  TestnetLeaderboardRoute: TestnetLeaderboardRoute,
+  TestnetGamepackIdRoute: TestnetGamepackIdRouteWithChildren,
+}
+
+const TestnetRouteWithChildren =
+  TestnetRoute._addFileChildren(TestnetRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   FreeRoute: FreeRoute,
   RealRoute: RealRoute,
+  TestnetRoute: TestnetRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

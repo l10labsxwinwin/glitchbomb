@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import GameContainer from '../components/GameContainer'
-import { LineDataPoint, OrbCategory, OrbEffect, PointType, type GameData, type Orb, orbCategoryColors } from '@/components/GameDataTypes'
-import type { ChartConfig } from '@/components/ui/chart'
+import { LineDataPoint, OrbCategory, OrbEffect, PointType, type GameData, type Orb } from '@/components/GameDataTypes'
+import type { OrbCategories } from '@/lib/frontenddatatypes'
 
 export const Route = createFileRoute('/free')({
   component: FreePlay,
@@ -41,23 +41,39 @@ const mockLineData: LineDataPoint[] = [
   { pull_number: 8, level: 1, aggregate_score: 25, point_type: PointType.NonBomb },
 ]
 
-// Group pullable orbs by category
-const groupOrbsByCategory = (orbs: Orb[]) => {
-  const grouped = orbs.reduce((acc, orb) => {
-    const category = orb.category
-    acc[category] = (acc[category] || 0) + 1
-    return acc
-  }, {} as Record<OrbCategory, number>)
-  
-  return grouped
-}
+// Convert Orb[] to OrbCategories format
+const convertOrbsToCategories = (orbs: Orb[]): OrbCategories => {
+  const result: OrbCategories = {
+    health: [],
+    bomb: [],
+    multiplier: [],
+    point: [],
+    special: [],
+  }
 
-const categoryLabels: Record<OrbCategory, string> = {
-  [OrbCategory.Point]: "Point",
-  [OrbCategory.Health]: "Health",
-  [OrbCategory.Bomb]: "Bomb",
-  [OrbCategory.Multiplier]: "Multiplier",
-  [OrbCategory.Special]: "Special",
+  for (const orb of orbs) {
+    const entry = { effect: orb.effect, value: orb.value }
+    
+    switch (orb.category) {
+      case OrbCategory.Health:
+        result.health.push(entry)
+        break
+      case OrbCategory.Bomb:
+        result.bomb.push(entry)
+        break
+      case OrbCategory.Multiplier:
+        result.multiplier.push(entry)
+        break
+      case OrbCategory.Point:
+        result.point.push(entry)
+        break
+      case OrbCategory.Special:
+        result.special.push(entry)
+        break
+    }
+  }
+
+  return result
 }
 
 function FreePlay() {
@@ -73,30 +89,10 @@ function FreePlay() {
     }
   }
 
-  // Calculate donut chart data based on current pullable orbs
-  const orbCategoryCounts = groupOrbsByCategory(pullableOrbs)
-  const donutChartData = Object.entries(orbCategoryCounts)
-    .filter(([_, count]) => count > 0)
-    .map(([category, count]) => ({
-      category,
-      value: count,
-      fill: orbCategoryColors[category as OrbCategory],
-    }))
-
-  const donutChartConfig: ChartConfig = {
-    value: {
-      label: "Count",
-    },
-    ...Object.entries(orbCategoryCounts).reduce((acc, [category]) => {
-      if (orbCategoryCounts[category as OrbCategory] > 0) {
-        acc[category] = {
-          label: categoryLabels[category as OrbCategory],
-          color: orbCategoryColors[category as OrbCategory],
-        }
-      }
-      return acc
-    }, {} as Record<string, { label: string; color: string }>),
-  }
+  // Convert pullable orbs to orb categories format
+  const orbCategories = useMemo(() => {
+    return convertOrbsToCategories(pullableOrbs)
+  }, [pullableOrbs])
 
   const gameData: GameData = {
     moonRocks: 80,
@@ -113,8 +109,7 @@ function FreePlay() {
   return (
     <GameContainer 
       gameData={gameData}
-      donutChartData={donutChartData}
-      donutChartConfig={donutChartConfig}
+      orbCategories={orbCategories}
       lineData={mockLineData}
       onPullOrb={pullOrb}
     />

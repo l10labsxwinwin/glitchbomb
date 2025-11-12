@@ -1,6 +1,6 @@
 {
   "world": {
-    "class_hash": "0x691da17eb9ef169b385eaaf3a303972d187479e30be146d3337423eaec6272d",
+    "class_hash": "0x33c71814820f0fdb8e9f890749fc9698096aa6dc3c5f60aeb0f16ff4b30707f",
     "address": "0x63d4a0854146d7f6e773b9c38d42156cefc3310524414cc75e61d593792c443",
     "seed": "GB-1.0.0",
     "name": "Glitch Bomb",
@@ -50,7 +50,7 @@
           },
           {
             "name": "pending_word_len",
-            "type": "core::integer::u32"
+            "type": "core::internal::bounded_int::BoundedInt::<0, 30>"
           }
         ]
       },
@@ -1491,7 +1491,7 @@
   "contracts": [
     {
       "address": "0x28fd9317324c861364737f8ccabd4e4fd2b2a9174f9a5e972e9c71c2281a6fe",
-      "class_hash": "0x63fe73085a8574ad576205702fffd3fe5a081cc0fae057014da20ecc0f71433",
+      "class_hash": "0x6774bf4c688c40f1805073fe19e6e3cd01250d9e9497283599b04c897acb746",
       "abi": [
         {
           "type": "impl",
@@ -1522,7 +1522,7 @@
             },
             {
               "name": "pending_word_len",
-              "type": "core::integer::u32"
+              "type": "core::internal::bounded_int::BoundedInt::<0, 30>"
             }
           ]
         },
@@ -2381,7 +2381,7 @@
     },
     {
       "address": "0x6cbcd89a04ef593a554b279fe345ebfb61b246baeee0bf7b834079cca18409e",
-      "class_hash": "0x48122804bc488ce04a4174b2768c4a2d2c0b0a3199a4a6e6d690a0a6bbd11b7",
+      "class_hash": "0x59a52bb01e92bae79e48b195cbf86318a5078ae10298d9451540930de03b7f",
       "abi": [
         {
           "type": "impl",
@@ -2412,7 +2412,7 @@
             },
             {
               "name": "pending_word_len",
-              "type": "core::integer::u32"
+              "type": "core::internal::bounded_int::BoundedInt::<0, 30>"
             }
           ]
         },
@@ -2862,7 +2862,7 @@
     },
     {
       "address": "0x63c38eb06b1e64df9cec2c8b6c6f4cfa6fe666108bf4f43a09f2aa3823a5318",
-      "class_hash": "0x5e1d907d3bb7528b69fa3190d98cb00e05954115071d8d375e864717c84e4c3",
+      "class_hash": "0x72b1498aa8130006523a96290e3796ab33b67852dc3fabc2834ceefe0888357",
       "abi": [
         {
           "type": "impl",
@@ -2893,7 +2893,7 @@
             },
             {
               "name": "pending_word_len",
-              "type": "core::integer::u32"
+              "type": "core::internal::bounded_int::BoundedInt::<0, 30>"
             }
           ]
         },
@@ -3235,25 +3235,25 @@
   "models": [
     {
       "members": [],
-      "class_hash": "0x1da7cc1389ad346718339dab2b05311b87c48e0349551e11bb9d625710d50d7",
+      "class_hash": "0x32f312732440d112fa94faf9aaab19d7f0653302219bff0451e97f25c80aa9f",
       "tag": "GLITCHBOMB-Config",
       "selector": "0x16ddde8f5c437c9820f010ba29d509ef4e193076a88b1249113be5242cecd85"
     },
     {
       "members": [],
-      "class_hash": "0x704062a0f50f5f507f82d88fcb468d14cfee73a94e7e645a2a41dc65e32acca",
+      "class_hash": "0x3ac93165aac0eeae7b8cdf797dd3a4b817557571a73934e50d8b5f7b85d610f",
       "tag": "GLITCHBOMB-Game",
       "selector": "0xd48638ded3043e79d3c7617230f85cc9026c5fc30e8cb05f80b142373c8bd6"
     },
     {
       "members": [],
-      "class_hash": "0x556f734d7fe876feab9021b51dd8322c35444b937bb42d23794abbf48bfbdda",
+      "class_hash": "0x1fb9af849c01f87816809c2dc394dafbca012223ab0563fbd20e798afb6f27c",
       "tag": "GLITCHBOMB-GamePack",
       "selector": "0x324bd4f94587c184b267fca9466754f87ec09b46366a6aad8a526db0ec27905"
     },
     {
       "members": [],
-      "class_hash": "0x6a959ed070bb469bb8e15868d232ba921faa475852e3ef092699f13be8bb185",
+      "class_hash": "0x253b473bd910f9b91de986498fdc11da30ba7dbe738b26cc79ce302dfc5412f",
       "tag": "GLITCHBOMB-OrbsInGame",
       "selector": "0x27ca987ea702e46490472a6815c43f5cb08a0317b42c00a5097cbe0bc59fa91"
     }
