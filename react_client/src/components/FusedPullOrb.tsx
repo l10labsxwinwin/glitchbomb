@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-import { Diameter, Heart } from 'lucide-react'
 import { Label, Pie, PieChart } from 'recharts'
 import {
   type ChartConfig,
@@ -12,6 +11,8 @@ import {
 import { cn } from '@/lib/utils'
 import { OrbCategory, orbCategoryColors } from './GameDataTypes'
 import type { OrbCategories } from '@/lib/frontenddatatypes'
+import OrbIcon from './OrbIcon'
+import HeartIcon from './HeartIcon'
 
 // Map OrbCategories field names to colors
 const orbCategoryFieldColors: Record<keyof OrbCategories, string> = {
@@ -173,15 +174,15 @@ export function FusedPullOrb({
                             </div>
                             <div className="flex items-center gap-2 mt-2">
                               <div className="flex items-center gap-1">
-                                <Diameter className="w-3 h-3" />
-                                <span className="text-lg font-mono" style={{ fontFamily: '"VCR OSD Mono", monospace' }}>
+                                <OrbIcon className="w-3 h-3 self-center" style={{ transform: 'translateY(1px)' }} />
+                                <span className="text-lg font-mono leading-none" style={{ fontFamily: '"VCR OSD Mono", monospace' }}>
                                   x{totalOrbs}
                                 </span>
                               </div>
                               <span className="w-0.5 h-0.5 rounded-full bg-gray-400"></span>
                               <div className="flex items-center gap-1">
-                                <Heart className="w-3 h-3" />
-                                <span className="text-lg font-mono" style={{ fontFamily: '"VCR OSD Mono", monospace' }}>
+                                <HeartIcon className="w-3 h-3 self-center" style={{ transform: 'translateY(1px)' }} />
+                                <span className="text-lg font-mono leading-none" style={{ fontFamily: '"VCR OSD Mono", monospace' }}>
                                   x{health}
                                 </span>
                               </div>
